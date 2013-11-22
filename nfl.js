@@ -1,3 +1,1 @@
-module.export = {
-	updateURL: "http://www.nfl.com/liveupdate/scorestrip/scorestrip.json"
-}
+exports.updateURL: "http://www.nfl.com/liveupdate/scorestrip/scorestrip.json";
