@@ -1,0 +1,16 @@
+{
+  "name": "score-tweet",
+  "version": "0.0.1",
+  "author": "Sanders DeNardi",
+  "description": "Framework for sending out live score updates via Twitter.",
+  "main": "score-tweets.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sedenardi/score-tweets"
+  },
+  "dependencies" : {
+  },
+  "engines": {
+    "node": ">=0.10"
+  }
+}
