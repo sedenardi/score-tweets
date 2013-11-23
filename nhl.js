@@ -8,7 +8,29 @@ var NHLScore = {
 	},
 	parseRawGame: function(rawGame) {
 		var gameDate; //make date from rawGame data
-		var gameState; //make state from rawGame
+		var gameState = '';
+		switch (rawGame.gs) {
+			case '1':
+				gameState = 'scheduled';
+				break;
+			case '3':
+				if (rawGame.ts.indexOf('END') !== -1) {
+					gameState = 'intermission';
+				} else {
+					gameState = 'progress';
+				}
+				break;
+			case '4':
+				if (rawGame.ts.indexOf('SHOOTOUT') !== -1) {
+					gameState = 'shootout';
+				} else {
+					gameState = 'overtime';
+				}
+				break;
+			case '5':
+				gameState = 'ended';
+				break;
+		}
 		this.gameId = rawGame.id;
 		this.state = gameState;
 		this.date = gameDate;
