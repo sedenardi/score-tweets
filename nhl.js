@@ -1,4 +1,5 @@
 var NHLScore = {
+	league: 'NHL',
 	updateURL: 'http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp',
 	getGameArray: function(rawData) {
 		rawData = rawData.replace('loadScoreboard(','');

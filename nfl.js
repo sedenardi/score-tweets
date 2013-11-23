@@ -1,4 +1,5 @@
 var NFLScore = {
+	league: 'NFL',
 	updateURL: 'http://www.nfl.com/liveupdate/scorestrip/scorestrip.json',
 	getGameArray: function(rawData) {
 		rawData = rawData.replace(/\,\,/g,',"",');
