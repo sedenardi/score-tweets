@@ -1,5 +1,10 @@
 var NFLScore = {
 	updateURL: 'http://www.nfl.com/liveupdate/scorestrip/scorestrip.json',
+	getGameArray: function(rawData) {
+		rawData = rawData.replace(/\,\,/g,',"",');
+		rawData = rawData.replace(/\,\,/g,',"",');
+		return JSON.parse(rawData).ss;
+	},
 	parseRawGame: function(rawGame) {
 		var gameDate; //make date from rawGame data
 		var gameState; //make state from rawGame
