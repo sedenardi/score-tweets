@@ -53,7 +53,7 @@ var NHLScore = {
 		}
 		game.gameId = rawGame.id;
 		game.state = gameState;
-		game.date = date.toDateString();
+		game.date = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 		game.time = timeString;
 		game.period = periodString;
 		game.awayTeamCity = rawGame.atn;
