@@ -15,6 +15,8 @@ var NHLScore = {
 		var game = { };
 		var date = new Date();
 		var gameState = '';
+		var timeString = '';
+		var periodString = '';
 		switch (rawGame.gs) {
 			case '1':
 				gameState = 'scheduled';
@@ -29,12 +31,16 @@ var NHLScore = {
 				} else {
 					gameState = 'progress';
 				}
+				timeString = rawGame.ts.split(' ')[0];
+				periodString = rawGame.ts.split(' ')[1];
 				break;
 			case '4':
 				if (rawGame.ts.indexOf('SHOOTOUT') !== -1) {
 					gameState = 'shootout';
 				} else {
 					gameState = 'overtime';
+					timeString = rawGame.ts.split(' ')[0];
+					periodString = rawGame.ts.split(' ')[1];
 				}
 				break;
 			case '5':
@@ -45,12 +51,11 @@ var NHLScore = {
 				date.setDate(parseInt(dateArr[1]));
 				break;
 		}
-		var timeString = rawGame.ts.split(' ');
 		game.gameId = rawGame.id;
 		game.state = gameState;
 		game.date = date.toDateString();
-		game.gameTime = timeString[0];
-		game.gamePeriod = timeString[1];
+		game.time = timeString;
+		game.period = periodString;
 		game.awayTeamCity = rawGame.atn;
 		game.awayTeamName = rawGame.atv;
 		game.awayScore = rawGame.ats;
