@@ -19,7 +19,7 @@ var NHLScore = {
 		var periodString = '';
 		switch (rawGame.gs) {
 			case '1':
-				gameState = 'scheduled';
+				gameState = 'Scheduled';
 				var arr = rawGame.ts.split(' ');
 				var dateArr = arr[arr.length-1].split('/');
 				date.setMonth(parseInt(dateArr[0])-1);
@@ -28,24 +28,24 @@ var NHLScore = {
 				break;
 			case '3':
 				if (rawGame.ts.indexOf('END') !== -1) {
-					gameState = 'intermission';
+					gameState = 'Intermission';
 				} else {
-					gameState = 'progress';
+					gameState = 'Progress';
 				}
 				timeString = rawGame.ts.split(' ')[0];
 				periodString = rawGame.ts.split(' ')[1];
 				break;
 			case '4':
 				if (rawGame.ts.indexOf('SHOOTOUT') !== -1) {
-					gameState = 'shootout';
+					gameState = 'Shootout';
 				} else {
-					gameState = 'overtime';
+					gameState = 'Overtime';
 					timeString = rawGame.ts.split(' ')[0];
 					periodString = rawGame.ts.split(' ')[1];
 				}
 				break;
 			case '5':
-				gameState = 'ended';
+				gameState = 'Ended';
 				var arr = rawGame.ts.split(' ');
 				var dateArr = arr[arr.length-1].split('/');
 				date.setMonth(parseInt(dateArr[0])-1);
