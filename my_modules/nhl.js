@@ -1,74 +1,39 @@
-var NHLScore = {
-	league: 'NHL',
-	updateURL: 'http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp',
-	getGameArray: function(rawData) {
-		rawData = rawData.replace('loadScoreboard(','');
-		rawData = rawData.substring(0,(rawData.length-2));
-		var rawArray = JSON.parse(rawData).games;
-		var gameArray = [];
-		for (var i = 0; i < rawArray.length; i++) {
-			gameArray.push(this.parseRawGame(rawArray[i]));
-		}
-		return gameArray;
-	},
-	parseRawGame: function(rawGame) {
-		var game = { };
-		var date = new Date();
-		var gameState = '';
-		var timeString = '';
-		var periodString = '';
-		switch (rawGame.gs) {
-			case '1':
-				gameState = 'Scheduled';
-				var arr = rawGame.ts.split(' ');
-				var dateArr = arr[arr.length-1].split('/');
-				date.setMonth(parseInt(dateArr[0])-1);
-				date.setDate(parseInt(dateArr[1]));
-				timeString = rawGame.bs;
-				break;
-			case '3':
-				if (rawGame.ts.indexOf('END') !== -1) {
-					gameState = 'Intermission';
-				} else {
-					gameState = 'Progress';
-				}
-				timeString = rawGame.ts.split(' ')[0];
-				periodString = rawGame.ts.split(' ')[1];
-				break;
-			case '4':
-				if (rawGame.ts.indexOf('SHOOTOUT') !== -1) {
-					gameState = 'Shootout';
-				} else {
-					gameState = 'Overtime';
-					timeString = rawGame.ts.split(' ')[0];
-					periodString = rawGame.ts.split(' ')[1];
-				}
-				break;
-			case '5':
-				gameState = 'Ended';
-				var arr = rawGame.ts.split(' ');
-				var dateArr = arr[arr.length-1].split('/');
-				date.setMonth(parseInt(dateArr[0])-1);
-				date.setDate(parseInt(dateArr[1]));
-				break;
-		}
-		game.GameID = rawGame.id;
-		game.Date = date;
-		game.State = gameState;
-		game.Time = timeString;
-		game.Period = periodString;
-		game.AwayTeamCity = rawGame.atn;
-		game.AwayTeamName = rawGame.atv;
-		game.AwayScore = rawGame.ats;
-		game.HomeTeamCity = rawGame.htn;
-		game.HomeTeamName = rawGame.htv;
-		game.HomeScore = rawGame.hts;
-		return game;
-	},
-	makeGameLink: function(game) {
-		var linkStub = 'http://www.nhl.com/gamecenter/en/icetracker?id=';
-		return linkStub + game.gameId;
-	}
+var NHLModel = require('./nhl_model.js')
+,	http = require('http')
+,	db = require('./db.js');
+
+var league = Object.create(NHLModel);
+var games = [];
+var loopInterval;
+
+var loop = function() {
+	var rawResponse = '';
+	var request = http.get(league.updateURL, function(res) {
+		res.on('data', function(chunk) {
+			rawResponse += chunk;
+		});
+		res.on('end', function() {
+			games = league.getGameArray(rawResponse);
+			console.log(league.leagueName + ': got ' + games.length + ' games');
+		});
+	}).on('error', function(e) {
+		console.log('Error: ' + e.message);
+	});
+}
+
+module.exports.league = league;
+
+module.exports.startProcess = function(interval) {
+	console.log(league.leagueName + ': starting process');
+	db.connect(function() {
+		console.log(league.leagueName + ': starting loop');
+		loopInterval = setInterval(loop, interval);
+		loop();
+	});	
 };
 
-module.exports = NHLScore;
+module.exports.endProcess = function() {
+	console.log(league.leagueName + ': ending process');
+	clearInterval(loopInterval);
+	db.disconnect();
+};
