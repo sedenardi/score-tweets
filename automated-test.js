@@ -1,7 +1,7 @@
-var http = require('http');
-var file = require('fs');
-var NHLScore = require('./nhl.js');
-var NFLScore = require('./nfl.js');
+var http = require('http')
+,	file = require('fs')
+,	NHLScore = require('./nhl.js')
+,	NFLScore = require('./nfl.js');
 
 //var league = Object.create(NHLScore);
 var league = Object.create(NFLScore);
