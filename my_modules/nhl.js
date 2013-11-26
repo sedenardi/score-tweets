@@ -24,6 +24,7 @@ var NHLScore = {
 				var dateArr = arr[arr.length-1].split('/');
 				date.setMonth(parseInt(dateArr[0])-1);
 				date.setDate(parseInt(dateArr[1]));
+				timeString = rawGame.bs;
 				break;
 			case '3':
 				if (rawGame.ts.indexOf('END') !== -1) {
@@ -51,17 +52,17 @@ var NHLScore = {
 				date.setDate(parseInt(dateArr[1]));
 				break;
 		}
-		game.gameId = rawGame.id;
-		game.state = gameState;
-		game.date = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
-		game.time = timeString;
-		game.period = periodString;
-		game.awayTeamCity = rawGame.atn;
-		game.awayTeamName = rawGame.atv;
-		game.awayScore = rawGame.ats;
-		game.homeTeamCity = rawGame.htn;
-		game.homeTeamName = rawGame.htv;
-		game.homeScore = rawGame.hts;
+		game.GameID = rawGame.id;
+		game.Date = date;
+		game.State = gameState;
+		game.Time = timeString;
+		game.Period = periodString;
+		game.AwayTeamCity = rawGame.atn;
+		game.AwayTeamName = rawGame.atv;
+		game.AwayScore = rawGame.ats;
+		game.HomeTeamCity = rawGame.htn;
+		game.HomeTeamName = rawGame.htv;
+		game.HomeScore = rawGame.hts;
 		return game;
 	},
 	makeGameLink: function(game) {
