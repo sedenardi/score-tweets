@@ -7,11 +7,19 @@ var NHLScore = {
 		return JSON.parse(rawData).games;
 	},
 	parseRawGame: function(rawGame) {
-		var gameDate; //make date from rawGame data
+		var date = new Date();
+		var arr = rawGame.ts.split(' ');
+		var dateArr = arr[arr.length-1].split('/');
+		d.setMonth(parseInt(dateArr[0])-1);
+		d.setDate(parseInt(dateArr[1]));
 		var gameState = '';
 		switch (rawGame.gs) {
 			case '1':
 				gameState = 'scheduled';
+				var arr = rawGame.ts.split(' ');
+				var dateArr = arr[arr.length-1].split('/');
+				d.setMonth(parseInt(dateArr[0])-1);
+				d.setDate(parseInt(dateArr[1]));
 				break;
 			case '3':
 				if (rawGame.ts.indexOf('END') !== -1) {
@@ -29,11 +37,15 @@ var NHLScore = {
 				break;
 			case '5':
 				gameState = 'ended';
+				var arr = rawGame.ts.split(' ');
+				var dateArr = arr[arr.length-1].split('/');
+				d.setMonth(parseInt(dateArr[0])-1);
+				d.setDate(parseInt(dateArr[1]));
 				break;
 		}
 		this.gameId = rawGame.id;
 		this.state = gameState;
-		this.date = gameDate;
+		this.date = date.toDateString();
 		this.gameTime = rawGame.tsc;
 		this.awayTeam = rawGame.atn;
 		this.awayScore = rawGame.ats;
