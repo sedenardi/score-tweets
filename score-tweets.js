@@ -1,5 +1,6 @@
 var http = require('http')
 ,	file = require('fs')
+,	db = require('./my_modules/db.js')
 ,	NHLScore = require('./my_modules/nhl.js')
 ,	NFLScore = require('./my_modules/nfl.js');
 
