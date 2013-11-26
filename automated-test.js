@@ -1,10 +1,10 @@
 var http = require('http')
 ,	file = require('fs')
-,	NHLScore = require('./nhl.js')
-,	NFLScore = require('./nfl.js');
+,	NHLScore = require('./my_modules/nhl.js')
+,	NFLScore = require('./my_modules/nfl.js');
 
 //var league = Object.create(NHLScore);
-var league = Object.create(NFLScore);
+var league = Object.create(NHLScore);
 
 var getData = function() {
 	var rawResponse = '';
@@ -15,8 +15,8 @@ var getData = function() {
 		});
 		res.on('end', function() {
 			var array = league.getGameArray(rawResponse);
-			toFile(array);
-			//console.log('Response: ' + JSON.stringify(array));
+			//toFile(array);
+			console.log('Response: ' + JSON.stringify(array,null,2));
 		});
 	}).on('error', function(e) {
 		console.log('Error: ' + e.message);
