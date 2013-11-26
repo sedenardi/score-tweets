@@ -26,11 +26,7 @@ var handleDisconnect = function(next) {
   });
 };
 
-module.exports.connect = function (next) {
-	handleDisconnect(next);
-};
-
-module.exports.disconnect = function() {
+var disconnect = function() {
 	connection.end(function (err) {
 		if (err) {
 			console.log('MYSQL: ', err);
@@ -40,23 +36,37 @@ module.exports.disconnect = function() {
 	});
 };
 
-module.exports.select1 = function() {
+/**** FUNCTIONS ****/
+var select1 = function(next) {
 	connection.query('Select 1 as one;', function(err, res) {
 		if (err) {
 			console.log('MYSQL: ', err);
 		} else {
 			console.log('MYSQL: ', res);
+			next(res);
 		}
 	});
 };
 
-module.exports.query = function(query,object) {
-	var sql = mysql.format(query, object);
+var query = function(stmnt, inserts, next) {
+	var sql = connection.format(stmnt, inserts);
 	connection.query(sql, function(err, res) {
 		if (err) {
 			console.log('MYSQL: ' + sql + ' \n' + err);
 		} else {
-			return res;
+			next(res);
 		}
 	});
 };
+
+var exists = function(stmnt, inserts, next) {
+	var sql = 'select case when exists (' + stmnt + ') then true else false end as \'exists\';';
+	query(sql, inserts, next);
+};
+
+/***** EXPORTS *****/
+module.exports.connect = handleDisconnect;
+module.exports.disconnect = disconnect;
+module.exports.select1 = select1;
+module.exports.query = query;
+module.exports.exists = exists;
