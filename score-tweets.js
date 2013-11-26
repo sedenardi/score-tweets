@@ -1,21 +1,22 @@
-var http = require('http')
-,	file = require('fs')
+var file = require('fs')
 ,	db = require('./my_modules/db.js')
-,	NHLScore = require('./my_modules/nhl.js')
-,	NFLScore = require('./my_modules/nfl.js');
+,	config = require('./my_modules/config.js')
+,	NHL = require('./my_modules/nhl.js');
 
-var league = Object.create(NHLScore);
+var leagues = [];
+leagues.push(NHL);
 
-var rawResponse = '';
-var request = http.get(league.updateURL, function(res) {
-	res.on('data', function(chunk) {
-		//console.log('Got %d bytes of data', chunk.length);
-		rawResponse += chunk;
-	});
-	res.on('end', function() {
-		var array = league.getGameArray(rawResponse);
-		console.log('Response: ' + JSON.stringify(array));
-	});
-}).on('error', function(e) {
-	console.log('Error: ' + e.message);
-});
+for (var i = 0; i < leagues.length; i++) {
+	var leagueName = leagues[0].league.leagueName;
+	leagues[i].startProcess(config.leagues[leagueName].refreshInterval);
+}
+
+var interval;
+var end = function() {
+	for (var i = 0; i < leagues.length; i++) {
+		leagues[i].endProcess();
+	}
+	clearInterval(interval);
+}
+
+interval = setInterval(end,25000);
