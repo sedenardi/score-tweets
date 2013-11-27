@@ -24,7 +24,7 @@ var handleDisconnect = function(next) {
       throw err;                                  // server variable configures this)
     }
   });
-};
+};	
 
 var disconnect = function() {
 	connection.end(function (err) {
@@ -61,7 +61,9 @@ var query = function(stmnt, inserts, next) {
 
 var exists = function(stmnt, inserts, next) {
 	var sql = 'select case when exists (' + stmnt + ') then true else false end as \'exists\';';
-	query(sql, inserts, next);
+	query(sql, inserts, function(res) {
+		next(res[0].exists === 1);
+	});
 };
 
 /***** EXPORTS *****/
