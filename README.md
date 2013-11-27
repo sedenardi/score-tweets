@@ -8,8 +8,14 @@ score-tweets also provides an express front end to view the scoring changes, twe
 ###score-tweets.js
 The main server.
 
-###nhl.js
-Object definition and methods for parsing NHL games from nhl.com.
+###db.js
+Mysql/MariaDB connection handling, plus tailored query methods.
 
-###nfl.js
-Object definition and methods for parsing NFL games from nfl.com.
+###nhl.js + nhl_model.js
+Object definition, methods for parsing NHL games from, object creation from the DB, comparision, and tweet making.
+
+###nfl.js + nfl_model.js
+Object definition, methods for parsing NFL games from, object creation from the DB, comparision, and tweet making.
+
+###config.js
+Account information, server names, and constants.
