@@ -59,11 +59,18 @@ var NHLScore = {
 		game.Period = periodString;
 		game.AwayTeamCity = rawGame.atn;
 		game.AwayTeamName = rawGame.atv;
-		game.AwayScore = rawGame.ats;
+		game.AwayScore = (rawGame.ats === '' ? 0 : parseInt(rawGame.ats));
 		game.HomeTeamCity = rawGame.htn;
 		game.HomeTeamName = rawGame.htv;
-		game.HomeScore = rawGame.hts;
+		game.HomeScore = (rawGame.hts === '' ? 0 : parseInt(rawGame.hts));
 		return game;
+	},
+	gameChanged: function(oldGame, newGame) {
+		return (oldGame.GameID === newGame.GameID) &&
+			(	(oldGame.State !== newGame.State) ||
+				(oldGame.Period !== newGame.Period) ||
+				(oldGame.AwayScore !== newGame.AwayScore) ||
+				(oldGame.HomeScore !== newGame.HomeScore));
 	},
 	makeGameLink: function(game) {
 		var linkStub = 'http://www.nhl.com/gamecenter/en/icetracker?id=';
