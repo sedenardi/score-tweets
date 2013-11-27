@@ -13,27 +13,29 @@ var loop = function() {
 		});
 		res.on('end', function() {
 			var games = league.getGameArray(rawResponse);
-			console.log(league.leagueName + ': got ' + games.length + ' games');
-			processArray(games);
+			processGames(games);
 		});
 	}).on('error', function(e) {
 		console.log('Error: ' + e.message);
 	});
 }
 
-var processArray = function(games) {
+var processGames = function(games) {
+	console.log(league.leagueName + ': processing ' + games.length + ' games @ ' + (new Date()).toLocaleString());
 	for (var i = 0; i < games.length; i++) {
-		console.log(league.leagueName + ': processing ' + games[i].GameID);
+		//console.log(league.leagueName + ': processing ' + games[i].GameID);
 		(function process(game){
 			db.exists('Select 1 from NHLGameInstances where GameID = ?', [game.GameID], function (res) {
 				if (res) {
-					console.log(league.leagueName + ': ' + game.GameID + ' does exist');
+					//console.log(league.leagueName + ': ' + game.GameID + ' does exist');
 					getLastGameInstance(game, function(res) {
 						var changed = league.gameChanged(res, game);
 						if (changed) {
-							console.log(league.leagueName + ': ' + game.GameID + ' game changed');
+							insertGame(game, function() {
+								console.log(league.leagueName + ': Inserted ' + game.GameID);
+							});
 						} else {
-							console.log(league.leagueName + ': ' + game.GameID + ' game not changed');
+							//console.log(league.leagueName + ': ' + game.GameID + ' game not changed');
 						}
 					});
 				} else {
@@ -74,9 +76,15 @@ var getLastGameInstance = function(game, next) {
 		,	game.Period\
 		,	away.City as AwayTeamCity\
 		,	away.Name as AwayTeamName\
+		,	away.DisplayName as AwayDisplayName\
+		,	away.TwitterAccount as AwayTwitterAccount\
+		,	away.TwitterHashtag as AwayTwitterHashtag\
 		,	game.AwayScore\
 		,	home.City as HomeTeamCity\
 		,	home.Name as HomeTeamName\
+		,	home.DisplayName as HomeDisplayName\
+		,	home.TwitterAccount as HomeTwitterAccount\
+		,	home.TwitterHashtag as HomeTwitterHashtag\
 		,	game.HomeScore\
 		from NHLGameInstances game\
 			inner join NHLStates state\
