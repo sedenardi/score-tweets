@@ -1,6 +1,7 @@
 var NFLScore = {
 	leagueName: 'NFL',
 	updateURL: 'http://www.nfl.com/liveupdate/scorestrip/ss.json',
+	updateURL2: 'http://www.nfl.com/liveupdate/scorestrip/scorestrip.json',
 	getGameArray: function(rawData) {
 		var s = JSON.parse(rawData);
 		for (var i = 0; i < s.gms.length; i++) {
