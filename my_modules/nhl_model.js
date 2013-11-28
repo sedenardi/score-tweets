@@ -39,9 +39,15 @@ var NHLScore = {
 				if (rawGame.ts.indexOf('SHOOTOUT') !== -1) {
 					gameState = 'Shootout';
 				} else {
-					gameState = 'Overtime';
 					timeString = rawGame.ts.split(' ')[0];
 					periodString = rawGame.ts.split(' ')[1];
+					if (periodString === 'OT') {
+						gameState = 'Overtime';
+					} else if (periodString === 'SO') {
+						gameState = 'Shootout';
+					} else {
+						gameState = 'Progress';
+					}
 				}
 				break;
 			case '5':

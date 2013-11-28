@@ -5,34 +5,35 @@ var NHLModel = require('./nhl_model.js')
 var league = Object.create(NHLModel);
 var loopInterval;
 
-var loop = function() {
+var loop = function () {
 	var rawResponse = '';
-	var request = http.get(league.updateURL, function(res) {
-		res.on('data', function(chunk) {
+	var request = http.get(league.updateURL, function (res) {
+		res.on('data', function (chunk) {
 			rawResponse += chunk;
 		});
-		res.on('end', function() {
+		res.on('end', function () {
 			var games = league.getGameArray(rawResponse);
 			processGames(games);
 		});
-	}).on('error', function(e) {
+	}).on('error', function (e) {
 		console.log('Error: ' + e.message);
 	});
 }
 
-var processGames = function(games) {
+var processGames = function (games) {
 	console.log(league.leagueName + ': processing ' + games.length + ' games @ ' + (new Date()).toLocaleString());
 	for (var i = 0; i < games.length; i++) {
 		//console.log(league.leagueName + ': processing ' + games[i].GameID);
-		(function process(game){
+		(function process (game){
 			db.exists('Select 1 from NHLGameInstances where GameID = ?', [game.GameID], function (res) {
 				if (res) {
-					//console.log(league.leagueName + ': ' + game.GameID + ' does exist');
-					getLastGameInstance(game, function(res) {
+					getLastGameInstance(game, function (res) {
 						var changed = league.gameChanged(res, game);
 						if (changed) {
-							insertGame(game, function() {
-								console.log(league.leagueName + ': Inserted ' + game.GameID);
+							console.log(league.leagueName + ': ' + game.GameID + ' changed');
+							game.Date = res.Date;
+							insertGame(game, function () {
+								console.log(league.leagueName + ': Inserted new instance of ' + game.GameID);
 							});
 						} else {
 							//console.log(league.leagueName + ': ' + game.GameID + ' game not changed');
@@ -40,7 +41,7 @@ var processGames = function(games) {
 					});
 				} else {
 					console.log(league.leagueName + ': ' + game.GameID + ' does not exist');
-					insertGame(game, function() {
+					insertGame(game, function () {
 						console.log(league.leagueName + ': Inserted ' + game.GameID);
 					});
 				}
@@ -49,7 +50,7 @@ var processGames = function(games) {
 	}
 }
 
-var insertGame = function(game, next) {
+var insertGame = function (game, next) {
 	var insertSql = 
 		'Insert into NHLGameInstances(GameID,Date,StateID,Time,\
 			Period,AwayTeamID,AwayScore,HomeTeamID,HomeScore)\
@@ -66,7 +67,7 @@ var insertGame = function(game, next) {
 	db.query(insertSql, inserts, next);
 }
 
-var getLastGameInstance = function(game, next) {
+var getLastGameInstance = function (game, next) {
 	var sql = 
 		'Select\
 			game.GameID\
@@ -95,7 +96,7 @@ var getLastGameInstance = function(game, next) {
 				on home.TeamID = game.HomeTeamID\
 		where GameID = ? order by ?? desc limit 1;';
 	var inserts = [game.GameID, 'RecordedOn'];
-	db.query(sql, inserts, function(res) {
+	db.query(sql, inserts, function (res) {
 		next(res[0]);
 	});
 };
@@ -103,7 +104,7 @@ var getLastGameInstance = function(game, next) {
 /***** EXPORTS *****/
 module.exports.league = league;
 
-module.exports.startProcess = function(interval) {
+module.exports.startProcess = function (interval) {
 	console.log(league.leagueName + ': starting process');
 	db.connect(function() {
 		loopInterval = setInterval(loop, interval);
@@ -111,7 +112,7 @@ module.exports.startProcess = function(interval) {
 	});	
 };
 
-module.exports.endProcess = function() {
+module.exports.endProcess = function () {
 	console.log(league.leagueName + ': ending process');
 	clearInterval(loopInterval);
 	db.disconnect();
