@@ -1,5 +1,4 @@
-var http = require('http')
-,	mysql = require('../node_modules/mysql');
+var http = require('http');
 
 var leagueInfo = {
 	leagueName: 'NHL',
