@@ -1,4 +1,5 @@
-var http = require('http');
+var http = require('http')
+,	mysql = require('../node_modules/mysql');
 
 var leagueInfo = {
 	leagueName: 'NHL',
@@ -113,9 +114,76 @@ var makeGameLink = function(game) {
 	return linkStub + game.gameId;
 };
 
+var existsQuery = function(game) {
+	var stmnt = 'Select 1 from NHLGameInstances where GameID = ?';
+	var params = [game.GameID];
+	return {
+		sql: stmnt,
+		inserts: params
+	};
+};
+
+var insertGameQuery = function(game) {
+	var stmnt = 
+		'Insert into NHLGameInstances(GameID,Date,StateID,Time,\
+			Period,AwayTeamID,AwayScore,HomeTeamID,HomeScore)\
+		Select\
+			?,?,state.StateID,?,?,away.TeamID,?,home.TeamID,?\
+		from NHLStates state\
+			inner join NHLTeams away\
+				on LOWER(REPLACE(away.Name,\' \',\'\')) like ?\
+			inner join NHLTeams home\
+				on LOWER(REPLACE(home.Name,\' \',\'\')) like ?\
+		where state.State = ?;';
+	var params = [game.GameID, game.Date, game.Time, game.Period, game.AwayScore,
+		game.HomeScore, game.AwayTeamName, game.HomeTeamName, game.State];
+	return {
+		sql: stmnt,
+		inserts: params
+	};
+};
+
+var lastGameInstanceQuery = function(game) {
+	var stmnt = 
+		'Select\
+			game.GameID\
+		,	game.Date\
+		,	state.State\
+		,	game.Time\
+		,	game.Period\
+		,	away.City as AwayTeamCity\
+		,	away.Name as AwayTeamName\
+		,	away.DisplayName as AwayDisplayName\
+		,	away.TwitterAccount as AwayTwitterAccount\
+		,	away.TwitterHashtag as AwayTwitterHashtag\
+		,	game.AwayScore\
+		,	home.City as HomeTeamCity\
+		,	home.Name as HomeTeamName\
+		,	home.DisplayName as HomeDisplayName\
+		,	home.TwitterAccount as HomeTwitterAccount\
+		,	home.TwitterHashtag as HomeTwitterHashtag\
+		,	game.HomeScore\
+		from NHLGameInstances game\
+			inner join NHLStates state\
+				on state.StateID = game.StateID\
+			inner join NHLTeams away\
+				on away.TeamID = game.AwayTeamID\
+			inner join NHLTeams home\
+				on home.TeamID = game.HomeTeamID\
+		where GameID = ? order by ?? desc limit 1;';
+	var params = [game.GameID, 'RecordedOn'];
+	return {
+		sql: stmnt,
+		inserts: params
+	};
+};
+
 module.exports.leagueInfo = leagueInfo;
 module.exports.getGameArray = getGameArray;
 module.exports.parseRawGame = parseRawGame;
 module.exports.gameChanged = gameChanged;
 module.exports.gameChangeString = gameChangeString;
 module.exports.makeGameLink = makeGameLink;
+module.exports.existsQuery = existsQuery;
+module.exports.insertGameQuery = insertGameQuery;
+module.exports.lastGameInstanceQuery = lastGameInstanceQuery;
