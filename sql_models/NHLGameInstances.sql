@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS `nhlgameinstances` (
+  `InstanceID` int(11) NOT NULL AUTO_INCREMENT,
+  `GameID` varchar(50) NOT NULL,
+  `Date` date NOT NULL,
+  `StateID` tinyint(4) NOT NULL,
+  `Time` varchar(50) NOT NULL,
+  `Period` varchar(50) NOT NULL,
+  `AwayTeamID` tinyint(4) NOT NULL,
+  `AwayScore` tinyint(4) NOT NULL,
+  `HomeTeamID` tinyint(4) NOT NULL,
+  `HomeScore` tinyint(4) NOT NULL,
+  `RecordedOn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`InstanceID`),
+  KEY `FK_NHLGameInstances_StateID` (`StateID`),
+  KEY `FK_NHLGameInstances_AwayTeamID` (`AwayTeamID`),
+  KEY `FK_NHLGameInstances_HomeTeamID` (`HomeTeamID`),
+  KEY `IX_NHLGameInstances_GameID` (`GameID`,`RecordedOn`),
+  CONSTRAINT `FK_NHLGameInstances_AwayTeamID` FOREIGN KEY (`AwayTeamID`) REFERENCES `nhlteams` (`TeamID`),
+  CONSTRAINT `FK_NHLGameInstances_HomeTeamID` FOREIGN KEY (`HomeTeamID`) REFERENCES `nhlteams` (`TeamID`),
+  CONSTRAINT `FK_NHLGameInstances_StateID` FOREIGN KEY (`StateID`) REFERENCES `nhlstates` (`StateID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
