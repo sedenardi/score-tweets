@@ -7,7 +7,7 @@ var leagues = [];
 leagues.push(NHL);
 
 for (var i = 0; i < leagues.length; i++) {
-	var leagueName = leagues[0].league.leagueName;
+	var leagueName = leagues[0].league.leagueInfo.leagueName;
 	leagues[i].startProcess(config.leagues[leagueName].refreshInterval);
 }
 

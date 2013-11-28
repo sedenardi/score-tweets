@@ -6,43 +6,32 @@ var league = Object.create(NHLModel);
 var loopInterval;
 
 var loop = function() {
-	var rawResponse = '';
-	var request = http.get(league.updateURL, function(res) {
-		res.on('data', function(chunk) {
-			rawResponse += chunk;
-		});
-		res.on('end', function() {
-			var games = league.getGameArray(rawResponse);
-			processGames(games);
-		});
-	}).on('error', function(e) {
-		console.log('Error: ' + e.message);
-	});
+	league.getGameArray(processGames);
 }
 
 var processGames = function(games) {
-	console.log(league.leagueName + ': processing ' + games.length + ' games @ ' + (new Date()).toLocaleString());
+	console.log(league.leagueInfo.leagueName + ': processing ' + games.length + ' games @ ' + (new Date()).toLocaleString());
 	for (var i = 0; i < games.length; i++) {
-		//console.log(league.leagueName + ': processing ' + games[i].GameID);
+		//console.log(league.leagueInfo.leagueName + ': processing ' + games[i].GameID);
 		(function process(game){
 			db.exists('Select 1 from NHLGameInstances where GameID = ?', [game.GameID], function (res) {
 				if (res) {
 					getLastGameInstance(game, function(res) {
 						var changed = league.gameChanged(res, game);
 						if (changed) {
-							console.log(league.leagueName + ': ' + game.GameID + ' changed, ' + league.gameChangeString(res, game));
+							console.log(league.leagueInfo.leagueName + ': ' + game.GameID + ' changed, ' + league.gameChangeString(res, game));
 							game.Date = res.Date;
 							insertGame(game, function() {
-								console.log(league.leagueName + ': Inserted new instance of ' + game.GameID);
+								console.log(league.leagueInfo.leagueName + ': Inserted new instance of ' + game.GameID);
 							});
 						} else {
-							//console.log(league.leagueName + ': ' + game.GameID + ' game not changed');
+							//console.log(league.leagueInfo.leagueName + ': ' + game.GameID + ' game not changed');
 						}
 					});
 				} else {
-					console.log(league.leagueName + ': ' + game.GameID + ' does not exist');
+					console.log(league.leagueInfo.leagueName + ': ' + game.GameID + ' does not exist');
 					insertGame(game, function() {
-						console.log(league.leagueName + ': Inserted ' + game.GameID);
+						console.log(league.leagueInfo.leagueName + ': Inserted ' + game.GameID);
 					});
 				}
 			});
@@ -105,7 +94,7 @@ var getLastGameInstance = function(game, next) {
 module.exports.league = league;
 
 module.exports.startProcess = function(interval) {
-	console.log(league.leagueName + ': starting process');
+	console.log(league.leagueInfo.leagueName + ': starting process');
 	db.connect(function() {
 		loopInterval = setInterval(loop, interval);
 		loop();
@@ -113,7 +102,7 @@ module.exports.startProcess = function(interval) {
 };
 
 module.exports.endProcess = function() {
-	console.log(league.leagueName + ': ending process');
+	console.log(league.leagueInfo.leagueName + ': ending process');
 	clearInterval(loopInterval);
 	db.disconnect();
 };
