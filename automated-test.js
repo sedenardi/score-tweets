@@ -25,11 +25,15 @@ var getData = function() {
 	var toFile = function(data){
 		var s = JSON.stringify(data,null,2);
 		var d = new Date(); 
-		var dateString = d.getMonth().toString() + 
-			d.getDate().toString() + 
+		var monthString = (d.getMonth() < 10 ? '0' : '') + d.getMonth().toString();
+		var dayString = (d.getDate() < 10 ? '0' : '') + d.getDate().toString();
+		var hourString = (d.getHours() < 10 ? '0' : '') + d.getHours().toString();
+		var minuteString = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes().toString();
+		var dateString = monthString + 
+			dayString + 
 			d.getFullYear().toString() + 
-			d.getHours().toString() + 
-			d.getMinutes().toString();
+			hourString + 
+			minuteString;
 		var fileName = './tests/' + league.league + '-automated/' + 
 			league.league + '-' + dateString + '.json';
 		file.writeFile(fileName, s, function(err) {
