@@ -19,4 +19,4 @@ var end = function() {
 	clearInterval(interval);
 }
 
-interval = setInterval(end,25000);
+//interval = setInterval(end,25000);
