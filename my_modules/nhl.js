@@ -154,13 +154,13 @@ var lastGameInstanceQuery = function(game) {
 		,	game.Period\
 		,	away.City as AwayTeamCity\
 		,	away.Name as AwayTeamName\
-		,	away.DisplayName as AwayDisplayName\
+		,	away.DisplayName as AwayTeamDisplayName\
 		,	away.TwitterAccount as AwayTwitterAccount\
 		,	away.TwitterHashtag as AwayTwitterHashtag\
 		,	game.AwayScore\
 		,	home.City as HomeTeamCity\
 		,	home.Name as HomeTeamName\
-		,	home.DisplayName as HomeDisplayName\
+		,	home.DisplayName as HomeTeamDisplayName\
 		,	home.TwitterAccount as HomeTwitterAccount\
 		,	home.TwitterHashtag as HomeTwitterHashtag\
 		,	game.HomeScore\

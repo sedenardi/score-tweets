@@ -117,12 +117,81 @@ var makeGameLink = function(game) {
 	return link;
 };
 
+var existsQuery = function(game) {
+	var stmnt = 'Select 1 from NFLGameInstances where GameID = ?';
+	var params = [game.GameID];
+	return {
+		sql: stmnt,
+		inserts: params
+	};
+};
+
+var insertGameQuery = function(game) {
+	var stmnt = 
+		'Insert into NFLGameInstances(GameID,Date,StateID,Time,\
+			SeasonYear,SeasonType,SeasonWeek,Quarter,AwayTeamID,\
+			AwayScore,HomeTeamID,HomeScore)\
+		Select\
+			?,?,state.StateID,?,?,?,?,?,away.TeamID,?,home.TeamID,?\
+		from NFLStates state\
+			inner join NFLTeams away\
+				on away.Name like ?\
+			inner join NFLTeams home\
+				on home.Name like ?\
+		where state.State = ?;';
+	var params = [game.GameID, game.Date, game.Time, game.SeasonYear,
+		game.SeasonType, game.SeasonWeek, game.Quarter, game.AwayScore,
+		game.HomeScore, game.AwayTeamName, game.HomeTeamName, game.State];
+	return {
+		sql: stmnt,
+		inserts: params
+	};
+};
+
+var lastGameInstanceQuery = function(game) {
+	var stmnt = 
+		'Select\
+			game.GameID\
+		,	game.Date\
+		,	state.State\
+		,	game.SeasonYear\
+		,	game.SeasonType\
+		,	game.SeasonWeek\
+		,	game.Time\
+		,	game.Quarter\
+		,	away.City as AwayTeamCity\
+		,	away.Name as AwayTeamName\
+		,	away.DisplayName as AwayTeamDisplayName\
+		,	away.TwitterAccount as AwayTwitterAccount\
+		,	away.TwitterHashtag as AwayTwitterHashtag\
+		,	game.AwayScore\
+		,	home.City as HomeTeamCity\
+		,	home.Name as HomeTeamName\
+		,	home.DisplayName as HomeTeamDisplayName\
+		,	home.TwitterAccount as HomeTwitterAccount\
+		,	home.TwitterHashtag as HomeTwitterHashtag\
+		,	game.HomeScore\
+		from NFLGameInstances game\
+			inner join NFLStates state\
+				on state.StateID = game.StateID\
+			inner join NFLTeams away\
+				on away.TeamID = game.AwayTeamID\
+			inner join NFLTeams home\
+				on home.TeamID = game.HomeTeamID\
+		where GameID = ? order by ?? desc limit 1;';
+	var params = [game.GameID, 'RecordedOn'];
+	return {
+		sql: stmnt,
+		inserts: params
+	};
+};
+
 module.exports.leagueInfo = leagueInfo;
 module.exports.getGameArray = getGameArray;
 module.exports.parseRawGame = parseRawGame;
 module.exports.gameChanged = gameChanged;
 module.exports.gameChangeString = gameChangeString;
 module.exports.makeGameLink = makeGameLink;
-//module.exports.existsQuery = existsQuery;
-//module.exports.insertGameQuery = insertGameQuery;
-//module.exports.lastGameInstanceQuery = lastGameInstanceQuery;
+module.exports.existsQuery = existsQuery;
+module.exports.insertGameQuery = insertGameQuery;
+module.exports.lastGameInstanceQuery = lastGameInstanceQuery;
