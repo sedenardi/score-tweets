@@ -89,6 +89,27 @@ var parseRawGame = function(rawGame) {
 	return game;
 };
 
+var gameChanged = function(oldGame, newGame) {
+	return (oldGame.GameID === newGame.GameID) &&
+		(	(oldGame.State !== newGame.State) ||
+			(oldGame.Quarter !== newGame.Quarter) ||
+			(oldGame.AwayScore !== newGame.AwayScore) ||
+			(oldGame.HomeScore !== newGame.HomeScore));
+};
+
+var gameChangeString = function(oldGame, newGame) {
+	var dif = [];
+	if (oldGame.State !== newGame.State)
+		dif.push(oldGame.State + '-' + newGame.State);
+	if (oldGame.Quarter !== newGame.Quarter)
+		dif.push(oldGame.Quarter + '-' + newGame.Quarter);
+	if (oldGame.AwayScore !== newGame.AwayScore)
+		dif.push(oldGame.AwayScore + '-' + newGame.AwayScore);
+	if (oldGame.HomeScore !== newGame.HomeScore)
+		dif.push(oldGame.HomeScore + '-' + newGame.HomeScore);
+	return dif.join(',');
+};
+
 var makeGameLink = function(game) {
 	var link = 'http://www.nfl.com/gamecenter/' +
 	game.GameID + '/' + game.SeasonYear + '/' + game.SeasonType + 
@@ -99,8 +120,8 @@ var makeGameLink = function(game) {
 module.exports.leagueInfo = leagueInfo;
 module.exports.getGameArray = getGameArray;
 module.exports.parseRawGame = parseRawGame;
-//module.exports.gameChanged = gameChanged;
-//module.exports.gameChangeString = gameChangeString;
+module.exports.gameChanged = gameChanged;
+module.exports.gameChangeString = gameChangeString;
 module.exports.makeGameLink = makeGameLink;
 //module.exports.existsQuery = existsQuery;
 //module.exports.insertGameQuery = insertGameQuery;
