@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `nflgameinstances` (
   KEY `FK_NFLGameInstances_AwayTeamID` (`AwayTeamID`),
   KEY `FK_NFLGameInstances_HomeTeamID` (`HomeTeamID`),
   KEY `IX_NFLGameInstances_GameID` (`GameID`,`RecordedOn`),
-  CONSTRAINT `FK_NFLGameInstances_AwayTeamID` FOREIGN KEY (`AwayTeamID`) REFERENCES `nhlteams` (`TeamID`),
-  CONSTRAINT `FK_NFLGameInstances_HomeTeamID` FOREIGN KEY (`HomeTeamID`) REFERENCES `nhlteams` (`TeamID`),
-  CONSTRAINT `FK_NFLGameInstances_StateID` FOREIGN KEY (`StateID`) REFERENCES `nhlstates` (`StateID`)
+  CONSTRAINT `FK_NFLGameInstances_AwayTeamID` FOREIGN KEY (`AwayTeamID`) REFERENCES `nflteams` (`TeamID`),
+  CONSTRAINT `FK_NFLGameInstances_HomeTeamID` FOREIGN KEY (`HomeTeamID`) REFERENCES `nflteams` (`TeamID`),
+  CONSTRAINT `FK_NFLGameInstances_StateID` FOREIGN KEY (`StateID`) REFERENCES `nflstates` (`StateID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
