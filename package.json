@@ -9,7 +9,8 @@
     "url": "https://github.com/sedenardi/score-tweets"
   },
   "dependencies" : {
-    "mysql": "*"
+    "mysql": "*",
+    "moment": "*"
   },
   "engines": {
     "node": ">=0.10"

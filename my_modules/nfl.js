@@ -1,4 +1,5 @@
-var http = require('http');
+var http = require('http')
+,	moment = require('../node_modules/moment');
 
 var leagueInfo = {
 	leagueName: 'NFL',
@@ -27,6 +28,7 @@ var getGameArray = function(next) {
 						innerObj[innerArray[i][10]] = innerArray[i];
 					}
 					outerObj = JSON.parse(rawOuter);
+					var gameArray = [];
 					for (var i = 0; i < outerObj.gms.length; i++) {
 						outerObj.gms[i].outer_w = outerObj.w;
 						outerObj.gms[i].outer_t = outerObj.t;
@@ -34,8 +36,9 @@ var getGameArray = function(next) {
 						outerObj.gms[i].outer_gd = outerObj.gd;
 						outerObj.gms[i].outer_bph = outerObj.bph;
 						outerObj.gms[i].score_array = innerObj[outerObj.gms[i].gsis];
+						gameArray.push(parseRawGame(outerObj.gms[i]));
 					}
-					next(outerObj.gms);
+					next(gameArray);
 				});
 			}).on('error', function(e) {
 				console.log('NFL inner http Error: ' + e.message);
@@ -47,27 +50,49 @@ var getGameArray = function(next) {
 };
 
 var parseRawGame = function(rawGame) {
-	var gameDate; //make date from rawGame data
-	var gameState; //make state from rawGame
-	this.GameID = rawGame.eid;
-	this.state = gameState;
-	this.date = gameDate;
-	this.Year = rawGame.outer_y;
-	this.SeasonType = '';
-	this.Week = rawGame.outer_t + rawGame.outer_w;
-	this.gameTime = rawGame.tsc;
-	this.awayTeamCity = rawGame.v;
-	this.awayTeamName = rawGame.vnn;
-	this.awayScore = rawGame.vs;
-	this.homeTeamCity = rawGame.h;
-	this.homeTeamName = rawGame.hnn;
-	this.homeScore = rawGame.hs;
+	var game = { };
+	var gameState = '';
+	switch(rawGame.q) {
+		case 'P':
+			gameState = 'Scheduled';
+			break;
+		case 'H':
+			gameState = 'Halftime';
+			break;
+		case 'F':
+			gameState = 'Ended';
+			break;
+		case 'FO':
+			gameState = 'Ended';
+			break;
+		default:
+			gameState = 'Progress';
+			break;
+	}
+	var endIndex = rawGame.eid.toString().length - 2;
+	var dateStr = rawGame.eid.toString().substr(0,endIndex);
+	var gameDate = moment(dateStr ,'YYYYMD').toDate();
+	game.GameID = rawGame.eid;
+	game.State = gameState;
+	game.Date = gameDate;
+	game.SeasonYear = rawGame.outer_y;
+	game.SeasonType = rawGame.outer_t;
+	game.SeasonWeek = rawGame.outer_w;
+	game.Time = rawGame.score_array[3];
+	game.Quarter = rawGame.q;
+	game.AwayTeamDisplayName = rawGame.v;
+	game.AwayTeamName = rawGame.vnn;
+	game.AwayScore = rawGame.vs;
+	game.HomeTeamDisplayName = rawGame.h;
+	game.HomeTeamName = rawGame.hnn;
+	game.HomeScore = rawGame.hs;
+	return game;
 };
 
 var makeGameLink = function(game) {
 	var link = 'http://www.nfl.com/gamecenter/' +
-	game.GameID + '/' + game.Year + '/' + game.SeasonType + 
-	game.Week + '/' + awayTeamName + '@' + homeTeamName;
+	game.GameID + '/' + game.SeasonYear + '/' + game.SeasonType + 
+	game.SeasonWeek + '/' + game.AwayTeamName + '@' + game.HomeTeamName;
 	return link;
 };
 
