@@ -22,7 +22,7 @@ var getGameArray = function(next) {
 			next(gameArray);
 		});
 	}).on('error', function(e) {
-		console.log('NHL Error: ' + e.message);
+		console.log('NHL http Error: ' + e.message);
 	});
 };
 
@@ -41,6 +41,8 @@ var parseRawGame = function(rawGame) {
 			date.setDate(parseInt(dateArr[1]));
 			timeString = rawGame.bs;
 			break;
+		case '2':
+			gameState = 'Scheduled';
 		case '3':
 			if (rawGame.ts.indexOf('END') !== -1) {
 				gameState = 'Intermission';
