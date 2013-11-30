@@ -52,6 +52,7 @@ var getGameArray = function(next) {
 var parseRawGame = function(rawGame) {
 	var game = { };
 	var gameState = '';
+	var timeString = rawGame.t;
 	switch(rawGame.q) {
 		case 'P':
 			gameState = 'Scheduled';
@@ -67,6 +68,7 @@ var parseRawGame = function(rawGame) {
 			break;
 		default:
 			gameState = 'Progress';
+			timeString = rawGame.score_array[3];
 			break;
 	}
 	var endIndex = rawGame.eid.toString().length - 2;
@@ -78,7 +80,7 @@ var parseRawGame = function(rawGame) {
 	game.SeasonYear = rawGame.outer_y;
 	game.SeasonType = rawGame.outer_t;
 	game.SeasonWeek = rawGame.outer_w;
-	game.Time = rawGame.score_array[3];
+	game.Time = timeString;
 	game.Quarter = rawGame.q;
 	game.AwayTeamDisplayName = rawGame.v;
 	game.AwayTeamName = rawGame.vnn;
