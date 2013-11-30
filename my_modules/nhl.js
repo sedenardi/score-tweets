@@ -181,7 +181,6 @@ var lastGameInstanceQuery = function(game) {
 
 module.exports.leagueInfo = leagueInfo;
 module.exports.getGameArray = getGameArray;
-module.exports.parseRawGame = parseRawGame;
 module.exports.gameChanged = gameChanged;
 module.exports.gameChangeString = gameChangeString;
 module.exports.makeGameLink = makeGameLink;
