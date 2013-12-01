@@ -20,25 +20,29 @@ var getGameArray = function(next) {
 					rawInner += chunk;
 				});
 				iRes.on('end', function() {
-					rawInner = rawInner.replace(/\,\,/g,',"",');
-					rawInner = rawInner.replace(/\,\,/g,',"",');
-					innerArray = JSON.parse(rawInner).ss;
-					var innerObj = { };
-					for (var i = 0; i < innerArray.length; i++) {
-						innerObj[innerArray[i][10]] = innerArray[i];
+					try {
+						rawInner = rawInner.replace(/\,\,/g,',"",');
+						rawInner = rawInner.replace(/\,\,/g,',"",');
+						innerArray = JSON.parse(rawInner).ss;
+						var innerObj = { };
+						for (var i = 0; i < innerArray.length; i++) {
+							innerObj[innerArray[i][10]] = innerArray[i];
+						}
+						outerObj = JSON.parse(rawOuter);
+						var gameArray = [];
+						for (var i = 0; i < outerObj.gms.length; i++) {
+							outerObj.gms[i].outer_w = outerObj.w;
+							outerObj.gms[i].outer_t = outerObj.t;
+							outerObj.gms[i].outer_y = outerObj.y;
+							outerObj.gms[i].outer_gd = outerObj.gd;
+							outerObj.gms[i].outer_bph = outerObj.bph;
+							outerObj.gms[i].score_array = innerObj[outerObj.gms[i].gsis];
+							gameArray.push(parseRawGame(outerObj.gms[i]));
+						}
+						next(gameArray);
+					} catch(e) {
+						console.log(e);
 					}
-					outerObj = JSON.parse(rawOuter);
-					var gameArray = [];
-					for (var i = 0; i < outerObj.gms.length; i++) {
-						outerObj.gms[i].outer_w = outerObj.w;
-						outerObj.gms[i].outer_t = outerObj.t;
-						outerObj.gms[i].outer_y = outerObj.y;
-						outerObj.gms[i].outer_gd = outerObj.gd;
-						outerObj.gms[i].outer_bph = outerObj.bph;
-						outerObj.gms[i].score_array = innerObj[outerObj.gms[i].gsis];
-						gameArray.push(parseRawGame(outerObj.gms[i]));
-					}
-					next(gameArray);
 				});
 			}).on('error', function(e) {
 				console.log('NFL inner http Error: ' + e.message);
@@ -88,6 +92,7 @@ var parseRawGame = function(rawGame) {
 	game.HomeTeamDisplayName = rawGame.h;
 	game.HomeTeamName = rawGame.hnn;
 	game.HomeScore = rawGame.hs;
+	game.RawInstance = JSON.stringify(rawGame,null,2);
 	return game;
 };
 
@@ -132,9 +137,9 @@ var insertGameQuery = function(game) {
 	var stmnt = 
 		'Insert into NFLGameInstances(GameID,Date,StateID,Time,\
 			SeasonYear,SeasonType,SeasonWeek,Quarter,AwayTeamID,\
-			AwayScore,HomeTeamID,HomeScore)\
+			AwayScore,HomeTeamID,HomeScore,RawInstance)\
 		Select\
-			?,?,state.StateID,?,?,?,?,?,away.TeamID,?,home.TeamID,?\
+			?,?,state.StateID,?,?,?,?,?,away.TeamID,?,home.TeamID,?,?\
 		from NFLStates state\
 			inner join NFLTeams away\
 				on away.Name like ?\
@@ -143,7 +148,8 @@ var insertGameQuery = function(game) {
 		where state.State = ?;';
 	var params = [game.GameID, game.Date, game.Time, game.SeasonYear,
 		game.SeasonType, game.SeasonWeek, game.Quarter, game.AwayScore,
-		game.HomeScore, game.AwayTeamName, game.HomeTeamName, game.State];
+		game.HomeScore, game.RawInstance, game.AwayTeamName,
+		game.HomeTeamName, game.State];
 	return {
 		sql: stmnt,
 		inserts: params
