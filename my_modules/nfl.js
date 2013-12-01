@@ -41,7 +41,7 @@ var getGameArray = function(next) {
 						}
 						next(gameArray);
 					} catch(e) {
-						console.log('NfL parsing error: ' + e);
+						console.log('NFL parsing error: ' + e);
 					}
 				});
 			}).on('error', function(e) {
@@ -70,6 +70,9 @@ var parseRawGame = function(rawGame) {
 		case 'FO':
 			gameState = 'Ended';
 			break;
+		case '5':
+			gameState = 'Overtime';
+			break;
 		default:
 			gameState = 'Progress';
 			timeString = rawGame.score_array[3];
@@ -85,14 +88,13 @@ var parseRawGame = function(rawGame) {
 	game.SeasonType = rawGame.outer_t;
 	game.SeasonWeek = rawGame.outer_w;
 	game.Time = timeString;
-	game.Quarter = rawGame.q.toString();
+	game.Quarter = rawGame.q;
 	game.AwayTeamDisplayName = rawGame.v;
 	game.AwayTeamName = rawGame.vnn;
 	game.AwayScore = rawGame.vs;
 	game.HomeTeamDisplayName = rawGame.h;
 	game.HomeTeamName = rawGame.hnn;
 	game.HomeScore = rawGame.hs;
-	game.RawInstance = JSON.stringify(rawGame,null,2);
 	return game;
 };
 
@@ -137,9 +139,9 @@ var insertGameQuery = function(game) {
 	var stmnt = 
 		'Insert into NFLGameInstances(GameID,Date,StateID,Time,\
 			SeasonYear,SeasonType,SeasonWeek,Quarter,AwayTeamID,\
-			AwayScore,HomeTeamID,HomeScore,RawInstance)\
+			AwayScore,HomeTeamID,HomeScore)\
 		Select\
-			?,?,state.StateID,?,?,?,?,?,away.TeamID,?,home.TeamID,?,?\
+			?,?,state.StateID,?,?,?,?,?,away.TeamID,?,home.TeamID,?\
 		from NFLStates state\
 			inner join NFLTeams away\
 				on away.Name like ?\
@@ -148,8 +150,7 @@ var insertGameQuery = function(game) {
 		where state.State = ?;';
 	var params = [game.GameID, game.Date, game.Time, game.SeasonYear,
 		game.SeasonType, game.SeasonWeek, game.Quarter, game.AwayScore,
-		game.HomeScore, game.RawInstance, game.AwayTeamName,
-		game.HomeTeamName, game.State];
+		game.HomeScore, game.AwayTeamName, game.HomeTeamName, game.State];
 	return {
 		sql: stmnt,
 		inserts: params
