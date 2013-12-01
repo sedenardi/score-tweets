@@ -12,14 +12,18 @@ var getGameArray = function(next) {
 			rawData += chunk;
 		});
 		res.on('end', function() {
-			rawData = rawData.replace('loadScoreboard(','');
-			rawData = rawData.substring(0,(rawData.length-2));
-			var rawArray = JSON.parse(rawData).games;
-			var gameArray = [];
-			for (var i = 0; i < rawArray.length; i++) {
-				gameArray.push(parseRawGame(rawArray[i]));
+			try {
+				rawData = rawData.replace('loadScoreboard(','');
+				rawData = rawData.substring(0,(rawData.length-2));
+				var rawArray = JSON.parse(rawData).games;
+				var gameArray = [];
+				for (var i = 0; i < rawArray.length; i++) {
+					gameArray.push(parseRawGame(rawArray[i]));
+				}
+				next(gameArray);
+			} catch(e) {
+				console.log('NHL parsing error: ' + e);
 			}
-			next(gameArray);
 		});
 	}).on('error', function(e) {
 		console.log('NHL http Error: ' + e.message);

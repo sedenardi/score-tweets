@@ -41,7 +41,7 @@ var getGameArray = function(next) {
 						}
 						next(gameArray);
 					} catch(e) {
-						console.log(e);
+						console.log('NfL parsing error: ' + e);
 					}
 				});
 			}).on('error', function(e) {
