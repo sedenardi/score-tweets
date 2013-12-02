@@ -11,11 +11,17 @@ The main server.
 ###db.js
 Mysql/MariaDB connection handling, plus tailored query methods.
 
-###nhl.js + nhl_model.js
-Object definition, methods for parsing NHL games from, object creation from the DB, comparision, and tweet making.
+###leagueManager.js
+Fetches, compares, and stores scores for a given league.
 
-###nfl.js + nfl_model.js
-Object definition, methods for parsing NFL games from, object creation from the DB, comparision, and tweet making.
+###nhl.js
+Object definition, methods for parsing games, and queries for NHL games.
+
+###nfl.js
+Object definition, methods for parsing games, and queries for NHL games.
 
 ###config.js
 Account information, server names, and constants.
+
+###/sql_models
+Table definitions for leagues, plus teams information for each specified league.
