@@ -79,7 +79,7 @@ var parseRawGame = function(rawGame) {
 			date.setDate(parseInt(dateArr[1]));
 			break;
 	}
-	game.GameID = rawGame.id;
+	game.GameSymbol = rawGame.id;
 	game.Date = date;
 	game.State = gameState;
 	game.Time = timeString;
@@ -90,11 +90,12 @@ var parseRawGame = function(rawGame) {
 	game.HomeTeamCity = rawGame.htn;
 	game.HomeTeamName = rawGame.htv;
 	game.HomeScore = (rawGame.hts === '' ? 0 : parseInt(rawGame.hts));
+	game.RawInstance = JSON.stringify(rawGame,null,2);
 	return game;
 };
 
 var gameChanged = function(oldGame, newGame) {
-	return (oldGame.GameID === newGame.GameID) &&
+	return (oldGame.GameSymbol === newGame.GameSymbol) &&
 		(	(oldGame.State !== newGame.State) ||
 			(oldGame.Period !== newGame.Period) ||
 			(oldGame.AwayScore !== newGame.AwayScore) ||
@@ -119,29 +120,38 @@ var makeGameLink = function(game) {
 	return linkStub + game.gameId;
 };
 
-var existsQuery = function(game) {
-	var stmnt = 'Select 1 from NHLGameInstances where GameID = ?';
-	var params = [game.GameID];
+var insertGameQuery = function(game) {
+	var stmnt = 
+		'Insert into NHLGames(GameSymbol,Date,AwayTeamID,\
+			HomeTeamID)\
+		Select\
+			?,?,away.TeamID,home.TeamID\
+		from NHLTeams away\
+			inner join NHLTeams home\
+				on LOWER(REPLACE(home.Name,\' \',\'\')) like ?\
+		where LOWER(REPLACE(away.Name,\' \',\'\')) like ?\
+		and not exists\
+			(Select 1 from NHLGames where GameSymbol like ?);';
+	var params = [game.GameSymbol, game.Date,
+		game.HomeTeamName, game.AwayTeamName, game.GameSymbol];
 	return {
 		sql: stmnt,
 		inserts: params
 	};
 };
 
-var insertGameQuery = function(game) {
+var insertGameInstanceQuery = function(game) {
 	var stmnt = 
-		'Insert into NHLGameInstances(GameID,Date,StateID,Time,\
-			Period,AwayTeamID,AwayScore,HomeTeamID,HomeScore)\
+		'Insert into NHLGameInstances(GameID,StateID,Time,\
+			Period,AwayScore,HomeScore,RawInstance)\
 		Select\
-			?,?,state.StateID,?,?,away.TeamID,?,home.TeamID,?\
+			game.GameID,state.StateID,?,?,?,?,?\
 		from NHLStates state\
-			inner join NHLTeams away\
-				on LOWER(REPLACE(away.Name,\' \',\'\')) like ?\
-			inner join NHLTeams home\
-				on LOWER(REPLACE(home.Name,\' \',\'\')) like ?\
+			inner join NHLGames game\
+				on game.GameSymbol like ?\
 		where state.State = ?;';
-	var params = [game.GameID, game.Date, game.Time, game.Period, game.AwayScore,
-		game.HomeScore, game.AwayTeamName, game.HomeTeamName, game.State];
+	var params = [game.Time, game.Period, game.AwayScore,
+		game.HomeScore, game.RawInstance, game.GameSymbol, game.State];
 	return {
 		sql: stmnt,
 		inserts: params
@@ -151,32 +161,35 @@ var insertGameQuery = function(game) {
 var lastGameInstanceQuery = function(game) {
 	var stmnt = 
 		'Select\
-			game.GameID\
+			game.GameSymbol\
 		,	game.Date\
 		,	state.State\
-		,	game.Time\
-		,	game.Period\
+		,	instance.Time\
+		,	instance.Period\
 		,	away.City as AwayTeamCity\
 		,	away.Name as AwayTeamName\
 		,	away.DisplayName as AwayTeamDisplayName\
 		,	away.TwitterAccount as AwayTwitterAccount\
 		,	away.TwitterHashtag as AwayTwitterHashtag\
-		,	game.AwayScore\
+		,	instance.AwayScore\
 		,	home.City as HomeTeamCity\
 		,	home.Name as HomeTeamName\
 		,	home.DisplayName as HomeTeamDisplayName\
 		,	home.TwitterAccount as HomeTwitterAccount\
 		,	home.TwitterHashtag as HomeTwitterHashtag\
-		,	game.HomeScore\
-		from NHLGameInstances game\
+		,	instance.HomeScore\
+		from NHLGameInstances instance\
+			inner join NHLGames game\
+				on game.GameID = instance.GameID\
+				and game.GameSymbol like ?\
 			inner join NHLStates state\
-				on state.StateID = game.StateID\
+				on state.StateID = instance.StateID\
 			inner join NHLTeams away\
 				on away.TeamID = game.AwayTeamID\
 			inner join NHLTeams home\
 				on home.TeamID = game.HomeTeamID\
-		where GameID = ? order by ?? desc limit 1;';
-	var params = [game.GameID, 'RecordedOn'];
+		order by ?? desc limit 1;';
+	var params = [game.GameSymbol, 'instance.RecordedOn'];
 	return {
 		sql: stmnt,
 		inserts: params
@@ -188,6 +201,6 @@ module.exports.getGameArray = getGameArray;
 module.exports.gameChanged = gameChanged;
 module.exports.gameChangeString = gameChangeString;
 module.exports.makeGameLink = makeGameLink;
-module.exports.existsQuery = existsQuery;
 module.exports.insertGameQuery = insertGameQuery;
+module.exports.insertGameInstanceQuery = insertGameInstanceQuery;
 module.exports.lastGameInstanceQuery = lastGameInstanceQuery;

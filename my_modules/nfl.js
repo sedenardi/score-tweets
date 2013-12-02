@@ -81,7 +81,7 @@ var parseRawGame = function(rawGame) {
 	var endIndex = rawGame.eid.toString().length - 2;
 	var dateStr = rawGame.eid.toString().substr(0,endIndex);
 	var gameDate = moment(dateStr ,'YYYYMD').toDate();
-	game.GameID = rawGame.eid.toString();
+	game.GameSymbol = rawGame.eid.toString();
 	game.State = gameState;
 	game.Date = gameDate;
 	game.SeasonYear = rawGame.outer_y;
@@ -95,11 +95,12 @@ var parseRawGame = function(rawGame) {
 	game.HomeTeamDisplayName = rawGame.h;
 	game.HomeTeamName = rawGame.hnn;
 	game.HomeScore = rawGame.hs;
+	game.RawInstance = JSON.stringify(rawGame,null,2);
 	return game;
 };
 
 var gameChanged = function(oldGame, newGame) {
-	return (oldGame.GameID === newGame.GameID) &&
+	return (oldGame.GameSymbol === newGame.GameSymbol) &&
 		(	(oldGame.State !== newGame.State) ||
 			(oldGame.Quarter !== newGame.Quarter) ||
 			(oldGame.AwayScore !== newGame.AwayScore) ||
@@ -126,31 +127,38 @@ var makeGameLink = function(game) {
 	return link;
 };
 
-var existsQuery = function(game) {
-	var stmnt = 'Select 1 from NFLGameInstances where GameID = ?';
-	var params = [game.GameID];
+var insertGameQuery = function(game) {
+	var stmnt = 
+		'Insert into NFLGames(GameSymbol,Date,SeasonYear,SeasonType,\
+			SeasonWeek,AwayTeamID,HomeTeamID)\
+		Select\
+			?,?,?,?,?,away.TeamID,home.TeamID\
+		from NFLTeams away\
+			inner join NFLTeams home\
+				on LOWER(REPLACE(home.Name,\' \',\'\')) like ?\
+		where LOWER(REPLACE(away.Name,\' \',\'\')) like ?\
+		and not exists\
+			(Select 1 from NFLGames where GameSymbol like ?);';
+	var params = [game.GameSymbol, game.Date, game.SeasonYear, game.SeasonType,
+		game.SeasonWeek, game.HomeTeamName, game.AwayTeamName, game.GameSymbol];
 	return {
 		sql: stmnt,
 		inserts: params
 	};
 };
 
-var insertGameQuery = function(game) {
+var insertGameInstanceQuery = function(game) {
 	var stmnt = 
-		'Insert into NFLGameInstances(GameID,Date,StateID,Time,\
-			SeasonYear,SeasonType,SeasonWeek,Quarter,AwayTeamID,\
-			AwayScore,HomeTeamID,HomeScore)\
+		'Insert into NFLGameInstances(GameID,StateID,Time,\
+			Quarter,AwayScore,HomeScore,RawInstance)\
 		Select\
-			?,?,state.StateID,?,?,?,?,?,away.TeamID,?,home.TeamID,?\
+			game.GameID,state.StateID,?,?,?,?,?\
 		from NFLStates state\
-			inner join NFLTeams away\
-				on away.Name like ?\
-			inner join NFLTeams home\
-				on home.Name like ?\
+			inner join NFLGames game\
+				on game.GameSymbol like ?\
 		where state.State = ?;';
-	var params = [game.GameID, game.Date, game.Time, game.SeasonYear,
-		game.SeasonType, game.SeasonWeek, game.Quarter, game.AwayScore,
-		game.HomeScore, game.AwayTeamName, game.HomeTeamName, game.State];
+	var params = [game.Time, game.Quarter, game.AwayScore,
+		game.HomeScore, game.RawInstance, game.GameSymbol, game.State];
 	return {
 		sql: stmnt,
 		inserts: params
@@ -160,35 +168,38 @@ var insertGameQuery = function(game) {
 var lastGameInstanceQuery = function(game) {
 	var stmnt = 
 		'Select\
-			game.GameID\
+			game.GameSymbol\
 		,	game.Date\
 		,	state.State\
 		,	game.SeasonYear\
 		,	game.SeasonType\
 		,	game.SeasonWeek\
-		,	game.Time\
-		,	game.Quarter\
+		,	instance.Time\
+		,	instance.Quarter\
 		,	away.City as AwayTeamCity\
 		,	away.Name as AwayTeamName\
 		,	away.DisplayName as AwayTeamDisplayName\
 		,	away.TwitterAccount as AwayTwitterAccount\
 		,	away.TwitterHashtag as AwayTwitterHashtag\
-		,	game.AwayScore\
+		,	instance.AwayScore\
 		,	home.City as HomeTeamCity\
 		,	home.Name as HomeTeamName\
 		,	home.DisplayName as HomeTeamDisplayName\
 		,	home.TwitterAccount as HomeTwitterAccount\
 		,	home.TwitterHashtag as HomeTwitterHashtag\
-		,	game.HomeScore\
-		from NFLGameInstances game\
+		,	instance.HomeScore\
+		from NFLGameInstances instance\
+			inner join NFLGames game\
+				on game.GameID = instance.GameID\
+				and game.GameSymbol like ?\
 			inner join NFLStates state\
-				on state.StateID = game.StateID\
+				on state.StateID = instance.StateID\
 			inner join NFLTeams away\
 				on away.TeamID = game.AwayTeamID\
 			inner join NFLTeams home\
 				on home.TeamID = game.HomeTeamID\
-		where GameID = ? order by ?? desc limit 1;';
-	var params = [game.GameID, 'RecordedOn'];
+		order by ?? desc limit 1;';
+	var params = [game.GameSymbol, 'instance.RecordedOn'];
 	return {
 		sql: stmnt,
 		inserts: params
@@ -201,6 +212,6 @@ module.exports.parseRawGame = parseRawGame;
 module.exports.gameChanged = gameChanged;
 module.exports.gameChangeString = gameChangeString;
 module.exports.makeGameLink = makeGameLink;
-module.exports.existsQuery = existsQuery;
 module.exports.insertGameQuery = insertGameQuery;
+module.exports.insertGameInstanceQuery = insertGameInstanceQuery;
 module.exports.lastGameInstanceQuery = lastGameInstanceQuery;

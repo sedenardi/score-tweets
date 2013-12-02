@@ -3,23 +3,23 @@ var mysql = require('../node_modules/mysql')
 
 var connection;
 
-var handleDisconnect = function(next) {
+var handleDisconnect = function(caller, next) {
   connection = mysql.createConnection(config.mysql); // Recreate the connection, since
                                                   // the old one cannot be reused.
 
   connection.connect(function(err) {              // The server is either down
     if(err) {                                     // or restarting (takes a while sometimes).
-      console.log('MYSQL: error when connecting to db: ', err);
+      console.log('MYSQL-' + caller + ': error when connecting to db: ', err);
       setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
     } else {                              // to avoid a hot loop, and to allow our node script to
-      console.log('MYSQL: connect success'); // process asynchronous requests in the meantime.
+      console.log('MYSQL-' + caller + ': connect success'); // process asynchronous requests in the meantime.
       next();
     }                                     // If you're also serving http, display a 503 error
   });
   connection.on('error', function(err) {
-    console.log('MYSQL: db error ', err);
+    console.log('MYSQL-' + caller + ': db error ', err);
     if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
-      handleDisconnect();                         // lost due to either server restart, or a
+      handleDisconnect('self',null);                         // lost due to either server restart, or a
     } else {                                      // connnection idle timeout (the wait_timeout
       throw err;                                  // server variable configures this)
     }
@@ -59,16 +59,8 @@ var query = function(stmnt, inserts, next) {
 	});
 };
 
-var exists = function(stmnt, inserts, next) {
-	var sql = 'select case when exists (' + stmnt + ') then true else false end as \'exists\';';
-	query(sql, inserts, function(res) {
-		next(res[0].exists === 1);
-	});
-};
-
 /***** EXPORTS *****/
 module.exports.connect = handleDisconnect;
 module.exports.disconnect = disconnect;
 module.exports.select1 = select1;
 module.exports.query = query;
-module.exports.exists = exists;
