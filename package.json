@@ -10,7 +10,12 @@
   },
   "dependencies" : {
     "mysql": "*",
-    "moment": "*"
+    "moment": "*",
+    "express": "*",
+    "express3-handlebars": "*",
+    "passport": "*",
+    "passport-twitter": "*",
+    "ntwitter": "*"
   },
   "engines": {
     "node": ">=0.10"
