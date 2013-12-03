@@ -41,6 +41,7 @@ var getGameArray = function(next) {
 						}
 						next(null, gameArray);
 					} catch(e) {
+						console.log('NFL: parsing error');
 						e.source = 'NFL';
 						next(e); 
 					}

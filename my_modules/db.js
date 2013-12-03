@@ -70,3 +70,4 @@ module.exports.connect = handleDisconnect;
 module.exports.disconnect = disconnect;
 module.exports.select1 = select1;
 module.exports.query = query;
+module.exports.logError = logError;

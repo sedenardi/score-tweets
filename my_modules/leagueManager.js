@@ -32,7 +32,7 @@ module.exports.LeagueManager = function(l) {
 
 	var processGames = function(err, games) {
 		if (err) {
-			db.logError(err,null);
+			db.logError(err,function(){});
 			return;
 		}
 		console.log(league.leagueInfo.leagueName + ': processing ' + games.length + ' games @ ' + (new Date()).toLocaleString());
