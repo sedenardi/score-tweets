@@ -30,7 +30,11 @@ module.exports.LeagueManager = function(l) {
 		league.getGameArray(processGames);
 	}
 
-	var processGames = function(games) {
+	var processGames = function(err, games) {
+		if (err) {
+			db.logError(err,null);
+			return;
+		}
 		console.log(league.leagueInfo.leagueName + ': processing ' + games.length + ' games @ ' + (new Date()).toLocaleString());
 		for (var i = 0; i < games.length; i++) {
 			//console.log(league.leagueInfo.leagueName + ': processing ' + games[i].GameID);

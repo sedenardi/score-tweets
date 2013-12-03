@@ -39,9 +39,10 @@ var getGameArray = function(next) {
 							outerObj.gms[i].score_array = innerObj[outerObj.gms[i].gsis];
 							gameArray.push(parseRawGame(outerObj.gms[i]));
 						}
-						next(gameArray);
+						next(null, gameArray);
 					} catch(e) {
-						console.log('NFL parsing error: ' + e);
+						e.source = 'NFL';
+						next(e); 
 					}
 				});
 			}).on('error', function(e) {

@@ -20,9 +20,10 @@ var getGameArray = function(next) {
 				for (var i = 0; i < rawArray.length; i++) {
 					gameArray.push(parseRawGame(rawArray[i]));
 				}
-				next(gameArray);
+				next(null, gameArray);
 			} catch(e) {
-				console.log('NHL parsing error: ' + e);
+				e.source = 'NHL';
+				next(e);
 			}
 		});
 	}).on('error', function(e) {

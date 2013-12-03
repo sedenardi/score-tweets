@@ -59,6 +59,12 @@ var query = function(stmnt, inserts, next) {
 	});
 };
 
+var logError = function(error, next) {
+	var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?';
+	var inserts = [error.source,error.message,error.stack];
+	query(stmnt,inserts,next);
+}
+
 /***** EXPORTS *****/
 module.exports.connect = handleDisconnect;
 module.exports.disconnect = disconnect;
