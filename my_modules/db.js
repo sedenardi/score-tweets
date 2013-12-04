@@ -1,5 +1,5 @@
-var mysql = require('../node_modules/mysql')
-,	config = require('./config.js');
+var mysql = require('../node_modules/mysql'),
+  config = require('./config.js');
 
 var connection;
 
@@ -24,45 +24,45 @@ var handleDisconnect = function(caller, next) {
       throw err;                                  // server variable configures this)
     }
   });
-};	
+};  
 
 var disconnect = function() {
-	connection.end(function (err) {
-		if (err) {
-			console.log('MYSQL: ', err);
-		} else {
-			console.log('MYSQL: disconnected');
-		}
-	});
+  connection.end(function (err) {
+    if (err) {
+      console.log('MYSQL: ', err);
+    } else {
+      console.log('MYSQL: disconnected');
+      }
+  });
 };
 
 /**** FUNCTIONS ****/
 var select1 = function(next) {
-	connection.query('Select 1 as one;', function(err, res) {
-		if (err) {
-			console.log('MYSQL: ', err);
-		} else {
-			console.log('MYSQL: ', res);
-			next(res);
-		}
-	});
+  connection.query('Select 1 as one;', function(err, res) {
+    if (err) {
+      console.log('MYSQL: ', err);
+    } else {
+      console.log('MYSQL: ', res);
+      next(res);
+    }
+  });
 };
 
 var query = function(stmnt, inserts, next) {
-	var sql = connection.format(stmnt, inserts);
-	connection.query(sql, function(err, res) {
-		if (err) {
-			console.log('MYSQL: ' + sql + ' \n' + err);
-		} else {
-			next(res);
-		}
-	});
+  var sql = connection.format(stmnt, inserts);
+  connection.query(sql, function(err, res) {
+    if (err) {
+      console.log('MYSQL: ' + sql + ' \n' + err);
+    } else {
+      next(res);
+    }
+  });
 };
 
 var logError = function(error, next) {
-	var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?';
-	var inserts = [error.source,error.message,error.stack];
-	query(stmnt,inserts,next);
+  var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?';
+  var inserts = [error.source,error.message,error.stack];
+  query(stmnt,inserts,next);
 }
 
 /***** EXPORTS *****/
