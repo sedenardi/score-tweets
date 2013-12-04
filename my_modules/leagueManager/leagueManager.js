@@ -1,8 +1,11 @@
-var http = require('http'),
+var events = require('events'),
+  util = require('util'),
+  http = require('http'),
   db = require('../db/db.js'),
   config = require('../config.js');
 
-exports.LeagueManager = function(l) {
+var LeagueManager = function(l) {
+  var self = this;
   var league = l;
   var loopInterval;
   var started = false;
@@ -56,12 +59,18 @@ exports.LeagueManager = function(l) {
       if (changed) {
         console.log(league.leagueInfo.leagueName + ': ' + newGame.GameSymbol + ' changed, ' + league.gameChangeString(oldGame[0], newGame));
         insertGameInstance(newGame, function insertGameInstanceFinished() {
-          console.log(league.leagueInfo.leagueName + ': Inserted new instance of ' + newGame.GameSymbol);
+          console.log(league.leagueInfo.leagueName + ': Inserted new instance of: ' + newGame.GameSymbol);
+          var changeObj = {
+            league: league,
+            oldGame: oldGame[0],
+            newGame: newGame
+          };
+          self.emit('change', changeObj);
         });
       }
     } else {
       insertGameInstance(newGame, function insertGameInstanceFinished() {
-        console.log(league.leagueInfo.leagueName + ': Inserted instance of ' + newGame.GameSymbol);
+        console.log(league.leagueInfo.leagueName + ': Inserted new game: ' + newGame.GameSymbol);
       });
     }
   };
@@ -83,3 +92,7 @@ exports.LeagueManager = function(l) {
   
   console.log('LeagueManager created with league: ' + league.leagueInfo.leagueName);
 };
+
+util.inherits(LeagueManager, events.EventEmitter);
+
+module.exports = LeagueManager;
