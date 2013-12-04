@@ -7,22 +7,22 @@ var leagueInfo = {
   updateURL2: 'http://www.nfl.com/liveupdate/scorestrip/scorestrip.json'
 };
 
-var getGameArray = function(next) {
+var getGameArray = function getGameArray(next) {
   var rawOuter = '';
-  var outerRequest = http.get(leagueInfo.updateURL, function(oRes) {
-    oRes.on('data', function(chunk) {
+  var outerRequest = http.get(leagueInfo.updateURL, function outHttpSetup(oRes) {
+    oRes.on('data', function outHttpData(chunk) {
       rawOuter += chunk;
     });
-    oRes.on('end', function() {
+    oRes.on('end', function outHttpEnd() {
       var rawInner = '';
-      var innerRequest = http.get(leagueInfo.updateURL2, function(iRes) {
-        iRes.on('data', function(chunk) {
+      var innerRequest = http.get(leagueInfo.updateURL2, function inHttpSetup(iRes) {
+        iRes.on('data', function inHttpData(chunk) {
           rawInner += chunk;
         });
-        iRes.on('end', function() {
+        iRes.on('end', function inHttpEnd() {
           try {
-            rawInner = rawInner.replace(/\,\,/g,',"",');
-            rawInner = rawInner.replace(/\,\,/g,',"",');
+            rawInner = rawInner.replace(/\,\,/g,',"",')
+              .replace(/\,\,/g,',"",');
             innerArray = JSON.parse(rawInner).ss;
             var innerObj = { };
             for (var i = 0; i < innerArray.length; i++) {
@@ -46,16 +46,16 @@ var getGameArray = function(next) {
             next(e); 
           }
         });
-      }).on('error', function(e) {
+      }).on('error', function inHttpEnd(e) {
         console.log('NFL inner http Error: ' + e.message);
       });
     });
-  }).on('error', function(e) {
+  }).on('error', function outHttpErrir(e) {
     console.log('NFL outer http Error: ' + e.message);
   });
 };
 
-var parseRawGame = function(rawGame) {
+var parseRawGame = function parseRawGame(rawGame) {
   var game = { };
   var gameState = '';
   var timeString = rawGame.t;
@@ -101,7 +101,7 @@ var parseRawGame = function(rawGame) {
   return game;
 };
 
-var gameChanged = function(oldGame, newGame) {
+var gameChanged = function gameChanged(oldGame, newGame) {
   return (oldGame.GameSymbol === newGame.GameSymbol) &&
     ( (oldGame.State !== newGame.State) ||
       (oldGame.Quarter !== newGame.Quarter) ||
@@ -109,7 +109,7 @@ var gameChanged = function(oldGame, newGame) {
       (oldGame.HomeScore !== newGame.HomeScore));
 };
 
-var gameChangeString = function(oldGame, newGame) {
+var gameChangeString = function gameChangeString(oldGame, newGame) {
   var dif = [];
   if (oldGame.State !== newGame.State)
     dif.push(oldGame.State + '-' + newGame.State);
@@ -122,14 +122,22 @@ var gameChangeString = function(oldGame, newGame) {
   return dif.join(',');
 };
 
-var makeGameLink = function(game) {
+var makeGameLink = function makeGameLink(game) {
   var link = 'http://www.nfl.com/gamecenter/' +
-  game.GameID + '/' + game.SeasonYear + '/' + game.SeasonType + 
-  game.SeasonWeek + '/' + game.AwayTeamName + '@' + game.HomeTeamName;
+    game.GameID + 
+    '/' + 
+    game.SeasonYear + 
+    '/' + 
+    game.SeasonType + 
+    game.SeasonWeek + 
+    '/' + 
+    game.AwayTeamName + 
+    '@' + 
+    game.HomeTeamName;
   return link;
 };
 
-var insertGameQuery = function(game) {
+var insertGameQuery = function insertGameQuery(game) {
   var stmnt = 
     'Insert into NFLGames(GameSymbol,Date,SeasonYear,SeasonType,\
       SeasonWeek,AwayTeamID,HomeTeamID)\
@@ -149,7 +157,7 @@ var insertGameQuery = function(game) {
   };
 };
 
-var insertGameInstanceQuery = function(game) {
+var insertGameInstanceQuery = function insertGameInstanceQuery(game) {
   var stmnt = 
     'Insert into NFLGameInstances(GameID,StateID,Time,\
       Quarter,AwayScore,HomeScore,RawInstance)\
@@ -167,7 +175,7 @@ var insertGameInstanceQuery = function(game) {
   };
 };
 
-var lastGameInstanceQuery = function(game) {
+var lastGameInstanceQuery = function lastGameInstanceQuery(game) {
   var stmnt = 
     'Select\
       game.GameSymbol\
