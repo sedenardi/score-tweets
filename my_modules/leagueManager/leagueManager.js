@@ -1,11 +1,11 @@
 var http = require('http'),
-  db = require('./db.js'),
-  config = require('./config.js');
+  db = require('../db/db.js'),
+  config = require('../config.js');
 
 exports.LeagueManager = function(l) {
   var league = l;
   var loopInterval;
-
+  var started = false;
   this.startProcess = function() {
     if (typeof league === 'undefined') {
       console.log('Can not start process, league is undefined. Call \'setLeague\' first.');
@@ -16,6 +16,7 @@ exports.LeagueManager = function(l) {
       db.connect(league.leagueInfo.leagueName, function startLoop() {
         loopInterval = setInterval(loop, config.leagues[league.leagueInfo.leagueName].refreshInterval);
         loop();
+        started = true;
       });
     }
   };
@@ -24,6 +25,7 @@ exports.LeagueManager = function(l) {
     console.log(league.leagueInfo.leagueName + ': ending process');
     clearInterval(loopInterval);
     db.disconnect();
+    started = false;
   };
 
   var loop = function() {

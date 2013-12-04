@@ -1,5 +1,5 @@
 var http = require('http'),
-  moment = require('../node_modules/moment');
+  moment = require('moment');
 
 var leagueInfo = {
   leagueName: 'NFL',

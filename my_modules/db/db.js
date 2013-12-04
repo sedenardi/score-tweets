@@ -1,5 +1,5 @@
-var mysql = require('../node_modules/mysql'),
-  config = require('./config.js');
+var mysql = require('mysql'),
+  config = require('../config.js');
 
 var connection;
 
