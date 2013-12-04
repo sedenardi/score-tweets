@@ -5,7 +5,7 @@ var leagueInfo = {
   updateURL: 'http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp'
 };
 
-var getGameArray = function getGameArray(next) {
+var getGameArray = function(next) {
   var rawData = '';
   var request = http.get(leagueInfo.updateURL, function httpSetup(res) {
     res.on('data', function httpData(chunk) {
@@ -31,7 +31,7 @@ var getGameArray = function getGameArray(next) {
   });
 };
 
-var parseRawGame = function parseRawGame(rawGame) {
+var parseRawGame = function(rawGame) {
   var game = { };
   var date = new Date();
   var gameState = '';
@@ -95,7 +95,7 @@ var parseRawGame = function parseRawGame(rawGame) {
   return game;
 };
 
-var gameChanged = function gameChanged(oldGame, newGame) {
+var gameChanged = function(oldGame, newGame) {
   return (oldGame.GameSymbol === newGame.GameSymbol) &&
     ( (oldGame.State !== newGame.State) ||
       (oldGame.Period !== newGame.Period) ||
@@ -103,7 +103,7 @@ var gameChanged = function gameChanged(oldGame, newGame) {
       (oldGame.HomeScore !== newGame.HomeScore));
 };
 
-var gameChangeString = function gameChangeString(oldGame, newGame) {
+var gameChangeString = function(oldGame, newGame) {
   var dif = [];
   if (oldGame.State !== newGame.State)
     dif.push(oldGame.State + '-' + newGame.State);
@@ -116,12 +116,12 @@ var gameChangeString = function gameChangeString(oldGame, newGame) {
   return dif.join(',');
 };
 
-var makeGameLink = function makeGameLink(game) {
+var makeGameLink = function(game) {
   var linkStub = 'http://www.nhl.com/gamecenter/en/icetracker?id=';
   return linkStub + game.gameId;
 };
 
-var insertGameQuery = function insertGameQuery(game) {
+var insertGameQuery = function(game) {
   var stmnt = 
     'Insert into NHLGames(GameSymbol,Date,AwayTeamID,\
       HomeTeamID)\
@@ -141,7 +141,7 @@ var insertGameQuery = function insertGameQuery(game) {
   };
 };
 
-var insertGameInstanceQuery = function insertGameInstanceQuery(game) {
+var insertGameInstanceQuery = function(game) {
   var stmnt = 
     'Insert into NHLGameInstances(GameID,StateID,Time,\
       Period,AwayScore,HomeScore,RawInstance)\
@@ -159,7 +159,7 @@ var insertGameInstanceQuery = function insertGameInstanceQuery(game) {
   };
 };
 
-var lastGameInstanceQuery = function lastGameInstanceQuery(game) {
+var lastGameInstanceQuery = function(game) {
   var stmnt = 
     'Select\
       game.GameSymbol\

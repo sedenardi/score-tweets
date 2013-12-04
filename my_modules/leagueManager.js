@@ -2,35 +2,35 @@ var http = require('http'),
   db = require('./db.js'),
   config = require('./config.js');
 
-module.exports.LeagueManager = function LeagueManager(l) {
+exports.LeagueManager = function(l) {
   var league = l;
   var loopInterval;
 
-  this.startProcess = function startProcess() {
+  this.startProcess = function() {
     if (typeof league === 'undefined') {
       console.log('Can not start process, league is undefined. Call \'setLeague\' first.');
     } else if (typeof config.leagues[league.leagueInfo.leagueName].refreshInterval === 'undefined') {
       condole.log('Can not start provess, missing refresl interval in config');
     } else {
       console.log(league.leagueInfo.leagueName + ': starting process');
-      db.connect(league.leagueInfo.leagueName, function() {
+      db.connect(league.leagueInfo.leagueName, function startLoop() {
         loopInterval = setInterval(loop, config.leagues[league.leagueInfo.leagueName].refreshInterval);
         loop();
       });
     }
   };
 
-  this.endProcess = function endProcess() {
+  this.endProcess = function() {
     console.log(league.leagueInfo.leagueName + ': ending process');
     clearInterval(loopInterval);
     db.disconnect();
   };
 
-  var loop = function loop() {
+  var loop = function() {
     league.getGameArray(processGames);
   }
 
-  var processGames = function processGames(err, games) {
+  var processGames = function(err, games) {
     if (err) {
       db.logError(err,function(){});
       return;
@@ -48,7 +48,7 @@ module.exports.LeagueManager = function LeagueManager(l) {
     }
   }
 
-  var processInstance = function processInstance(oldGame, newGame) {
+  var processInstance = function(oldGame, newGame) {
     if (oldGame.length) {
       var changed = league.gameChanged(oldGame[0], newGame);
       if (changed) {
@@ -64,17 +64,17 @@ module.exports.LeagueManager = function LeagueManager(l) {
     }
   };
 
-  var insertGame = function insertGame(game, next) {
+  var insertGame = function(game, next) {
     var cmd = league.insertGameQuery(game);
     db.query(cmd.sql, cmd.inserts, next);
   };
 
-  var insertGameInstance = function insertGameInstance(game, next) {
+  var insertGameInstance = function(game, next) {
     var cmd = league.insertGameInstanceQuery(game);
     db.query(cmd.sql, cmd.inserts, next);
   }
 
-  var getLastGameInstance = function getLastGameInstance(game, next) {
+  var getLastGameInstance = function(game, next) {
     var cmd = league.lastGameInstanceQuery(game);
     db.query(cmd.sql, cmd.inserts, next);
   };

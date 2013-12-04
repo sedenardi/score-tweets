@@ -7,7 +7,7 @@ var leagueInfo = {
   updateURL2: 'http://www.nfl.com/liveupdate/scorestrip/scorestrip.json'
 };
 
-var getGameArray = function getGameArray(next) {
+var getGameArray = function(next) {
   var rawOuter = '';
   var outerRequest = http.get(leagueInfo.updateURL, function outHttpSetup(oRes) {
     oRes.on('data', function outHttpData(chunk) {
@@ -55,7 +55,7 @@ var getGameArray = function getGameArray(next) {
   });
 };
 
-var parseRawGame = function parseRawGame(rawGame) {
+var parseRawGame = function(rawGame) {
   var game = { };
   var gameState = '';
   var timeString = rawGame.t;
@@ -101,7 +101,7 @@ var parseRawGame = function parseRawGame(rawGame) {
   return game;
 };
 
-var gameChanged = function gameChanged(oldGame, newGame) {
+var gameChanged = function(oldGame, newGame) {
   return (oldGame.GameSymbol === newGame.GameSymbol) &&
     ( (oldGame.State !== newGame.State) ||
       (oldGame.Quarter !== newGame.Quarter) ||
@@ -109,7 +109,7 @@ var gameChanged = function gameChanged(oldGame, newGame) {
       (oldGame.HomeScore !== newGame.HomeScore));
 };
 
-var gameChangeString = function gameChangeString(oldGame, newGame) {
+var gameChangeString = function(oldGame, newGame) {
   var dif = [];
   if (oldGame.State !== newGame.State)
     dif.push(oldGame.State + '-' + newGame.State);
@@ -122,7 +122,7 @@ var gameChangeString = function gameChangeString(oldGame, newGame) {
   return dif.join(',');
 };
 
-var makeGameLink = function makeGameLink(game) {
+var makeGameLink = function(game) {
   var link = 'http://www.nfl.com/gamecenter/' +
     game.GameID + 
     '/' + 
@@ -137,7 +137,7 @@ var makeGameLink = function makeGameLink(game) {
   return link;
 };
 
-var insertGameQuery = function insertGameQuery(game) {
+var insertGameQuery = function(game) {
   var stmnt = 
     'Insert into NFLGames(GameSymbol,Date,SeasonYear,SeasonType,\
       SeasonWeek,AwayTeamID,HomeTeamID)\
@@ -157,7 +157,7 @@ var insertGameQuery = function insertGameQuery(game) {
   };
 };
 
-var insertGameInstanceQuery = function insertGameInstanceQuery(game) {
+var insertGameInstanceQuery = function(game) {
   var stmnt = 
     'Insert into NFLGameInstances(GameID,StateID,Time,\
       Quarter,AwayScore,HomeScore,RawInstance)\
@@ -175,7 +175,7 @@ var insertGameInstanceQuery = function insertGameInstanceQuery(game) {
   };
 };
 
-var lastGameInstanceQuery = function lastGameInstanceQuery(game) {
+var lastGameInstanceQuery = function(game) {
   var stmnt = 
     'Select\
       game.GameSymbol\

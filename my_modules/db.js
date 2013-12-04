@@ -3,7 +3,7 @@ var mysql = require('../node_modules/mysql'),
 
 var connection;
 
-var handleDisconnect = function handleDisconnect(caller, next) {
+var handleDisconnect = function(caller, next) {
   connection = mysql.createConnection(config.mysql); // Recreate the connection, since
                                                   // the old one cannot be reused.
 
@@ -26,7 +26,7 @@ var handleDisconnect = function handleDisconnect(caller, next) {
   });
 };  
 
-var disconnect = function disconnect() {
+var disconnect = function() {
   connection.end(function (err) {
     if (err) {
       console.log('MYSQL: ', err);
@@ -37,7 +37,7 @@ var disconnect = function disconnect() {
 };
 
 /**** FUNCTIONS ****/
-var select1 = function select1(next) {
+var select1 = function(next) {
   connection.query('Select 1 as one;', function(err, res) {
     if (err) {
       console.log('MYSQL: ', err);
@@ -48,7 +48,7 @@ var select1 = function select1(next) {
   });
 };
 
-var query = function query(stmnt, inserts, next) {
+var query = function(stmnt, inserts, next) {
   var sql = connection.format(stmnt, inserts);
   connection.query(sql, function(err, res) {
     if (err) {
@@ -59,7 +59,7 @@ var query = function query(stmnt, inserts, next) {
   });
 };
 
-var logError = function logError(error, next) {
+var logError = function(error, next) {
   var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?';
   var inserts = [error.source,error.message,error.stack];
   query(stmnt,inserts,next);
