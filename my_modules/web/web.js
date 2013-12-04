@@ -64,7 +64,8 @@ var Web = function(rootDir) {
     app.set('view engine', 'handlebars');
     app.use(express.logger());
     app.use(express.cookieParser());
-    app.use(express.bodyParser());
+    app.use(express.json());
+    app.use(express.urlencoded())
     app.use(express.methodOverride());
     app.use(express.session({ secret: 'keyboard cat' }));
     // Initialize Passport!  Also use passport.session() middleware, to support
