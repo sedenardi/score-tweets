@@ -78,4 +78,6 @@ exports.LeagueManager = function(l) {
     var cmd = league.lastGameInstanceQuery(game);
     db.query(cmd.sql, cmd.inserts, next);
   };
+  
+  console.log('LeagueManager created with league: ' + league.leagueInfo.leagueName);
 };
