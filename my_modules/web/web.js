@@ -34,7 +34,7 @@ var Web = function(config, rootDir) {
 
   var app = express(),
     hbs = exphbs.create({
-      //defaultLayout: 'main',
+      defaultLayout: 'main',
       helpers: helpers,
       layoutsDir: rootDir + config.web.folders.layouts,
       partialsDir: rootDir + config.web.folders.partials
