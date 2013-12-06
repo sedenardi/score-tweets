@@ -122,6 +122,88 @@ var gameChangeString = function(oldGame, newGame) {
   return dif.join(',');
 };
 
+var makeQuarterString = function(quarter) {
+  switch (quarter) {
+    case '1':
+      return '1st';
+    case '2':
+      return '2nd';
+    case '3':
+      return '3rd';
+    case '4':
+      return '4th';
+    case '5':
+      return 'OT';
+    default:
+      return '';
+  }
+}
+
+var gameChangeTweet = function(oldGame, newGame) {
+  var tweet = {
+    InstanceID: newGame.InstanceID,
+    TweetString: ''
+  };
+  if (oldGame.State !== newGame.State) {
+    if (oldGame.State === 'Scheduled' && newGame.State === 'Progress') {
+      tweet.TweetString = 'Start of game: ' +
+        newGame.AwayTeamName + ' vs ' + newGame.HomeTeamName +
+        makeGameLink(newGame);
+    }
+    if (oldGame.State === 'Progress' && newGame.State === 'Halftime') {
+      tweet.TweetString = 'Halftime. ' +
+        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+        makeGameLink(newGame);
+    }
+    if (oldGame.State === 'Halftime' && newGame.State === 'Progress') {
+      tweet.TweetString = 'Start of 3rd. ' +
+        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+        makeGameLink(newGame);
+    }
+    if (oldGame.State === 'Progress' && newGame.State === 'Overtime') {
+      tweet.TweetString = 'Headed to OT. ' +
+        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+        makeGameLink(newGame);
+    }
+    if (newGame.State === 'Ended') {
+      if (oldGame.State === 'Overtime') {
+        tweet.TweetString = 'Final OT. ' +
+          newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+          newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+          makeGameLink(newGame);
+      } else {
+        tweet.TweetString = 'Final. ' +
+          newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+          newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+          makeGameLink(newGame);
+      }
+    }
+  } else if (oldGame.Quarter !== newGame.Quarter) {
+      tweet.TweetString = 'Start of ' + makeQuarterString(newGame.Quarter) + '. ' +
+        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+        makeGameLink(newGame);
+  } else {
+    if (oldGame.AwayScore !== newGame.AwayScore) {
+      tweet.TweetString = newGame.AwayTeamName + ' score. ' +
+        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        newGame.HomeTeamName + ' ' + newGame.HomeScore + ', ' +
+        newGame.Time + ' ' + makeQuarterString(newGame.Quarter) + ' ' +
+        makeGameLink(newGame);
+    }
+    if (oldGame.HomeScore !== newGame.HomeScore) {
+      tweet.TweetString = newGame.HomeTeamName + ' score. ' +
+        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        newGame.HomeTeamName + ' ' + newGame.HomeScore + ', ' +
+        newGame.Time + ' ' + makeQuarterString(newGame.Quarter) + ' ' +
+        makeGameLink(newGame);
+    }
+  }
+};
+
 var makeGameLink = function(game) {
   var link = 'http://www.nfl.com/gamecenter/' +
     game.GameID + 
@@ -178,7 +260,8 @@ var insertGameInstanceQuery = function(game) {
 var lastGameInstanceQuery = function(game) {
   var stmnt = 
     'Select\
-      game.GameSymbol\
+      instance.InstanceID\
+    , game.GameSymbol\
     , game.Date\
     , state.State\
     , game.SeasonYear\
@@ -216,12 +299,26 @@ var lastGameInstanceQuery = function(game) {
   };
 };
 
+var insertGameChangeTweetQuery = function(tweet) {
+  var stmnt = 
+    'Insert into NFLTweets(InstanceID,TweetString)\
+    Select ?,?\
+    where not exists\
+      (Select 1 from NFLTweets where InstanceID = ?);';
+  var params = [tweet.InstanceID, tweet.TweetString, tweet.InstanceID];
+  return {
+    sql: stmnt,
+    inserts: params
+  };
+};
+
 module.exports.leagueInfo = leagueInfo;
 module.exports.getGameArray = getGameArray;
-module.exports.parseRawGame = parseRawGame;
 module.exports.gameChanged = gameChanged;
 module.exports.gameChangeString = gameChangeString;
+module.exports.gameChangeTweet = gameChangeTweet;
 module.exports.makeGameLink = makeGameLink;
 module.exports.insertGameQuery = insertGameQuery;
 module.exports.insertGameInstanceQuery = insertGameInstanceQuery;
 module.exports.lastGameInstanceQuery = lastGameInstanceQuery;
+module.exports.insertGameChangeTweetQuery = insertGameChangeTweetQuery;

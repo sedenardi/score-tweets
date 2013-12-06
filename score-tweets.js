@@ -22,8 +22,8 @@ var leagues = [];
 var leagueNHL = new LeagueManager(config, NHL);
 leagues.push(leagueNHL);
 
-/*var leagueNFL = new LeagueManager(config, NFL);
-leagues.push(leagueNFL);*/
+var leagueNFL = new LeagueManager(config, NFL);
+leagues.push(leagueNFL);
 
 var web = new Web(config, __dirname);
 
