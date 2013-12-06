@@ -1,1 +1,36 @@
-[object Object]
+{
+  "mysql": {
+    "host": "dbhost",
+    "post": "port",
+    "user": "username",
+    "password": "password",
+    "database": "dbname"
+  },
+  "leagues": {
+    "leagueName": {
+      "refreshInterval": "30000"
+    }
+  },
+  "web": {
+    "port": "3000",
+    "folders": {
+      "layouts": "",
+      "partials": "",
+      "static": ""
+    }
+  },
+  "twitter": {
+    "app": {
+      "consumerKey": "",
+      "consumerSecret": "",
+      "callbackURL": ""
+    },
+    "accounts": {
+      "leagueUser": {
+        "league": "",
+        "access_token_key": "",
+        "access_token_secret": ""
+      }
+    }
+  }
+}

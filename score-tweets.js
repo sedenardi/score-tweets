@@ -28,9 +28,6 @@ leagues.push(leagueNFL);
 var web = new Web(config, __dirname);
 
 web.on('auth', function receiveAuth(data) {
-  console.log('Auth received for: ' + data.profile.username);
-  console.log('token: ' + data.token);
-  console.log('tokenSecret: ' + data.tokenSecret);
   config.twitter.accounts[data.profile.username].access_token_key = data.token;
   config.twitter.accounts[data.profile.username].access_token_secret = data.tokenSecret;
   fs.writeFile(configFile, JSON.stringify(config,null,2), function(e) {
