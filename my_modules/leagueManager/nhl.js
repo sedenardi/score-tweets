@@ -117,16 +117,6 @@ var gameChangeString = function(oldGame, newGame) {
   return dif.join(',');
 };
 
-var gameChangeType = function(oldGame, newGame) {
-  if (oldGame.State !== newGame.State)
-    return 'State';
-  if (oldGame.AwayScore !== newGame.AwayScore)
-    return 'Away';
-  if (oldGame.HomeScore !== newGame.HomeScore)
-    return 'Home';
-  return 'none';
-};
-
 var gameChangeTweet = function(oldGame, newGame) {
   var tweet = {
     InstanceID: newGame.InstanceID,
@@ -268,11 +258,26 @@ var lastGameInstanceQuery = function(game) {
   };
 };
 
+var insertGameChangeTweetQuery = function(tweet) {
+  var stmnt = 
+    'Insert into NHLTweets(InstanceID,TweetString)\
+    Select ?,?\
+    where not exists\
+      (Select 1 from NHLTweets where InstanceID = ?);';
+  var params = [tweet.InstanceID, tweet.TweetString, tweet.InstanceID];
+  return {
+    sql: stmnt,
+    inserts: params
+  };
+};
+
 module.exports.leagueInfo = leagueInfo;
 module.exports.getGameArray = getGameArray;
 module.exports.gameChanged = gameChanged;
 module.exports.gameChangeString = gameChangeString;
+module.exports.gameChangeTweet = gameChangeTweet;
 module.exports.makeGameLink = makeGameLink;
 module.exports.insertGameQuery = insertGameQuery;
 module.exports.insertGameInstanceQuery = insertGameInstanceQuery;
 module.exports.lastGameInstanceQuery = lastGameInstanceQuery;
+module.exports.insertGameChangeTweetQuery = insertGameChangeTweetQuery;
