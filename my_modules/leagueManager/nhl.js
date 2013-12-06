@@ -153,10 +153,17 @@ var gameChangeTweet = function(oldGame, newGame) {
       makeGameLink(newGame);
     }
     if (newGame.State === 'Final') {
-      tweet.TweetString = 'Final ' + newGame.Period + ' ' +
-      newGame.AwayTeamName + ': ' + newGame.AwayScore + ', ' +
-      newGame.HomeTeamName + ': ' + newGame.HomeScore + ' ' +
-      makeGameLink(newGame);
+      if (newGame.Period !== '') {
+        tweet.TweetString = 'Final ' + newGame.Period + '. ' +
+        newGame.AwayTeamName + ': ' + newGame.AwayScore + ', ' +
+        newGame.HomeTeamName + ': ' + newGame.HomeScore + ' ' +
+        makeGameLink(newGame);
+      } else {
+        tweet.TweetString = 'Final. ' +
+        newGame.AwayTeamName + ': ' + newGame.AwayScore + ', ' +
+        newGame.HomeTeamName + ': ' + newGame.HomeScore + ' ' +
+        makeGameLink(newGame);
+      }      
     }
   }
   if (oldGame.AwayScore !== newGame.AwayScore) {
