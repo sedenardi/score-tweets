@@ -60,11 +60,13 @@ var LeagueManager = function(config, l) {
         insertGameInstance(newGame, function insertGameInstanceFinished() {
           console.log(league.leagueInfo.leagueName + ': Inserted new instance of: ' + newGame.GameSymbol);
           var changeObj = {
-            league: league,
             oldGame: oldGame[0],
             newGame: newGame
           };
-          self.emit('change', changeObj);
+          insertGameChangeTweet(changeObj, function insertTweetFinished() {
+            console.log(league.leagueInfo.leagueName + ': Created new tweet for: ' + newGame.GameSymbol);
+            self.emit('change', changeObj);
+          });
         });
       }
     } else {
@@ -86,6 +88,12 @@ var LeagueManager = function(config, l) {
 
   var getLastGameInstance = function(game, next) {
     var cmd = league.lastGameInstanceQuery(game);
+    db.query(cmd.sql, cmd.inserts, next);
+  };
+
+  var insertGameChangeTweet = function(changeObj, next) {
+    var tweet = league.gameChangeTweet(changeObj.oldGame, changeObj.newGame);
+    var cmd = league.insertGameChangeTweetQuery(tweet);
     db.query(cmd.sql, cmd.inserts, next);
   };
   

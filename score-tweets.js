@@ -22,8 +22,8 @@ var leagues = [];
 var leagueNHL = new LeagueManager(config, NHL);
 leagues.push(leagueNHL);
 
-var leagueNFL = new LeagueManager(config, NFL);
-leagues.push(leagueNFL);
+/*var leagueNFL = new LeagueManager(config, NFL);
+leagues.push(leagueNFL);*/
 
 var web = new Web(config, __dirname);
 
@@ -41,7 +41,7 @@ web.on('auth', function receiveAuth(data) {
 });
 
 var processChange = function(changeObj) {
-  console.log('Detected change from ' + changeObj.league.leagueInfo.leagueName);
+  console.log('New tweet created from ' + changeObj.league.leagueInfo.leagueName);
 };
 
 for (var i = 0; i < leagues.length; i++) {
