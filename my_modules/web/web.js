@@ -4,10 +4,9 @@ var events = require('events'),
   helpers = require('./helpers.js'),
   passport = require('passport'),
   util = require('util'),
-  TwitterStrategy = require('passport-twitter').Strategy
-  config = require('../config.js');
+  TwitterStrategy = require('passport-twitter').Strategy;
 
-var Web = function(rootDir) {
+var Web = function(config, rootDir) {
   var self = this;
   // Passport session setup.
   //   To support persistent login sessions, Passport needs to be able to

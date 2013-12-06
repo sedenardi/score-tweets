@@ -1,4 +1,4 @@
 tests/
 node_modules/
-my_modules/config_real.js
-my_modules/config_shell.js
+config_real.json
+config_shell.json

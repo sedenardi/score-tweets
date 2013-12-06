@@ -1,10 +1,9 @@
 var events = require('events'),
   util = require('util'),
   http = require('http'),
-  db = require('../db/db.js'),
-  config = require('../config.js');
+  db = require('../db/db.js');
 
-var LeagueManager = function(l) {
+var LeagueManager = function(config, l) {
   var self = this;
   var league = l;
   var loopInterval;
@@ -16,7 +15,7 @@ var LeagueManager = function(l) {
       condole.log('Can not start provess, missing refresl interval in config');
     } else {
       console.log(league.leagueInfo.leagueName + ': starting process');
-      db.connect(league.leagueInfo.leagueName, function startLoop() {
+      db.connect(config, league.leagueInfo.leagueName, function startLoop() {
         loopInterval = setInterval(loop, config.leagues[league.leagueInfo.leagueName].refreshInterval);
         loop();
         started = true;
