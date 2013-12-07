@@ -168,15 +168,15 @@ var gameChangeTweet = function(oldGame, newGame) {
   } else {
     if (oldGame.AwayScore !== newGame.AwayScore) {
       tweet.TweetString = newGame.AwayTeamName + ' score. ' +
-        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-        newGame.HomeTeamName + ' ' + newGame.HomeScore + ', ' +
+        oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
         newGame.Time + ' ' + newGame.Period + ' ' +
         makeGameLink(newGame);
     }
     if (oldGame.HomeScore !== newGame.HomeScore) {
       tweet.TweetString = newGame.HomeTeamName + ' score. ' +
-        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-        newGame.HomeTeamName + ' ' + newGame.HomeScore + ', ' +
+        oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
         newGame.Time + ' ' + newGame.Period + ' ' +
         makeGameLink(newGame);
     }
