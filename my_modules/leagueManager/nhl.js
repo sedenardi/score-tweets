@@ -153,8 +153,13 @@ var gameChangeTweet = function(oldGame, newGame) {
         makeGameLink(newGame);
     }
     if (newGame.State === 'Ended') {
-      if (newGame.Period !== '') {
-        tweet.TweetString = 'Final ' + newGame.Period + '. ' +
+      if (oldGame.State === 'Shootout') {
+        tweet.TweetString = 'Final SO. ' +
+          oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+          oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+          makeGameLink(newGame);
+      } else if (oldGame.State === 'Overtime') {
+        tweet.TweetString = 'Final OT. ' +
           oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
           oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
           makeGameLink(newGame);
