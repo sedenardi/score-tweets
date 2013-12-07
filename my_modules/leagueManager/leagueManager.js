@@ -8,7 +8,7 @@ var LeagueManager = function(config, l) {
   var league = l;
   var loopInterval;
   var started = false;
-  this.startProcess = function() {
+  this.start = function() {
     if (typeof league === 'undefined') {
       console.log('Can not start process, league is undefined. Call \'setLeague\' first.');
     } else if (typeof config.leagues[league.leagueInfo.leagueName].refreshInterval === 'undefined') {
@@ -23,7 +23,7 @@ var LeagueManager = function(config, l) {
     }
   };
 
-  this.endProcess = function() {
+  this.end = function() {
     console.log(league.leagueInfo.leagueName + ': ending process');
     clearInterval(loopInterval);
     db.disconnect();

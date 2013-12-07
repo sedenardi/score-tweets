@@ -45,7 +45,7 @@ var processChange = function(changeObj) {
 };
 
 for (var i = 0; i < leagues.length; i++) {
-  leagues[i].startProcess();
+  leagues[i].start();
   leagues[i].on('change', processChange);
 }
 
