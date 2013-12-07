@@ -125,43 +125,43 @@ var gameChangeTweet = function(oldGame, newGame) {
   if (oldGame.State !== newGame.State) {
     if (oldGame.State === 'Scheduled' && newGame.State === 'Progress') {
       tweet.TweetString = 'Start of game: ' +
-        newGame.AwayTeamName + ' vs ' + newGame.HomeTeamName +
+        oldGame.AwayTeamName + ' vs ' + oldGame.HomeTeamName + ' ' +
         makeGameLink(newGame);
     }
     if (oldGame.State === 'Progress' && newGame.State === 'Intermission') {
       tweet.TweetString = 'End of ' + newGame.Period + '. ' +
-        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-        newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+        oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
         makeGameLink(newGame);
     }
     if (oldGame.State === 'Intermission' && newGame.State === 'Progress') {
       tweet.TweetString = 'Start of ' + newGame.Period + '. ' +
-        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-        newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+        oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
         makeGameLink(newGame);
     }
     if (oldGame.State === 'Progress' && newGame.State === 'Overtime') {
       tweet.TweetString = 'Headed to OT. ' +
-        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-        newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+        oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
         makeGameLink(newGame);
     }
     if (oldGame.State === 'Overtime' && newGame.State === 'Shootout') {
       tweet.TweetString = 'Headed to a shootout. ' +
-        newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-        newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+        oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+        oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
         makeGameLink(newGame);
     }
     if (newGame.State === 'Ended') {
       if (newGame.Period !== '') {
         tweet.TweetString = 'Final ' + newGame.Period + '. ' +
-          newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-          newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+          oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+          oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
           makeGameLink(newGame);
       } else {
         tweet.TweetString = 'Final. ' +
-          newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-          newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
+          oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+          oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ' +
           makeGameLink(newGame);
       }      
     }
@@ -186,7 +186,7 @@ var gameChangeTweet = function(oldGame, newGame) {
 
 var makeGameLink = function(game) {
   var linkStub = 'http://www.nhl.com/gamecenter/en/icetracker?id=';
-  return linkStub + game.gameId;
+  return linkStub + game.GameSymbol;
 };
 
 var insertGameQuery = function(game) {
@@ -268,10 +268,8 @@ var lastGameInstanceQuery = function(game) {
 
 var insertGameChangeTweetQuery = function(tweet) {
   var stmnt = 
-    'Insert into NHLTweets(InstanceID,TweetString)\
-    Select ?,?\
-    where not exists\
-      (Select 1 from NHLTweets where InstanceID = ?);';
+    'Insert ignore into NHLTweets(InstanceID,TweetString)\
+    Select ?,?;';
   var params = [tweet.InstanceID, tweet.TweetString, tweet.InstanceID];
   return {
     sql: stmnt,

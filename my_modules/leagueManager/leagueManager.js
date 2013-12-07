@@ -57,9 +57,11 @@ var LeagueManager = function(config, l) {
       var changed = league.gameChanged(oldGame[0], newGame);
       if (changed) {
         console.log(league.leagueInfo.leagueName + ': ' + newGame.GameSymbol + ' changed, ' + league.gameChangeString(oldGame[0], newGame));
-        insertGameInstance(newGame, function insertGameInstanceFinished() {
+        insertGameInstance(newGame, function insertGameInstanceFinished(result) {
+          newGame.InstanceID = result.insertId;
           console.log(league.leagueInfo.leagueName + ': Inserted new instance of: ' + newGame.GameSymbol);
           var changeObj = {
+            league: league,
             oldGame: oldGame[0],
             newGame: newGame
           };

@@ -147,7 +147,7 @@ var gameChangeTweet = function(oldGame, newGame) {
   if (oldGame.State !== newGame.State) {
     if (oldGame.State === 'Scheduled' && newGame.State === 'Progress') {
       tweet.TweetString = 'Start of game: ' +
-        newGame.AwayTeamName + ' vs ' + newGame.HomeTeamName +
+        newGame.AwayTeamName + ' vs ' + newGame.HomeTeamName + ' ' +
         makeGameLink(newGame);
     }
     if (oldGame.State === 'Progress' && newGame.State === 'Halftime') {
@@ -301,10 +301,8 @@ var lastGameInstanceQuery = function(game) {
 
 var insertGameChangeTweetQuery = function(tweet) {
   var stmnt = 
-    'Insert into NFLTweets(InstanceID,TweetString)\
-    Select ?,?\
-    where not exists\
-      (Select 1 from NFLTweets where InstanceID = ?);';
+    'Insert ignore into NFLTweets(InstanceID,TweetString)\
+    Select ?,?;';
   var params = [tweet.InstanceID, tweet.TweetString, tweet.InstanceID];
   return {
     sql: stmnt,
