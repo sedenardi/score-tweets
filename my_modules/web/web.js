@@ -82,7 +82,11 @@ var Web = function(config, rootDir) {
   app.get('/auth/twitter/callback', 
     passport.authenticate('twitter', { failureRedirect: '/login' }),
     function(req, res) {
-      if (typeof config.twitter.accounts[req.user.profile.username] !== 'undefined') {
+      var exists = false;
+      for (var i = 0; i < config.twitter.accounts.length; i++) {
+        exists = exists || (config.twitter.accounts[i].username === req.user.profile.username);
+      }
+      if (exists) {
         self.emit('auth', req.user);
         req.session.result = 'Successfully Authenticated';
       } else {

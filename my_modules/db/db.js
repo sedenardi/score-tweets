@@ -47,8 +47,8 @@ var select1 = function(next) {
   });
 };
 
-var query = function(stmnt, inserts, next) {
-  var sql = connection.format(stmnt, inserts);
+var query = function(cmd, next) {
+  var sql = connection.format(cmd.sql, cmd.inserts);
   connection.query(sql, function(err, res) {
     if (err) {
       console.log('MYSQL: ' + sql + ' \n' + err);
@@ -58,15 +58,21 @@ var query = function(stmnt, inserts, next) {
   });
 };
 
+var queryWithError = function(cmd, next) {
+  var sql = connection.format(cmd.sql, cmd.inserts);
+  connection.query(sql, next);
+};
+
 var logError = function(error, next) {
   var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?';
   var inserts = [error.source,error.message,error.stack];
   query(stmnt,inserts,next);
-}
+};
 
 /***** EXPORTS *****/
 module.exports.connect = handleDisconnect;
 module.exports.disconnect = disconnect;
 module.exports.select1 = select1;
 module.exports.query = query;
+module.exports.queryWithError = queryWithError;
 module.exports.logError = logError;

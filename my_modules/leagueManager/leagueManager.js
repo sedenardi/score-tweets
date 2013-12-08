@@ -6,25 +6,34 @@ var events = require('events'),
 var LeagueManager = function(config, l) {
   var self = this;
   var league = l;
-  var loopInterval;
+  var loopInterval = null;
   var started = false;
   this.start = function() {
-    if (typeof league === 'undefined') {
-      console.log('Can not start process, league is undefined. Call \'setLeague\' first.');
+    if (loopInterval !== null) {
+      console.log('Can not start LeagueManager, already running');
+    } else if (typeof league === 'undefined') {
+      console.log('Can not start LeagueManager, league is undefined. Call \'setLeague\' first.');
     } else if (typeof config.leagues[league.leagueInfo.leagueName].refreshInterval === 'undefined') {
-      condole.log('Can not start provess, missing refresl interval in config');
+      condole.log('Can not start LeagueManager, missing refresl interval in config');
     } else {
-      console.log(league.leagueInfo.leagueName + ': starting process');
-      db.connect(config, league.leagueInfo.leagueName, function startLoop() {
-        loopInterval = setInterval(loop, config.leagues[league.leagueInfo.leagueName].refreshInterval);
-        loop();
-        started = true;
+      console.log(league.leagueInfo.leagueName + ': starting League Manager');
+      db.connect(config, league.leagueInfo.leagueName + ' LeagueManager', function startLoop(err) {
+        if (err) {
+          console.log(league.leagueInfo.leagueName + ': LeagueManager can not connect to DB. ' + JSON.stringify(err));
+        } else {
+          loopInterval = setInterval(loop, config.leagues[league.leagueInfo.leagueName].refreshInterval);
+          loop();
+          started = true;
+        }
       });
     }
   };
 
   this.end = function() {
-    console.log(league.leagueInfo.leagueName + ': ending process');
+    if (loopInterval === null) {
+      console.log('Can not end process, not running');
+    }
+    console.log(league.leagueInfo.leagueName + ': ending League Manager');
     clearInterval(loopInterval);
     db.disconnect();
     started = false;
@@ -32,7 +41,7 @@ var LeagueManager = function(config, l) {
 
   var loop = function() {
     league.getGameArray(processGames);
-  }
+  };
 
   var processGames = function(err, games) {
     if (err) {
@@ -50,7 +59,7 @@ var LeagueManager = function(config, l) {
         });
       }(games[i]));
     }
-  }
+  };
 
   var processInstance = function(oldGame, newGame) {
     if (oldGame.length) {
@@ -80,23 +89,23 @@ var LeagueManager = function(config, l) {
 
   var insertGame = function(game, next) {
     var cmd = league.insertGameQuery(game);
-    db.query(cmd.sql, cmd.inserts, next);
+    db.query(cmd, next);
   };
 
   var insertGameInstance = function(game, next) {
     var cmd = league.insertGameInstanceQuery(game);
-    db.query(cmd.sql, cmd.inserts, next);
-  }
+    db.query(cmd, next);
+  };
 
   var getLastGameInstance = function(game, next) {
     var cmd = league.lastGameInstanceQuery(game);
-    db.query(cmd.sql, cmd.inserts, next);
+    db.query(cmd, next);
   };
 
   var insertGameChangeTweet = function(changeObj, next) {
     var tweet = league.gameChangeTweet(changeObj.oldGame, changeObj.newGame);
     var cmd = league.insertGameChangeTweetQuery(tweet);
-    db.query(cmd.sql, cmd.inserts, next);
+    db.query(cmd, next);
   };
   
   console.log('LeagueManager created with league: ' + league.leagueInfo.leagueName);

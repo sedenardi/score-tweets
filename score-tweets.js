@@ -1,6 +1,6 @@
 var fs = require('fs'),
-  db = require('./my_modules/db/db.js'),
   LeagueManager = require('./my_modules/leagueManager/leagueManager.js'),
+  TwitGame = require('./my_modules/twitter/twitGame.js'),
   NHL = require('./my_modules/leagueManager/nhl.js'),
   NFL = require('./my_modules/leagueManager/nfl.js'),
   Web = require('./my_modules/web/web.js');
@@ -17,19 +17,24 @@ try {
   console.log(e);
 }
 
-var leagues = [];
+var leagues = {};
+var twitters = {};
 
-var leagueNHL = new LeagueManager(config, NHL);
-leagues.push(leagueNHL);
+leagues.NHL = new LeagueManager(config, NHL);
+twitters.NHL = new TwitGame(config, NHL);
 
-var leagueNFL = new LeagueManager(config, NFL);
-leagues.push(leagueNFL);
+leagues.NFL = new LeagueManager(config, NFL);
+twitters.NFL = new TwitGame(config, NFL);
 
 var web = new Web(config, __dirname);
 
 web.on('auth', function receiveAuth(data) {
-  config.twitter.accounts[data.profile.username].access_token_key = data.token;
-  config.twitter.accounts[data.profile.username].access_token_secret = data.tokenSecret;
+  for (var i = 0; i < config.twitter.accounts.length; i++) {
+    if (config.twitter.accounts[i].username === data.profile.username) {
+      config.twitter.accounts[i].access_token_key = data.token;
+      config.twitter.accounts[i].access_token_secret = data.tokenSecret;
+    }
+  }
   fs.writeFile(configFile, JSON.stringify(config,null,2), function(e) {
     if (e) {
       console.log('Error saving config file.');
@@ -42,11 +47,14 @@ web.on('auth', function receiveAuth(data) {
 
 var processChange = function(changeObj) {
   console.log('New tweet created from ' + changeObj.league.leagueInfo.leagueName);
+  twitters[changeObj.league.leagueInfo.leagueName].tweet();
+
 };
 
-for (var i = 0; i < leagues.length; i++) {
-  leagues[i].start();
-  leagues[i].on('change', processChange);
-}
+leagues.NHL.start();
+leagues.NFL.start();
+
+twitters.NHL.start();
+twitters.NFL.start();
 
 web.startServer();

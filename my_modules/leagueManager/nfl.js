@@ -298,6 +298,37 @@ var insertGameChangeTweetQuery = function(tweet) {
   };
 };
 
+var nextTweetQuery = function() {
+  var stmnt = 
+    'Select\
+      tweet.TweetID\
+    , tweet.TweetString\
+    , tweet.RecordedOn\
+    from NFLTweets tweet\
+      inner join NFLGameInstances instance\
+        on instance.InstanceID = tweet.InstanceID\
+    where tweet.TwitterID is null\
+    and not exists\
+      (select 1 from NFLGameInstances newerInstance\
+      where newerInstance.GameID = instance.GameID\
+      and instance.RecordedOn < newerInstance.RecordedOn)\
+    order by tweet.RecordedOn asc limit 1;';
+  var params = [];
+  return {
+    sql: stmnt,
+    inserts: params
+  };
+};
+
+var updateTweetQuery = function(TweetID, TwitterID) {
+  var stmnt = 'Update NFLTweets set TwitterID = ? where TweetID = ?;';
+  var params = [TwitterID, TweetID];
+  return {
+    sql: stmnt,
+    inserts: params
+  };
+};
+
 module.exports.leagueInfo = leagueInfo;
 module.exports.getGameArray = getGameArray;
 module.exports.gameChanged = gameChanged;
@@ -308,3 +339,5 @@ module.exports.insertGameQuery = insertGameQuery;
 module.exports.insertGameInstanceQuery = insertGameInstanceQuery;
 module.exports.lastGameInstanceQuery = lastGameInstanceQuery;
 module.exports.insertGameChangeTweetQuery = insertGameChangeTweetQuery;
+module.exports.nextTweetQuery = nextTweetQuery;
+module.exports.updateTweetQuery = updateTweetQuery;

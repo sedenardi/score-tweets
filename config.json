@@ -23,14 +23,17 @@
     "app": {
       "consumerKey": "",
       "consumerSecret": "",
-      "callbackURL": ""
+      "callbackURL": "",
+      "refreshDelay": "2000",
+      "maxLagMinutes": "5"
     },
-    "accounts": {
-      "leagueUser": {
+    "accounts": [
+      {
+        "username": "",
         "league": "",
         "access_token_key": "",
         "access_token_secret": ""
       }
-    }
+    ]
   }
 }
