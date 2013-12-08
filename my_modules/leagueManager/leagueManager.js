@@ -104,8 +104,10 @@ var LeagueManager = function(config, l) {
 
   var insertGameChangeTweet = function(changeObj, next) {
     var tweet = league.gameChangeTweet(changeObj.oldGame, changeObj.newGame);
-    var cmd = league.insertGameChangeTweetQuery(tweet);
-    db.query(cmd, next);
+    if (tweet) {
+      var cmd = league.insertGameChangeTweetQuery(tweet);
+      db.query(cmd, next);
+    }
   };
   
   console.log('LeagueManager created with league: ' + league.leagueInfo.leagueName);

@@ -67,7 +67,7 @@ var logError = function(error, next) {
   if (typeof error.source !== 'undefined' &&
     typeof error.message !== 'undefined' &&
     typeof error.stack !== 'undefined') {
-    var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?';
+    var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?;';
     var inserts = [error.source,error.message,error.stack];
     query(stmnt,inserts,next);
   }

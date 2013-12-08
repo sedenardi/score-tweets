@@ -40,17 +40,17 @@ var TwitGame = function(config, l) {
     twit.updateStatus(tweet.TweetString, function twitterResponse(err,data) {
       if (err){
         console.log(league.leagueInfo.leagueName + '-TwitGame: ERROR - ' + JSON.stringify(err));
-        var e = {
-          source: 'TwitGame',
-          message: 'ERROR',
-          stack: JSON.stringify(err)
-        };
-        db.logError(e, function(){});
         looping = false;
         if (typeof err.statusCode !== 'undefined' && err.statusCode === 403) {
           console.log(league.leagueInfo.leagueName + '-TwitGame: throttling');
           throttled = true;
           setTimeout(undoThrottle,240000);
+          var e = {
+            source: 'TwitGame',
+            message: 'ERROR',
+            stack: 'Throttling'
+          };
+          db.logError(e, function(){});
         }
       } else {
         updateTweet(tweet.TweetID, data.id_str, next);
