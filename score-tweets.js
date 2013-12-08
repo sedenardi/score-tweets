@@ -51,6 +51,8 @@ var processChange = function(changeObj) {
 
 };
 
+leagues.NHL.on('change', processChange);
+leagues.NFL.on('change', processChange);
 leagues.NHL.start();
 leagues.NFL.start();
 

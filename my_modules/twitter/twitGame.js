@@ -30,16 +30,17 @@ var TwitGame = function(config, l) {
   }
 
   var sendTweet = function(tweet, next) {
-    /*twit.updateStatus(tweet.TweetString, function twitterResponse(err,data) {
+    twit.updateStatus(tweet.TweetString, function twitterResponse(err,data) {
       if (err){
+        console.log(league.leagueInfo.leagueName + '-TwitGame: ERROR - ' + JSON.stringify(err));
         err.source = 'TwitGame';
         db.logError(err, function(){});
         looping = false;
       } else {
         updateTweet(tweet.TweetID, data.id_str, next);
       }
-    });*/
-    updateTweet(tweet.TweetID, 'test', next);
+    });
+    //updateTweet(tweet.TweetID, 'test', next);
   };
 
   var updateTweet = function(TweetID, TwitterID, next) {
