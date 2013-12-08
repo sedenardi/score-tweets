@@ -195,7 +195,7 @@ var gameChangeTweet = function(oldGame, newGame) {
 
 var makeGameLink = function(game) {
   var link = 'http://www.nfl.com/gamecenter/' +
-    game.GameID + 
+    game.GameSymbol + 
     '/' + 
     game.SeasonYear + 
     '/' + 
