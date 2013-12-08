@@ -12,6 +12,7 @@ var TwitGame = function(config, l) {
   var ready = false;
   var looping = false;
   var loopTimeout = null;
+  var throttled = false;
 
   for (var i = 0; i < config.twitter.accounts.length; i++) {
     if (config.twitter.accounts[i].league === league.leagueInfo.leagueName) {
@@ -29,13 +30,28 @@ var TwitGame = function(config, l) {
     }
   }
 
+  var undoThrottle = function() {
+    console.log(league.leagueInfo.leagueName + '-TwitGame: Undoing throttle');
+    throttled = false;
+    tweet();
+  };
+
   var sendTweet = function(tweet, next) {
     twit.updateStatus(tweet.TweetString, function twitterResponse(err,data) {
       if (err){
         console.log(league.leagueInfo.leagueName + '-TwitGame: ERROR - ' + JSON.stringify(err));
-        err.source = 'TwitGame';
-        db.logError(err, function(){});
+        var e = {
+          source: 'TwitGame',
+          message: 'ERROR',
+          stack: JSON.stringify(err)
+        };
+        db.logError(e, function(){});
         looping = false;
+        if (typeof err.statusCode !== 'undefined' && err.statusCode === 403) {
+          console.log(league.leagueInfo.leagueName + '-TwitGame: throttling');
+          throttled = true;
+          setTimeout(undoThrottle,240000);
+        }
       } else {
         updateTweet(tweet.TweetID, data.id_str, next);
       }
@@ -69,7 +85,7 @@ var TwitGame = function(config, l) {
   };
 
   this.tweet = function() {
-    if (!looping) {
+    if (!looping && !throttled) {
       looping = true;
       checkForTweet();
     }
