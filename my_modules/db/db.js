@@ -64,9 +64,13 @@ var queryWithError = function(cmd, next) {
 };
 
 var logError = function(error, next) {
-  var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?';
-  var inserts = [error.source,error.message,error.stack];
-  query(stmnt,inserts,next);
+  if (typeof error.source !== 'undefined' &&
+    typeof error.message !== 'undefined' &&
+    typeof error.stack !== 'undefined') {
+    var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?';
+    var inserts = [error.source,error.message,error.stack];
+    query(stmnt,inserts,next);
+  }
 };
 
 /***** EXPORTS *****/
