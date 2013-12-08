@@ -102,11 +102,31 @@ var parseRawGame = function(rawGame) {
 };
 
 var gameChanged = function(oldGame, newGame) {
-  return (oldGame.GameSymbol === newGame.GameSymbol) &&
+  if (oldGame.GameSymbol === newGame.GameSymbol) {
+    if (oldGame.State !== newGame.State) {
+      return true;
+    }
+    if (oldGame.Quarter !== newGame.Quarter) {
+      return true;
+    }
+    if (oldGame.AwayScore !== newGame.AwayScore ||
+      oldGame.HomeScore !== newGame.HomeScore) {
+      if ((oldGame.Quarter === newGame.Quarter && 
+        oldGame.Time >= newGame.Time) ||
+        oldGame.Quarter < newGame.Quarter) {
+        return true;
+      }
+    }
+  }
+  return false;
+  /*return (oldGame.GameSymbol === newGame.GameSymbol) &&
     ( (oldGame.State !== newGame.State) ||
       (oldGame.Quarter !== newGame.Quarter) ||
-      (oldGame.AwayScore !== newGame.AwayScore) ||
-      (oldGame.HomeScore !== newGame.HomeScore));
+      ((oldGame.AwayScore !== newGame.AwayScore) ||
+      (oldGame.HomeScore !== newGame.HomeScore) && 
+      ((oldGame.Quarter === newGame.Quarter &&
+        oldGame.Time > newGame.Time) ||
+      oldGame.Quarter < newGame.Quarter)));*/
 };
 
 var gameChangeString = function(oldGame, newGame) {
@@ -177,15 +197,20 @@ var gameChangeTweet = function(oldGame, newGame) {
       tweet.TweetString = 'Start of ' + makeQuarterString(newGame.Quarter) + '. ' +
         scores + makeGameLink(newGame);*/
   } else if ((oldGame.Quarter === newGame.Quarter 
-    && oldGame.Time > newGame.Time) ||
+    && oldGame.Time >= newGame.Time) ||
     (oldGame.Quarter < newGame.Quarter)) {
-    if (oldGame.AwayScore !== newGame.AwayScore) {
+    if (oldGame.AwayScore > newGame.AwayScore ||
+      oldGame.HomeScore > newGame.HomeScore) {
+      tweet.TweetString = 'Score correction. ' +
+        scores + newGame.Time + ' ' + 
+        makeQuarterString(newGame.Quarter) + ' ' +
+        makeGameLink(newGame);
+    } else if (oldGame.AwayScore !== newGame.AwayScore) {
       tweet.TweetString = newGame.AwayTeamName + ' score. ' +
         scores + newGame.Time + ' ' + 
         makeQuarterString(newGame.Quarter) + ' ' +
         makeGameLink(newGame);
-    }
-    if (oldGame.HomeScore !== newGame.HomeScore) {
+    } else if (oldGame.HomeScore !== newGame.HomeScore) {
       tweet.TweetString = newGame.HomeTeamName + ' score. ' +
         scores + newGame.Time + ' ' + 
         makeQuarterString(newGame.Quarter) + ' ' +
