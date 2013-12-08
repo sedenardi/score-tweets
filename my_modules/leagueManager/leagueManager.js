@@ -104,7 +104,7 @@ var LeagueManager = function(config, l) {
 
   var insertGameChangeTweet = function(changeObj, next) {
     var tweet = league.gameChangeTweet(changeObj.oldGame, changeObj.newGame);
-    if (tweet) {
+    if (tweet.TweetString.length) {
       var cmd = league.insertGameChangeTweetQuery(tweet);
       db.query(cmd, next);
     }

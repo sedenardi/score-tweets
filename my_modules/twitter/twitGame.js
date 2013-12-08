@@ -33,7 +33,8 @@ var TwitGame = function(config, l) {
   var undoThrottle = function() {
     console.log(league.leagueInfo.leagueName + '-TwitGame: Undoing throttle');
     throttled = false;
-    tweet();
+    looping = true;
+    checkForTweet();
   };
 
   var sendTweet = function(tweet, next) {
@@ -45,12 +46,12 @@ var TwitGame = function(config, l) {
           console.log(league.leagueInfo.leagueName + '-TwitGame: throttling');
           throttled = true;
           setTimeout(undoThrottle,240000);
-          var e = {
+          /*var e = {
             source: 'TwitGame',
             message: 'ERROR',
             stack: 'Throttling'
           };
-          db.logError(e, function(){});
+          db.logError(e, function(){});*/
         }
       } else {
         updateTweet(tweet.TweetID, data.id_str, next);

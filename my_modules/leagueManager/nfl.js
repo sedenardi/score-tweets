@@ -145,7 +145,7 @@ var gameChangeTweet = function(oldGame, newGame) {
     TweetString: ''
   };
   var scores = newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-        newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ';
+    newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ';
   if (oldGame.State !== newGame.State) {
     if (oldGame.State === 'Scheduled' && newGame.State === 'Progress') {
       tweet.TweetString = 'Start of game: ' +
@@ -190,6 +190,7 @@ var gameChangeTweet = function(oldGame, newGame) {
         makeGameLink(newGame);
     }
   }
+  return tweet;
 };
 
 var makeGameLink = function(game) {
