@@ -176,7 +176,9 @@ var gameChangeTweet = function(oldGame, newGame) {
   /*} else if (oldGame.Quarter !== newGame.Quarter) {
       tweet.TweetString = 'Start of ' + makeQuarterString(newGame.Quarter) + '. ' +
         scores + makeGameLink(newGame);*/
-  } else {
+  } else if ((oldGame.Quarter === newGame.Quarter 
+    && oldGame.Time > newGame.Time) ||
+    (oldGame.Quarter < newGame.Quarter)) {
     if (oldGame.AwayScore !== newGame.AwayScore) {
       tweet.TweetString = newGame.AwayTeamName + ' score. ' +
         scores + newGame.Time + ' ' + 
