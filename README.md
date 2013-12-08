@@ -23,6 +23,9 @@ Fetches, compares, and stores scores for a given league.
 ### nhl.js & nfl.js
 Object definition, methods for parsing games, and queries for NHL & NFL games.
 
+### twitGame.js
+Tweeter. Throttles queued tweets.
+
 ### config.js
 Account information, server names, and constants.
 
