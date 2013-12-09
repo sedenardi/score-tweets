@@ -103,6 +103,9 @@ var parseRawGame = function(rawGame) {
 
 var gameChanged = function(oldGame, newGame) {
   if (oldGame.GameSymbol === newGame.GameSymbol) {
+    if (oldGame.State === 'Ended' && newGame.State !== 'Ended') {
+      return false;
+    }
     if (oldGame.State !== newGame.State) {
       return true;
     }
