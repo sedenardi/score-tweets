@@ -43,15 +43,28 @@ var TwitGame = function(config, l) {
         console.log(league.leagueInfo.leagueName + '-TwitGame: ERROR - ' + JSON.stringify(err));
         looping = false;
         if (typeof err.statusCode !== 'undefined' && err.statusCode === 403) {
-          console.log(league.leagueInfo.leagueName + '-TwitGame: throttling');
-          throttled = true;
-          setTimeout(undoThrottle,240000);
-          /*var e = {
-            source: 'TwitGame',
-            message: 'ERROR',
-            stack: 'Throttling'
-          };
-          db.logError(e, function(){});*/
+          var errData;
+          try {
+            errData = JSON.parse(err.data);
+          } catch (e) {
+            console.log(league.leagueInfo.leagueName + '-TwitGame: update error - ' + JSON.stringify(e));
+          }
+          if (typeof errData !== 'undefined' && typeof errData.errors[0] !== 'undefined' &&
+            errData.errors[0].code === 187) {
+            console.log(league.leagueInfo.leagueName + '-TwitGame: SENT A DUPE, NO WAY JOSE!');
+            updateTweet(tweet.TweetID, 'DUPE', next(null,'DUPE'));
+          }
+          else {
+            console.log(league.leagueInfo.leagueName + '-TwitGame: throttling');
+            throttled = true;
+            setTimeout(undoThrottle,240000);
+            /*var e = {
+              source: 'TwitGame',
+              message: 'ERROR',
+              stack: 'Throttling'
+            };
+            db.logError(e, function(){});*/
+          }
         }
       } else {
         updateTweet(tweet.TweetID, data.id_str, next);
@@ -75,7 +88,9 @@ var TwitGame = function(config, l) {
             db.logError(err, function(){});
             looping = false;
           } else {
-            setTimeout(checkForTweet, config.twitter.app.refreshDelay);
+            if (res === 'undefined'){
+              setTimeout(checkForTweet, config.twitter.app.refreshDelay);
+            }
             console.log(league.leagueInfo.leagueName + '-TwitGame: Tweet successful');
           }
         });
