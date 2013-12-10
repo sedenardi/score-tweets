@@ -364,6 +364,103 @@ var NFL = function() {
     };
   };
 
+  this.latestGamesQuery = function(hoursAgo) {
+    var stmnt = 
+      'Select\
+        instance.GameID\
+      , instance.InstanceID\
+      , (Select TwitterID\
+        from NFLTweets tweet\
+          inner join NFLGameInstances lastTweet\
+            on lastTweet.InstanceID = tweet.InstanceID\
+        where lastTweet.GameID = instance.GameID\
+        and tweet.TwitterID REGEXP \'[0-9]+\'\
+        order by tweet.RecordedOn desc limit 1) as LastTwitterID\
+      , game.GameSymbol\
+      , game.Date\
+      , state.State\
+      , game.SeasonYear\
+      , game.SeasonType\
+      , game.SeasonWeek\
+      , instance.Time\
+      , instance.Quarter\
+      , away.City as AwayTeamCity\
+      , away.Name as AwayTeamName\
+      , away.DisplayName as AwayTeamDisplayName\
+      , instance.AwayScore\
+      , home.City as HomeTeamCity\
+      , home.Name as HomeTeamName\
+      , home.DisplayName as HomeTeamDisplayName\
+      , instance.HomeScore\
+      from NFLGameInstances instance\
+        inner join NFLGames game\
+          on game.GameID = instance.GameID\
+        inner join NFLStates state\
+          on state.StateID = instance.StateID\
+        inner join NFLTeams away\
+          on away.TeamID = game.AwayTeamID\
+        inner join NFLTeams home\
+          on home.TeamID = game.HomeTeamID\
+      where instance.RecordedOn > DATE_SUB(NOW(),INTERVAL ? HOUR)\
+      and not exists\
+        (Select 1 from NFLGameInstances newerInstance\
+        where newerInstance.GameID = instance.GameID\
+        and instance.RecordedOn < newerInstance.RecordedOn);';
+    var params = [hoursAgo];
+    return {
+      sql: stmnt,
+      inserts: params
+    };
+  };
+
+  this.scheduledGamesQuery = function() {
+    var stmnt = 
+      'Select\
+        instance.GameID\
+      , instance.InstanceID\
+      , (Select TwitterID\
+        from NFLTweets tweet\
+          inner join NFLGameInstances lastTweet\
+            on lastTweet.InstanceID = tweet.InstanceID\
+        where lastTweet.GameID = instance.GameID\
+        and tweet.TwitterID REGEXP \'[0-9]+\'\
+        order by tweet.RecordedOn desc limit 1) as LastTwitterID\
+      , game.GameSymbol\
+      , game.Date\
+      , state.State\
+      , game.SeasonYear\
+      , game.SeasonType\
+      , game.SeasonWeek\
+      , instance.Time\
+      , instance.Quarter\
+      , away.City as AwayTeamCity\
+      , away.Name as AwayTeamName\
+      , away.DisplayName as AwayTeamDisplayName\
+      , instance.AwayScore\
+      , home.City as HomeTeamCity\
+      , home.Name as HomeTeamName\
+      , home.DisplayName as HomeTeamDisplayName\
+      , instance.HomeScore\
+      from NFLGameInstances instance\
+        inner join NFLGames game\
+          on game.GameID = instance.GameID\
+        inner join NFLStates state\
+          on state.StateID = instance.StateID\
+        inner join NFLTeams away\
+          on away.TeamID = game.AwayTeamID\
+        inner join NFLTeams home\
+          on home.TeamID = game.HomeTeamID\
+      where state.State like \'Scheduled\'\
+      and not exists\
+        (Select 1 from NFLGameInstances newerInstance\
+        where newerInstance.GameID = instance.GameID\
+        and instance.RecordedOn < newerInstance.RecordedOn);';
+    var params = [];
+    return {
+      sql: stmnt,
+      inserts: params
+    };
+  };
 };
 
 module.exports = new NFL();

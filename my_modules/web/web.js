@@ -4,9 +4,10 @@ var events = require('events'),
   helpers = require('./helpers.js'),
   passport = require('passport'),
   util = require('util'),
-  TwitterStrategy = require('passport-twitter').Strategy;
+  TwitterStrategy = require('passport-twitter').Strategy,
+  db = require('../db/db.js');
 
-var Web = function(config, rootDir) {
+var Web = function(config, rootDir, leagues) {
   var self = this;
   
   passport.serializeUser(function(user, done) {
@@ -66,6 +67,32 @@ var Web = function(config, rootDir) {
     res.render('account', { user: req.user });
   });*/
 
+  app.get('/GetLatestGames', function (req, res) {
+      if (typeof req.query.league !== 'undefined') {
+        var leagueName = req.query.league;
+        if (typeof leagues[leagueName] !== 'undefined') {
+          if (typeof req.query.hoursAgo !== 'undefined' &&
+            !isNaN(parseInt(req.query.hoursAgo))) {
+            var cmd = leagues[leagueName].latestGamesQuery(req.query.hoursAgo);
+            db.queryWithError(cmd, function webDBReturn(err,data) {
+              if (err) {
+                console.log('web DB error');
+                res.json(500,err);
+              } else {
+                res.json(200,data);
+              }
+            });
+          } else {
+            res.json(402, { error: 'must specify valid hoursAgo parameter.'});
+          }          
+        } else {
+          res.json(402, { error: 'Specified league does not exist.'});
+        }
+      } else {
+        res.json(402, { error: 'Must specify league parameter.'});
+      }
+  });
+
   app.get('/login', function(req, res){
     res.render('login', { 
       user: req.user,
@@ -101,8 +128,10 @@ var Web = function(config, rootDir) {
   });  
 
   this.startServer = function() {
-    app.listen(config.web.port, function createSuccess() {
-      console.log('Created web server');
+    db.connect(config, 'WEB', function webDB() {
+      app.listen(config.web.port, function webStarted() {
+        console.log('Created web server');
+      });
     });
   };
   

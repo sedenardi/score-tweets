@@ -301,6 +301,98 @@ var NHL = function() {
       inserts: params
     };
   };
+
+  this.latestGamesQuery = function(hoursAgo) {
+    var stmnt = 
+      'Select\
+        instance.GameID\
+      , instance.InstanceID\
+      , (Select TwitterID\
+        from NHLTweets tweet\
+          inner join NHLGameInstances lastTweet\
+            on lastTweet.InstanceID = tweet.InstanceID\
+        where lastTweet.GameID = instance.GameID\
+        and tweet.TwitterID REGEXP \'[0-9]+\'\
+        order by tweet.RecordedOn desc limit 1) as LastTwitterID\
+      , game.GameSymbol\
+      , game.Date\
+      , state.State\
+      , instance.Time\
+      , instance.Period\
+      , away.City as AwayTeamCity\
+      , away.Name as AwayTeamName\
+      , away.DisplayName as AwayTeamDisplayName\
+      , instance.AwayScore\
+      , home.City as HomeTeamCity\
+      , home.Name as HomeTeamName\
+      , home.DisplayName as HomeTeamDisplayName\
+      , instance.HomeScore\
+      from NHLGameInstances instance\
+        inner join NHLGames game\
+          on game.GameID = instance.GameID\
+        inner join NHLStates state\
+          on state.StateID = instance.StateID\
+        inner join NHLTeams away\
+          on away.TeamID = game.AwayTeamID\
+        inner join NHLTeams home\
+          on home.TeamID = game.HomeTeamID\
+      where instance.RecordedOn > DATE_SUB(NOW(),INTERVAL ? HOUR)\
+      and not exists\
+        (Select 1 from NHLGameInstances newerInstance\
+        where newerInstance.GameID = instance.GameID\
+        and instance.RecordedOn < newerInstance.RecordedOn);';
+    var params = [hoursAgo];
+    return {
+      sql: stmnt,
+      inserts: params
+    };
+  };
+
+  this.scheduledGamesQuery = function() {
+    var stmnt = 
+      'Select\
+        instance.GameID\
+      , instance.InstanceID\
+      , (Select TwitterID\
+        from NHLTweets tweet\
+          inner join NHLGameInstances lastTweet\
+            on lastTweet.InstanceID = tweet.InstanceID\
+        where lastTweet.GameID = instance.GameID\
+        and tweet.TwitterID REGEXP \'[0-9]+\'\
+        order by tweet.RecordedOn desc limit 1) as LastTwitterID\
+      , game.GameSymbol\
+      , game.Date\
+      , state.State\
+      , instance.Time\
+      , instance.Period\
+      , away.City as AwayTeamCity\
+      , away.Name as AwayTeamName\
+      , away.DisplayName as AwayTeamDisplayName\
+      , instance.AwayScore\
+      , home.City as HomeTeamCity\
+      , home.Name as HomeTeamName\
+      , home.DisplayName as HomeTeamDisplayName\
+      , instance.HomeScore\
+      from NHLGameInstances instance\
+        inner join NHLGames game\
+          on game.GameID = instance.GameID\
+        inner join NHLStates state\
+          on state.StateID = instance.StateID\
+        inner join NHLTeams away\
+          on away.TeamID = game.AwayTeamID\
+        inner join NHLTeams home\
+          on home.TeamID = game.HomeTeamID\
+      where state.State like \'Scheduled\'\
+      and not exists\
+        (Select 1 from NHLGameInstances newerInstance\
+        where newerInstance.GameID = instance.GameID\
+        and instance.RecordedOn < newerInstance.RecordedOn);';
+    var params = [];
+    return {
+      sql: stmnt,
+      inserts: params
+    };
+  };
 };
 
 module.exports = new NHL();

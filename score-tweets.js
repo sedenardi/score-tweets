@@ -17,16 +17,19 @@ try {
   console.log(e);
 }
 
-var leagues = {};
-var twitters = {};
+var leagues = {},
+  leagueManagers = {},
+  twitters = {};
 
-leagues.NHL = new LeagueManager(config, NHL);
+leagues.NHL = NHL;
+leagueManagers.NHL = new LeagueManager(config, NHL);
 twitters.NHL = new TwitGame(config, NHL);
 
-leagues.NFL = new LeagueManager(config, NFL);
+leagues.NFL = NFL;
+leagueManagers.NFL = new LeagueManager(config, NFL);
 twitters.NFL = new TwitGame(config, NFL);
 
-var web = new Web(config, __dirname);
+var web = new Web(config, __dirname,leagues);
 
 web.on('auth', function receiveAuth(data) {
   for (var i = 0; i < config.twitter.accounts.length; i++) {
@@ -51,10 +54,10 @@ var processChange = function(changeObj) {
 
 };
 
-leagues.NHL.on('change', processChange);
-leagues.NFL.on('change', processChange);
-leagues.NHL.start();
-leagues.NFL.start();
+leagueManagers.NHL.on('change', processChange);
+leagueManagers.NFL.on('change', processChange);
+leagueManagers.NHL.start();
+leagueManagers.NFL.start();
 
 twitters.NHL.start();
 twitters.NFL.start();
