@@ -71,10 +71,10 @@ var NFL = function() {
         gameState = 'Halftime';
         break;
       case 'F':
-        gameState = 'Ended';
+        gameState = 'Final';
         break;
       case 'FO':
-        gameState = 'Ended';
+        gameState = 'Final';
         break;
       case '5':
         gameState = 'Overtime';
@@ -107,7 +107,7 @@ var NFL = function() {
 
   this.gameChanged = function(oldGame, newGame) {
     if (oldGame.GameSymbol === newGame.GameSymbol) {
-      if (oldGame.State === 'Ended' && newGame.State !== 'Ended') {
+      if (oldGame.State === 'Final' && newGame.State !== 'Final') {
         return false;
       }
       if (oldGame.State !== newGame.State) {
@@ -191,7 +191,7 @@ var NFL = function() {
         tweet.TweetString = 'Headed to OT. ' +
           scores + self.makeGameLink(newGame);
       }*/
-      if (newGame.State === 'Ended') {
+      if (newGame.State === 'Final') {
         if (oldGame.State === 'Overtime') {
           tweet.TweetString = 'Final OT. ' +
             scores + self.makeGameLink(newGame);

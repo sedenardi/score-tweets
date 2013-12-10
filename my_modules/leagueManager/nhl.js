@@ -79,7 +79,7 @@ var NHL = function() {
         }
         break;
       case '5':
-        gameState = 'Ended';
+        gameState = 'Final';
         var arr = rawGame.ts.split(' ');
         var dateArr = arr[arr.length-1].split('/');
         date.setMonth(parseInt(dateArr[0])-1);
@@ -151,7 +151,7 @@ var NHL = function() {
         tweet.TweetString = 'Headed to a shootout. ' +
           scores + self.makeGameLink(newGame);
       }*/
-      if (newGame.State === 'Ended') {
+      if (newGame.State === 'Final') {
         if (oldGame.State === 'Shootout') {
           tweet.TweetString = 'Final SO. ' +
             scores + self.makeGameLink(newGame);

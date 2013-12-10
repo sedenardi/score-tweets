@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `nhlstates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `nhlstates` (`StateID`, `State`) VALUES
-	(6, 'Ended'),
+	(6, 'Final'),
 	(3, 'Intermission'),
 	(4, 'Overtime'),
 	(2, 'Progress'),
