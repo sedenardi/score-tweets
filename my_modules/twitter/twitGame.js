@@ -3,16 +3,21 @@ var twitter = require('ntwitter'),
   events = require('events'),
   util = require('util');
 
-var TwitGame = function(config, l) {
+var TwitGame = function(config, league) {
 
-  var self = this;
-  var league = l;
-  var accountName;
-  var twit;
-  var ready = false;
-  var looping = false;
-  var loopTimeout = null;
-  var throttled = false;
+  var statuses = {
+    stopped: 'No DB connection',
+    idle: 'Not looping or waiting',
+    looping: 'Looping through work to do',
+    throttled: 'Waiting to try and send another tweet'
+  };
+
+  var self = this,
+    loopTimeout = null,
+    status = statuses.stopped,
+    logTag = league.leagueInfo.leagueName + '-TwitGame',
+    accountName,
+    twit;
 
   for (var i = 0; i < config.twitter.accounts.length; i++) {
     if (config.twitter.accounts[i].league === league.leagueInfo.leagueName) {
@@ -31,32 +36,31 @@ var TwitGame = function(config, l) {
   }
 
   var undoThrottle = function() {
-    console.log(league.leagueInfo.leagueName + '-TwitGame: Undoing throttle');
-    throttled = false;
-    looping = true;
+    console.log(logTag + ': Undoing throttle');
+    status = statuses.looping;
     checkForTweet();
   };
 
   var sendTweet = function(tweet, next) {
     twit.updateStatus(tweet.TweetString, function twitterResponse(err,data) {
       if (err){
-        console.log(league.leagueInfo.leagueName + '-TwitGame: ERROR - ' + JSON.stringify(err));
-        looping = false;
+        console.log(logTag + ': ERROR - ' + JSON.stringify(err));
+        status = statuses.idle;
         if (typeof err.statusCode !== 'undefined' && err.statusCode === 403) {
           var errData;
           try {
             errData = JSON.parse(err.data);
           } catch (e) {
-            console.log(league.leagueInfo.leagueName + '-TwitGame: update error - ' + JSON.stringify(e));
+            console.log(logTag + ': update error - ' + JSON.stringify(e));
           }
           if (typeof errData !== 'undefined' && typeof errData.errors[0] !== 'undefined' &&
             errData.errors[0].code === 187) {
-            console.log(league.leagueInfo.leagueName + '-TwitGame: SENT A DUPE, NO WAY JOSE!');
+            console.log(logTag + ': SENT A DUPE, NO WAY JOSE!');
             updateTweet(tweet.TweetID, 'DUPE', next(null,'DUPE'));
           }
           else {
-            console.log(league.leagueInfo.leagueName + '-TwitGame: throttling');
-            throttled = true;
+            console.log(logTag + ': throttling');
+            status = statuses.throttled;
             setTimeout(undoThrottle,240000);
             /*var e = {
               source: 'TwitGame',
@@ -70,7 +74,6 @@ var TwitGame = function(config, l) {
         updateTweet(tweet.TweetID, data.id_str, next);
       }
     });
-    //updateTweet(tweet.TweetID, 'test', next);
   };
 
   var updateTweet = function(TweetID, TwitterID, next) {
@@ -86,37 +89,38 @@ var TwitGame = function(config, l) {
           if (err) {
             err.source = 'TwitGame';
             db.logError(err, function(){});
-            looping = false;
+            status = statuses.idle;
           } else {
-            if (res === 'undefined'){
-              setTimeout(checkForTweet, config.twitter.app.refreshDelay);
-            }
-            console.log(league.leagueInfo.leagueName + '-TwitGame: Tweet successful');
+            setTimeout(checkForTweet, config.twitter.app.refreshDelay);
+            console.log(logTag + ': Tweet successful');
           }
         });
       } else {
-        looping = false;
+        console.log(logTag + ': Nothing to tweet, going idle');
+        status = statuses.idle;
       }
     });
   };
 
   this.tweet = function() {
-    if (!looping && !throttled) {
-      looping = true;
+    if (status === statuses.throttled) {
+      console.log(logTag + ': Throttled');
+    } else if (status === statuses.idle) {
+      status = statuses.looping;
       checkForTweet();
     }
   };
 
   this.start = function() {
     if (typeof twit === 'undefined') {
-      console.log(league.leagueInfo.leagueName + ': Can not start TwitGame, check config.');
+      console.log(logTag + ': Can not start TwitGame, check config.');
     } else {
-      console.log(league.leagueInfo.leagueName + ': starting TwitGame');
-      db.connect(config, league.leagueInfo.leagueName + ' TwitGame', function startLoop(err) {
+      console.log(logTag + ': starting TwitGame');
+      db.connect(config, logTag, function startLoop(err) {
         if (err) {
-          console.log(league.leagueInfo.leagueName + ': TwitGame can not connect to DB. ' + JSON.stringify(err));
+          console.log(logTag + ': TwitGame can not connect to DB. ' + JSON.stringify(err));
         } else {
-          ready = true;
+          status = statuses.idle;
           checkForTweet();
         }
       });
@@ -124,9 +128,9 @@ var TwitGame = function(config, l) {
   };
 
   this.end = function() {
-    console.log(league.leagueInfo.leagueName + ': ending TwitGame');
+    console.log(logTag + ': ending TwitGame');
     db.disconnect();
-    ready = false;
+    status = statuses.stopped;
   };
 };
 
