@@ -4,6 +4,13 @@ var http = require('http'),
 var NFL = function() {
 
   var self = this;
+  var numTrans = {
+    1: "1st",
+    2: "2nd",
+    3: "3rd",
+    4: "4th",
+    5: "OT"
+  };
 
   this.leagueInfo = {
     leagueName: 'NFL',
@@ -149,23 +156,6 @@ var NFL = function() {
     return dif.join(',');
   };
 
-  this.makeQuarterString = function(quarter) {
-    switch (quarter) {
-      case '1':
-        return '1st';
-      case '2':
-        return '2nd';
-      case '3':
-        return '3rd';
-      case '4':
-        return '4th';
-      case '5':
-        return 'OT';
-      default:
-        return '';
-    }
-  }
-
   this.gameChangeTweet = function(oldGame, newGame) {
     var tweet = {
       InstanceID: newGame.InstanceID,
@@ -201,7 +191,7 @@ var NFL = function() {
         }
       }
     /*} else if (oldGame.Quarter !== newGame.Quarter) {
-        tweet.TweetString = 'Start of ' + self.makeQuarterString(newGame.Quarter) + '. ' +
+        tweet.TweetString = 'Start of ' + numTrans[newGame.Quarter] + '. ' +
           scores + self.makeGameLink(newGame);*/
     } else if ((oldGame.Quarter === newGame.Quarter 
       && oldGame.Time >= newGame.Time) ||
@@ -210,17 +200,17 @@ var NFL = function() {
         oldGame.HomeScore > newGame.HomeScore) {
         tweet.TweetString = 'Score correction. ' +
           scores + newGame.Time + ' ' + 
-          self.makeQuarterString(newGame.Quarter) + ' ' +
+          numTrans[newGame.Quarter] + ' ' +
           self.makeGameLink(newGame);
       } else if (oldGame.AwayScore !== newGame.AwayScore) {
         tweet.TweetString = newGame.AwayTeamName + ' score. ' +
           scores + newGame.Time + ' ' + 
-          self.makeQuarterString(newGame.Quarter) + ' ' +
+          numTrans[newGame.Quarter] + ' ' +
           self.makeGameLink(newGame);
       } else if (oldGame.HomeScore !== newGame.HomeScore) {
         tweet.TweetString = newGame.HomeTeamName + ' score. ' +
           scores + newGame.Time + ' ' + 
-          self.makeQuarterString(newGame.Quarter) + ' ' +
+          numTrans[newGame.Quarter] + ' ' +
           self.makeGameLink(newGame);
       }
     }
@@ -367,7 +357,8 @@ var NFL = function() {
   this.latestGamesQuery = function(hoursAgo) {
     var stmnt = 
       'Select\
-        instance.GameID\
+        \'NFL\' as League\
+      , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
         from NFLTweets tweet\
@@ -401,7 +392,8 @@ var NFL = function() {
           on away.TeamID = game.AwayTeamID\
         inner join NFLTeams home\
           on home.TeamID = game.HomeTeamID\
-      where instance.RecordedOn > DATE_SUB(NOW(),INTERVAL ? HOUR)\
+      where (instance.RecordedOn > DATE_SUB(NOW(),INTERVAL ? HOUR)\
+        or state.State like \'Scheduled\')\
       and not exists\
         (Select 1 from NFLGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
@@ -416,7 +408,8 @@ var NFL = function() {
   this.scheduledGamesQuery = function() {
     var stmnt = 
       'Select\
-        instance.GameID\
+        \'NFL\' as League\
+      , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
         from NFLTweets tweet\
