@@ -1,11 +1,11 @@
-<div class="game {{State}} col-xs-6 col-md-3">
+<div class="game {{State}} col-xs-6 col-md-3" gameSymbol="{{GameSymbol}}">
   <div class="away">
     <span class="team">{{AwayTeamName}}</span>
-    <span class="score">{{AwayScore}}</span>
+    <span class="score">{{awayScore this}}</span>
   </div>
   <div class="home">
     <span class="team">{{HomeTeamName}}</span>
-    <span class="score">{{HomeScore}}</span>
+    <span class="score">{{homeScore this}}</span>
   </div>
   <div class="status">
     {{state this}}

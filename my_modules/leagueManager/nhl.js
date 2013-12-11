@@ -45,10 +45,12 @@ var NHL = function() {
     switch (rawGame.gs) {
       case '1':
         gameState = 'Scheduled';
-        var arr = rawGame.ts.split(' ');
-        var dateArr = arr[arr.length-1].split('/');
-        date.setMonth(parseInt(dateArr[0])-1);
-        date.setDate(parseInt(dateArr[1]));
+        if (rawGame.ts !== 'TODAY') {
+          var arr = rawGame.ts.split(' ');
+          var dateArr = arr[arr.length-1].split('/');
+          date.setMonth(parseInt(dateArr[0])-1);
+          date.setDate(parseInt(dateArr[1]));
+        }
         timeString = rawGame.bs;
         break;
       case '2':
@@ -323,6 +325,11 @@ var NHL = function() {
         order by tweet.RecordedOn desc limit 1) as LastTwitterID\
       , game.GameSymbol\
       , game.Date\
+      , (Select Time\
+        from NHLGameInstances sched\
+        where sched.GameID = instance.GameID\
+        and sched.StateID = 1\
+        order by sched.RecordedOn limit 1) as StartTime\
       , state.State\
       , instance.Time\
       , instance.Period\
@@ -371,6 +378,11 @@ var NHL = function() {
         order by tweet.RecordedOn desc limit 1) as LastTwitterID\
       , game.GameSymbol\
       , game.Date\
+      , (Select Time\
+        from NHLGameInstances sched\
+        where sched.GameID = instance.GameID\
+        and sched.StateID = 1\
+        order by sched.RecordedOn limit 1) as StartTime\
       , state.State\
       , instance.Time\
       , instance.Period\

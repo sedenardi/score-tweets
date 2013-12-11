@@ -4,12 +4,12 @@ var http = require('http'),
 var NFL = function() {
 
   var self = this;
-  var numTrans = {
-    1: "1st",
-    2: "2nd",
-    3: "3rd",
-    4: "4th",
-    5: "OT"
+  var quarterArray = {
+    1: '1st',
+    2: '2nd',
+    3: '3rd',
+    4: '4th',
+    5: 'OT'
   };
 
   this.leagueInfo = {
@@ -191,7 +191,7 @@ var NFL = function() {
         }
       }
     /*} else if (oldGame.Quarter !== newGame.Quarter) {
-        tweet.TweetString = 'Start of ' + numTrans[newGame.Quarter] + '. ' +
+        tweet.TweetString = 'Start of ' + quarterArray[newGame.Quarter] + '. ' +
           scores + self.makeGameLink(newGame);*/
     } else if ((oldGame.Quarter === newGame.Quarter 
       && oldGame.Time >= newGame.Time) ||
@@ -200,17 +200,17 @@ var NFL = function() {
         oldGame.HomeScore > newGame.HomeScore) {
         tweet.TweetString = 'Score correction. ' +
           scores + newGame.Time + ' ' + 
-          numTrans[newGame.Quarter] + ' ' +
+          quarterArray[newGame.Quarter] + ' ' +
           self.makeGameLink(newGame);
       } else if (oldGame.AwayScore !== newGame.AwayScore) {
         tweet.TweetString = newGame.AwayTeamName + ' score. ' +
           scores + newGame.Time + ' ' + 
-          numTrans[newGame.Quarter] + ' ' +
+          quarterArray[newGame.Quarter] + ' ' +
           self.makeGameLink(newGame);
       } else if (oldGame.HomeScore !== newGame.HomeScore) {
         tweet.TweetString = newGame.HomeTeamName + ' score. ' +
           scores + newGame.Time + ' ' + 
-          numTrans[newGame.Quarter] + ' ' +
+          quarterArray[newGame.Quarter] + ' ' +
           self.makeGameLink(newGame);
       }
     }
@@ -369,6 +369,11 @@ var NFL = function() {
         order by tweet.RecordedOn desc limit 1) as LastTwitterID\
       , game.GameSymbol\
       , game.Date\
+      , (Select Time\
+        from NFLGameInstances sched\
+        where sched.GameID = instance.GameID\
+        and sched.StateID = 1\
+        order by sched.RecordedOn limit 1) as StartTime\
       , state.State\
       , game.SeasonYear\
       , game.SeasonType\
@@ -420,6 +425,11 @@ var NFL = function() {
         order by tweet.RecordedOn desc limit 1) as LastTwitterID\
       , game.GameSymbol\
       , game.Date\
+      , (Select Time\
+        from NFLGameInstances sched\
+        where sched.GameID = instance.GameID\
+        and sched.StateID = 1\
+        order by sched.RecordedOn limit 1) as StartTime\
       , state.State\
       , game.SeasonYear\
       , game.SeasonType\
