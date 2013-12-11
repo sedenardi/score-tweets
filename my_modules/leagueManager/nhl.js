@@ -80,6 +80,12 @@ var NHL = function() {
         break;
       case '5':
         gameState = 'Final';
+        if (rawGame.bs.indexOf('OT') !== -1) {
+          periodString === 'OT';
+        }
+        if (rawGame.bs.indexOf('SO') !== -1) {
+          periodString === 'SO';
+        }
         var arr = rawGame.ts.split(' ');
         var dateArr = arr[arr.length-1].split('/');
         date.setMonth(parseInt(dateArr[0])-1);
@@ -152,10 +158,10 @@ var NHL = function() {
           scores + self.makeGameLink(newGame);
       }*/
       if (newGame.State === 'Final') {
-        if (oldGame.State === 'Shootout') {
+        if (newGame.Period === 'SO') {
           tweet.TweetString = 'Final SO. ' +
             scores + self.makeGameLink(newGame);
-        } else if (oldGame.State === 'Overtime') {
+        } else if (newGame.Period === 'OT') {
           tweet.TweetString = 'Final OT. ' +
             scores + self.makeGameLink(newGame);
         } else {
