@@ -311,7 +311,8 @@ var NHL = function() {
   this.latestGamesQuery = function(hoursAgo) {
     var stmnt = 
       'Select\
-        instance.GameID\
+        \'NHL\' as League\
+      , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
         from NHLTweets tweet\
@@ -358,7 +359,8 @@ var NHL = function() {
   this.scheduledGamesQuery = function() {
     var stmnt = 
       'Select\
-        instance.GameID\
+        \'NHL\' as League\
+      , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
         from NHLTweets tweet\
