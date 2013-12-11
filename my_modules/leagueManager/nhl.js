@@ -81,10 +81,10 @@ var NHL = function() {
       case '5':
         gameState = 'Final';
         if (rawGame.bs.indexOf('OT') !== -1) {
-          periodString === 'OT';
+          periodString = 'OT';
         }
         if (rawGame.bs.indexOf('SO') !== -1) {
-          periodString === 'SO';
+          periodString = 'SO';
         }
         var arr = rawGame.ts.split(' ');
         var dateArr = arr[arr.length-1].split('/');
