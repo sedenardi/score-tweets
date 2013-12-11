@@ -71,19 +71,23 @@ var Web = function(config, rootDir, leagues) {
       if (typeof req.query.league !== 'undefined') {
         var leagueName = req.query.league;
         if (typeof leagues[leagueName] !== 'undefined') {
-          if (typeof req.query.hoursAgo !== 'undefined' &&
+          if (typeof req.query.hoursAgo === 'undefined' ||
             !isNaN(parseInt(req.query.hoursAgo))) {
-            var cmd = leagues[leagueName].latestGamesQuery(req.query.hoursAgo);
+            var hoursAgo = !isNaN(parseInt(req.query.hoursAgo)) ? 
+              parseInt(req.query.hoursAgo) : 12;
+            var cmd = leagues[leagueName].latestGamesQuery(hoursAgo);
             db.queryWithError(cmd, function webDBReturn(err,data) {
               if (err) {
                 console.log('web DB error');
                 res.json(500,err);
               } else {
-                res.json(200,data);
+                res.render('gameList', {
+                  games: data
+                });
               }
             });
           } else {
-            res.json(402, { error: 'must specify valid hoursAgo parameter.'});
+            res.json(402, { error: 'hoursAgo parameter must be a number.'});
           }          
         } else {
           res.json(402, { error: 'Specified league does not exist.'});
@@ -103,7 +107,10 @@ var Web = function(config, rootDir, leagues) {
               console.log('web DB error');
               res.json(500,err);
             } else {
-              res.json(200,data);
+              //res.json(200,data);
+              res.render('gameList', {
+                games: data
+              });
             }
           });         
         } else {
