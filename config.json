@@ -8,7 +8,8 @@
   },
   "leagues": {
     "leagueName": {
-      "refreshInterval": "30000"
+      "refreshInterval": "30000",
+      "twitterUser": ""
     }
   },
   "web": {

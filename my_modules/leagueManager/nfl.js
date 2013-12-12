@@ -368,6 +368,10 @@ var NFL = function() {
         and tweet.TwitterID REGEXP \'[0-9]+\'\
         order by tweet.RecordedOn desc limit 1) as LastTwitterID\
       , game.GameSymbol\
+      , CONCAT(\'http://www.nfl.com/gamecenter/\',game.GameSymbol,\
+        \'/\',game.SeasonYear,\'/\',game.SeasonType,\
+        game.SeasonWeek,\'/\',away.Name,\
+        \'@\',home.Name) as GameLink\
       , game.Date\
       , (Select Time\
         from NFLGameInstances sched\
@@ -402,7 +406,8 @@ var NFL = function() {
       and not exists\
         (Select 1 from NFLGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
-        and instance.RecordedOn < newerInstance.RecordedOn);';
+        and instance.RecordedOn < newerInstance.RecordedOn)\
+      order by game.GameSymbol asc;';
     var params = [hoursAgo];
     return {
       sql: stmnt,
@@ -424,6 +429,10 @@ var NFL = function() {
         and tweet.TwitterID REGEXP \'[0-9]+\'\
         order by tweet.RecordedOn desc limit 1) as LastTwitterID\
       , game.GameSymbol\
+      , CONCAT(\'http://www.nfl.com/gamecenter/\',game.GameSymbol,\
+        \'/\',game.SeasonYear,\'/\',game.SeasonType,\
+        game.SeasonWeek,\'/\',away.Name,\
+        \'@\',home.Name) as GameLink\
       , game.Date\
       , (Select Time\
         from NFLGameInstances sched\
@@ -457,7 +466,8 @@ var NFL = function() {
       and not exists\
         (Select 1 from NFLGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
-        and instance.RecordedOn < newerInstance.RecordedOn);';
+        and instance.RecordedOn < newerInstance.RecordedOn)\
+      order by game.GameSymbol asc;';
     var params = [];
     return {
       sql: stmnt,

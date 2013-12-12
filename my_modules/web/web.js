@@ -1,7 +1,7 @@
 var events = require('events'),
   express = require('express'),
-  exphbs  = require('express3-handlebars'),
-  helpers = require('./helpers.js'),
+  //exphbs  = require('express3-handlebars'),
+  hbars = require('./hbars.js'),
   passport = require('passport'),
   util = require('util'),
   TwitterStrategy = require('passport-twitter').Strategy,
@@ -34,15 +34,9 @@ var Web = function(config, rootDir, leagues) {
   ));
 
   var app = express(),
-    hbs = exphbs.create({
-      defaultLayout: 'main',
-      helpers: helpers,
-      layoutsDir: rootDir + config.web.folders.layouts,
-      partialsDir: rootDir + config.web.folders.partials
-  });
+    hbs = new hbars(rootDir, config);
 
-  app.engine('handlebars', hbs.engine);
-  //app.set('view engine', 'handlebars');
+  app.engine('handlebars', hbs.hbs.engine);
 
   app.configure(function() {
     app.set('views', rootDir + '/web/views');

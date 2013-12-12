@@ -324,6 +324,7 @@ var NHL = function() {
         and tweet.TwitterID REGEXP \'[0-9]+\'\
         order by tweet.RecordedOn desc limit 1) as LastTwitterID\
       , game.GameSymbol\
+      , CONCAT(?,game.GameSymbol) as GameLink\
       , game.Date\
       , (Select Time\
         from NHLGameInstances sched\
@@ -355,8 +356,9 @@ var NHL = function() {
       and not exists\
         (Select 1 from NHLGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
-        and instance.RecordedOn < newerInstance.RecordedOn);';
-    var params = [hoursAgo];
+        and instance.RecordedOn < newerInstance.RecordedOn)\
+      order by game.GameSymbol asc;';
+    var params = ['http://www.nhl.com/gamecenter/en/icetracker?id=',hoursAgo];
     return {
       sql: stmnt,
       inserts: params
@@ -377,6 +379,7 @@ var NHL = function() {
         and tweet.TwitterID REGEXP \'[0-9]+\'\
         order by tweet.RecordedOn desc limit 1) as LastTwitterID\
       , game.GameSymbol\
+      , CONCAT(?,game.GameSymbol) as GameLink\
       , game.Date\
       , (Select Time\
         from NHLGameInstances sched\
@@ -407,8 +410,9 @@ var NHL = function() {
       and not exists\
         (Select 1 from NHLGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
-        and instance.RecordedOn < newerInstance.RecordedOn);';
-    var params = [];
+        and instance.RecordedOn < newerInstance.RecordedOn)\
+      order by game.GameSymbol asc;';
+    var params = ['http://www.nhl.com/gamecenter/en/icetracker?id='];
     return {
       sql: stmnt,
       inserts: params
