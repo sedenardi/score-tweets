@@ -13,6 +13,7 @@
     "moment": "*",
     "express": "*",
     "express3-handlebars": "*",
+    "handlebars": "*",
     "passport": "*",
     "passport-twitter": "*",
     "ntwitter": "*"
