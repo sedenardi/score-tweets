@@ -16,16 +16,17 @@ var exphbs = function(rootDir, config) {
         return game.State !== 'Scheduled' ? game.HomeScore : '';
       },
       info: function(game) {
-        var extLink = '<a href="' + game.GameLink + '" target="_blank" title="View game on league\'s site">' +
-          '<i class="fa fa-external-link"></i> Open Game</a>';
-        var tweetLink = '';
+        var extSpan = '<span class="gameLink"><a href="' + game.GameLink + '" target="_blank" title="View game on league\'s site">' +
+          '<i class="fa fa-external-link"></i> Open Game</a></span>';
+        var tweetSpan = '<span class="gameTweet"></span>';
         if (game.LastTwitterID) {
           var userName = config.leagues[game.League].twitterUser;
           var tweetURL = 'https://twitter.com/' + userName + '/status/' + game.LastTwitterID;
-          tweetLink = '<a href="' + tweetURL + '" target="_blank" title="Open last tweet related to game">' +
-          '<i class="fa fa-twitter"></i> Last Tweet</a>';
+          var tweetLink = '<a href="' + tweetURL + '" target="_blank" title="Open last tweet related to game">' +
+            '<i class="fa fa-twitter"></i> Last Tweet</a>';
+          tweetSpan = '<span class="gameTweet">' + tweetLink + '</span>';
         }
-        return new Handlebars.SafeString(extLink + '&nbsp;&nbsp;' + tweetLink);
+        return new Handlebars.SafeString(extSpan + tweetSpan);
       },
       state: function(game) {
         var dayArray = {

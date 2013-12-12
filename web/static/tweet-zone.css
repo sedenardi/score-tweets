@@ -1,5 +1,13 @@
-.score {
+span.score {
   float: right;
+}
+
+span.gameTweet {
+  float: right;
+}
+
+a.tweetLink {
+  cursor: pointer;
 }
 
 .game {
