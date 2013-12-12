@@ -326,11 +326,6 @@ var NHL = function() {
       , game.GameSymbol\
       , CONCAT(?,game.GameSymbol) as GameLink\
       , game.Date\
-      , (Select Time\
-        from NHLGameInstances sched\
-        where sched.GameID = instance.GameID\
-        and sched.StateID = 1\
-        order by sched.RecordedOn limit 1) as StartTime\
       , state.State\
       , instance.Time\
       , instance.Period\
@@ -381,11 +376,6 @@ var NHL = function() {
       , game.GameSymbol\
       , CONCAT(?,game.GameSymbol) as GameLink\
       , game.Date\
-      , (Select Time\
-        from NHLGameInstances sched\
-        where sched.GameID = instance.GameID\
-        and sched.StateID = 1\
-        order by sched.RecordedOn limit 1) as StartTime\
       , state.State\
       , instance.Time\
       , instance.Period\

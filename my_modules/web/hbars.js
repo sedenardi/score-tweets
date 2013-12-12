@@ -54,8 +54,8 @@ var exphbs = function(rootDir, config) {
               }
             case 'Scheduled':
               if (game.Date !== '0000-00-00'){
-                if (game.StartTime) {
-                  return dayArray[game.Date.getDay()] + ' ' + game.StartTime;
+                if (game.Time) {
+                  return dayArray[game.Date.getDay()] + ' ' + game.Time;
                 } else {
                   return dayArray[game.Date.getDay()];
                 }
@@ -80,8 +80,8 @@ var exphbs = function(rootDir, config) {
               return 'Final';
             case 'Scheduled':
               if (game.Date !== '0000-00-00'){
-                if (game.StartTime) {
-                  return dayArray[game.Date.getDay()] + ' ' + game.StartTime;
+                if (game.Time) {
+                  return dayArray[game.Date.getDay()] + ' ' + game.Time;
                 } else {
                   return dayArray[game.Date.getDay()];
                 }

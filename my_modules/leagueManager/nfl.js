@@ -373,11 +373,6 @@ var NFL = function() {
         game.SeasonWeek,\'/\',away.Name,\
         \'@\',home.Name) as GameLink\
       , game.Date\
-      , (Select Time\
-        from NFLGameInstances sched\
-        where sched.GameID = instance.GameID\
-        and sched.StateID = 1\
-        order by sched.RecordedOn limit 1) as StartTime\
       , state.State\
       , game.SeasonYear\
       , game.SeasonType\
@@ -434,11 +429,6 @@ var NFL = function() {
         game.SeasonWeek,\'/\',away.Name,\
         \'@\',home.Name) as GameLink\
       , game.Date\
-      , (Select Time\
-        from NFLGameInstances sched\
-        where sched.GameID = instance.GameID\
-        and sched.StateID = 1\
-        order by sched.RecordedOn limit 1) as StartTime\
       , state.State\
       , game.SeasonYear\
       , game.SeasonType\
