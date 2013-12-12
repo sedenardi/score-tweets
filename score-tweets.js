@@ -32,11 +32,9 @@ twitters.NFL = new TwitGame(config, NFL);
 var web = new Web(config, __dirname,leagues);
 
 web.on('auth', function receiveAuth(data) {
-  for (var i = 0; i < config.twitter.accounts.length; i++) {
-    if (config.twitter.accounts[i].username === data.profile.username) {
-      config.twitter.accounts[i].access_token_key = data.token;
-      config.twitter.accounts[i].access_token_secret = data.tokenSecret;
-    }
+  if (config.twitter.accounts[data.profile.username] !== 'undefined') {
+    config.twitter.accounts[i].access_token_key = data.token;
+    config.twitter.accounts[i].access_token_secret = data.tokenSecret;
   }
   fs.writeFile(configFile, JSON.stringify(config,null,2), function(e) {
     if (e) {

@@ -135,16 +135,18 @@ var Web = function(config, rootDir, leagues) {
   app.get('/auth/twitter/callback', 
     passport.authenticate('twitter', { failureRedirect: '/login' }),
     function(req, res) {
-      var exists = false;
-      for (var i = 0; i < config.twitter.accounts.length; i++) {
-        exists = exists || (config.twitter.accounts[i].username === req.user.profile.username);
-      }
-      if (exists) {
-        self.emit('auth', req.user);
-        req.session.result = 'Successfully Authenticated';
+      var user = req.user.profile.username;
+      if (config.twitter.accounts[user] !== 'undefined'){
+        if (config.twitter.accounts[user].access_token_key ||
+          config.twitter.accounts[user].access_token_secret) {
+          req.session.result = 'Keys exist for user. Clear keys in config and try again';
+        } else {
+          self.emit('auth', req.user);
+          req.session.result = 'Successfully Authenticated';
+        }
       } else {
         req.session.result = 'User not found in config';
-      }      
+      }   
       res.redirect('/login');
   });
 

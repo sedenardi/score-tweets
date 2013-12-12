@@ -16,23 +16,19 @@ var TwitGame = function(config, league) {
     loopTimeout = null,
     status = statuses.stopped,
     logTag = league.leagueInfo.leagueName + '-TwitGame',
-    accountName,
+    accountName = config.leagues[league.leagueInfo.leagueName].twitterUser,
     twit;
 
-  for (var i = 0; i < config.twitter.accounts.length; i++) {
-    if (config.twitter.accounts[i].league === league.leagueInfo.leagueName) {
-      if (config.twitter.app.consumerKey &&
-        config.twitter.app.consumerSecret &&
-        config.twitter.accounts[i].access_token_key &&
-        config.twitter.accounts[i].access_token_secret) {
-        twit = new twitter({
-          consumer_key: config.twitter.app.consumerKey,
-          consumer_secret: config.twitter.app.consumerSecret,
-          access_token_key: config.twitter.accounts[i].access_token_key,
-          access_token_secret: config.twitter.accounts[i].access_token_secret
-        });
-      }
-    }
+  if (config.twitter.app.consumerKey &&
+    config.twitter.app.consumerSecret &&
+    config.twitter.accounts[accountName].access_token_key &&
+    config.twitter.accounts[accountName].access_token_secret) {
+    twit = new twitter({
+      consumer_key: config.twitter.app.consumerKey,
+      consumer_secret: config.twitter.app.consumerSecret,
+      access_token_key: config.twitter.accounts[accountName].access_token_key,
+      access_token_secret: config.twitter.accounts[accountName].access_token_secret
+    });
   }
 
   var undoThrottle = function() {
