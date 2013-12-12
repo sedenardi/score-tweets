@@ -42,7 +42,7 @@ var exphbs = function(rootDir, config) {
             case 'Overtime':
             case 'Intermission':
             case 'Progress':
-              return game.Time + ' ' + game.Period;
+              return 'Last score - ' + game.Time + ' ' + game.Period;
             case 'Shootout':
               return 'Shootout';
             case 'Final':
@@ -74,7 +74,7 @@ var exphbs = function(rootDir, config) {
             case 'Halftime':
               return 'Halftime';
             case 'Progress':
-              return game.Time + ' ' + quarterArray[game.Quarter];
+              return 'Last score - ' + game.Time + ' ' + quarterArray[game.Quarter];
             case 'Final':
               return 'Final';
             case 'Scheduled':

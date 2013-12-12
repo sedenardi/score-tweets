@@ -18,20 +18,24 @@ var Web = function(config, rootDir, leagues) {
     done(null, obj);
   });
 
-  passport.use(new TwitterStrategy({
-      consumerKey: config.twitter.app.consumerKey,
-      consumerSecret: config.twitter.app.consumerSecret,
-      callbackURL: config.twitter.app.callbackURL
-    },
-    function processAuth(token, tokenSecret, profile, done) {
-      var user = {
-        token: token,
-        tokenSecret: tokenSecret,
-        profile: profile
-      };
-      return done(null, user);
-    }
-  ));
+  if (config.twitter.app.consumerKey &&
+    config.twitter.app.consumerSecret &&
+    config.twitter.app.callbackURL) {
+    passport.use(new TwitterStrategy({
+        consumerKey: config.twitter.app.consumerKey,
+        consumerSecret: config.twitter.app.consumerSecret,
+        callbackURL: config.twitter.app.callbackURL
+      },
+      function processAuth(token, tokenSecret, profile, done) {
+        var user = {
+          token: token,
+          tokenSecret: tokenSecret,
+          profile: profile
+        };
+        return done(null, user);
+      }
+    ));
+  }
 
   var app = express(),
     hbs = new hbars(rootDir, config);
