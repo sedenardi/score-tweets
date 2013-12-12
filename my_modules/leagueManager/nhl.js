@@ -310,6 +310,49 @@ var NHL = function() {
     };
   };
 
+  this.nextGameQuery = function() {
+    var stmnt = 
+      'Select\
+        \'NHL\' as League\
+      , instance.GameID\
+      , instance.InstanceID\
+      , game.GameSymbol\
+      , CONCAT(?,game.GameSymbol) as GameLink\
+      , game.Date\
+      , STR_TO_DATE(CONCAT(DATE_FORMAT(game.Date,\'%Y-%m-%d\'),\' \',instance.Time),\'%Y-%m-%d %h:%i %p\') as StartTime\
+      , state.State\
+      , instance.Time\
+      , instance.Period\
+      , away.City as AwayTeamCity\
+      , away.Name as AwayTeamName\
+      , away.DisplayName as AwayTeamDisplayName\
+      , instance.AwayScore\
+      , home.City as HomeTeamCity\
+      , home.Name as HomeTeamName\
+      , home.DisplayName as HomeTeamDisplayName\
+      , instance.HomeScore\
+      from NHLGameInstances instance\
+        inner join NHLGames game\
+          on game.GameID = instance.GameID\
+        inner join NHLStates state\
+          on state.StateID = instance.StateID\
+        inner join NHLTeams away\
+          on away.TeamID = game.AwayTeamID\
+        inner join NHLTeams home\
+          on home.TeamID = game.HomeTeamID\
+      where state.State like \'Scheduled\'\
+      and not exists\
+        (Select 1 from NHLGameInstances newerInstance\
+        where newerInstance.GameID = instance.GameID\
+        and instance.RecordedOn < newerInstance.RecordedOn)\
+      order by StartTime asc limit 1;';
+    var params = ['http://www.nhl.com/gamecenter/en/icetracker?id='];
+    return {
+      sql: stmnt,
+      inserts: params
+    };
+  };
+
   this.latestGamesQuery = function(hoursAgo) {
     var stmnt = 
       'Select\

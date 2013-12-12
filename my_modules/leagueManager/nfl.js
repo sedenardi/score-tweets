@@ -354,6 +354,55 @@ var NFL = function() {
     };
   };
 
+  this.nextGameQuery = function() {
+    var stmnt = 
+      'Select\
+        \'NFL\' as League\
+      , instance.GameID\
+      , instance.InstanceID\
+      , game.GameSymbol\
+      , CONCAT(\'http://www.nfl.com/gamecenter/\',game.GameSymbol,\
+        \'/\',game.SeasonYear,\'/\',game.SeasonType,\
+        game.SeasonWeek,\'/\',away.Name,\
+        \'@\',home.Name) as GameLink\
+      , game.Date\
+      , STR_TO_DATE(CONCAT(DATE_FORMAT(game.Date,\'%Y-%m-%d\'),\' \',instance.Time,\' PM\'),\'%Y-%m-%d %h:%i %p\') as StartTime\
+      , state.State\
+      , game.SeasonYear\
+      , game.SeasonType\
+      , game.SeasonWeek\
+      , instance.Time\
+      , instance.Quarter\
+      , away.City as AwayTeamCity\
+      , away.Name as AwayTeamName\
+      , away.DisplayName as AwayTeamDisplayName\
+      , instance.AwayScore\
+      , home.City as HomeTeamCity\
+      , home.Name as HomeTeamName\
+      , home.DisplayName as HomeTeamDisplayName\
+      , instance.HomeScore\
+      from NFLGameInstances instance\
+        inner join NFLGames game\
+          on game.GameID = instance.GameID\
+        inner join NFLStates state\
+          on state.StateID = instance.StateID\
+        inner join NFLTeams away\
+          on away.TeamID = game.AwayTeamID\
+        inner join NFLTeams home\
+          on home.TeamID = game.HomeTeamID\
+      where state.State like \'Scheduled\'\
+      and not exists\
+        (Select 1 from NFLGameInstances newerInstance\
+        where newerInstance.GameID = instance.GameID\
+        and instance.RecordedOn < newerInstance.RecordedOn)\
+      order by StartTime asc limit 1;';
+    var params = [];
+    return {
+      sql: stmnt,
+      inserts: params
+    };
+  };
+
   this.latestGamesQuery = function(hoursAgo) {
     var stmnt = 
       'Select\
