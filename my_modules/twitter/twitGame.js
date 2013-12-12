@@ -13,7 +13,6 @@ var TwitGame = function(config, league) {
   };
 
   var self = this,
-    loopTimeout = null,
     status = statuses.stopped,
     logTag = league.leagueInfo.leagueName + '-TwitGame',
     accountName = config.leagues[league.leagueInfo.leagueName].twitterUser,

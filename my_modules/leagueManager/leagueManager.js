@@ -4,10 +4,18 @@ var events = require('events'),
   db = require('../db/db.js');
 
 var LeagueManager = function(config, l) {
-  var self = this;
-  var league = l;
-  var loopInterval = null;
-  var started = false;
+
+  var statuses = {
+    stopped: 'Stopped',
+    fastLoop: 'Looping quickly.',
+    slowLoop: 'Looping slowly'
+  };
+
+  var self = this,
+    league = l,
+    loopInterval = null,
+    status = statuses.stopped;
+
   this.start = function() {
     if (loopInterval !== null) {
       console.log('Can not start LeagueManager, already running');
@@ -23,7 +31,7 @@ var LeagueManager = function(config, l) {
         } else {
           loopInterval = setInterval(loop, config.leagues[league.leagueInfo.leagueName].refreshInterval);
           loop();
-          started = true;
+          status = statuses.fastLoop;
         }
       });
     }
@@ -36,7 +44,7 @@ var LeagueManager = function(config, l) {
     console.log(league.leagueInfo.leagueName + ': ending League Manager');
     clearInterval(loopInterval);
     db.disconnect();
-    started = false;
+    status = statuses.stopped;
   };
 
   var loop = function() {
