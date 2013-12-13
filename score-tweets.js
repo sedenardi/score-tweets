@@ -46,16 +46,30 @@ web.on('auth', function receiveAuth(data) {
   });
 });
 
-var processChange = function(changeObj) {
+var leagueChange = function(changeObj) {
   console.log('New tweet created from ' + changeObj.league.leagueInfo.leagueName);
   twitters[changeObj.league.leagueInfo.leagueName].tweet();
-
 };
 
-leagueManagers.NHL.on('change', processChange);
-leagueManagers.NFL.on('change', processChange);
+var leagueStatus = function(status) {
+  web.updateLeagueStatus(status);
+};
+
+var twitStatus = function(status) {
+  web.updateTwitStatus(status);
+};
+
+leagueManagers.NHL.on('change', leagueChange);
+leagueManagers.NHL.on('status', leagueStatus);
+
+leagueManagers.NFL.on('change', leagueChange);
+leagueManagers.NFL.on('status', leagueStatus);
+
 leagueManagers.NHL.start();
 leagueManagers.NFL.start();
+
+twitters.NHL.on('status', twitStatus);
+twitters.NFL.on('status', twitStatus);
 
 twitters.NHL.start();
 twitters.NFL.start();

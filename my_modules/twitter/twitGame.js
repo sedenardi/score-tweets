@@ -6,7 +6,12 @@ var twitter = require('ntwitter'),
 var TwitGame = function(config, league) {
 
   var statuses = {
-    stopped: 'No DB connection',
+    stopped: 'stopped',
+    idle: 'idle',
+    looping: 'looping',
+    throttled: 'throttled'
+  }, statusDescriptions = {
+    stopped: 'Stopped, able to be started',
     idle: 'Not looping or waiting',
     looping: 'Looping through work to do',
     throttled: 'Waiting to try and send another tweet'
@@ -33,6 +38,7 @@ var TwitGame = function(config, league) {
   var undoThrottle = function() {
     console.log(logTag + ': Undoing throttle');
     status = statuses.looping;
+    sendStatus();
     checkForTweet();
   };
 
@@ -64,6 +70,7 @@ var TwitGame = function(config, league) {
             };
             db.logError(e, function(){});*/
           }
+          sendStatus();
         }
       } else {
         updateTweet(tweet.TweetID, data.id_str, next);
@@ -94,7 +101,16 @@ var TwitGame = function(config, league) {
         console.log(logTag + ': Nothing to tweet, going idle');
         status = statuses.idle;
       }
+      sendStatus();
     });
+  };
+
+  var sendStatus = function() {
+    var s = {};
+    s.league = league.leagueInfo.leagueName;
+    s.status = status;
+    s.statusDescription = statusDescriptions[status];
+    self.emit('status', s);
   };
 
   this.tweet = function() {
@@ -102,6 +118,7 @@ var TwitGame = function(config, league) {
       console.log(logTag + ': Throttled');
     } else if (status === statuses.idle) {
       status = statuses.looping;
+      sendStatus();
       checkForTweet();
     }
   };
@@ -116,6 +133,7 @@ var TwitGame = function(config, league) {
           console.log(logTag + ': TwitGame can not connect to DB. ' + JSON.stringify(err));
         } else {
           status = statuses.idle;
+          sendStatus();
           checkForTweet();
         }
       });
@@ -126,6 +144,7 @@ var TwitGame = function(config, league) {
     console.log(logTag + ': ending TwitGame');
     db.disconnect();
     status = statuses.stopped;
+    sendStatus();
   };
 };
 

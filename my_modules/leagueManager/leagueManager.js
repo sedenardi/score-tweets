@@ -7,16 +7,21 @@ var events = require('events'),
 var LeagueManager = function(config, l) {
 
   var statuses = {
-    stopped: 'Stopped',
-    looping: 'Looping quickly',
-    throttled: 'Looping slowly'
+    stopped: 'stopped',
+    looping: 'looping',
+    throttled: 'throttled'
+  }, statusDescriptions = {
+    stopped: 'Stopped, able to be started',
+    looping: 'Looping quickly, games are ongoing',
+    throttled: 'Looping slowly, no games currently ongoing'
   };
 
   var self = this,
     league = l,
     loopInterval = null,
     status = statuses.stopped,
-    throttleCheck = false;
+    throttleCheck = false,
+    throttleInfo = {};
 
   this.start = function() {
     if (loopInterval !== null) {
@@ -50,6 +55,17 @@ var LeagueManager = function(config, l) {
     status = statuses.stopped;
   };
 
+  var sendStatus = function() {
+    var s = {};
+    s.league = league.leagueInfo.leagueName;
+    s.status = status;
+    s.statusDescription = statusDescriptions[status];
+    if (status === statuses.throttled) {
+      s.throttleInfo = throttleInfo;
+    }
+    self.emit('status', s);
+  }
+
   var loop = function() {
     if (throttleCheck) {
       console.log(league.leagueInfo.leagueName + ': Throttle Check');
@@ -68,20 +84,7 @@ var LeagueManager = function(config, l) {
     db.query(cmd, function checkNext(nextGame){
       if (nextGame.length) {
         if (nextGame[0].StartTime) {
-          var duration = moment.duration(moment(nextGame[0].StartTime) - moment());
-          if (duration.asHours() > 25) {
-            //over a day away, don't check again for a day
-            throttleLoop(86400000);
-          } else if (duration.asHours() > 1.5) {
-            //over an hour away, don't check again for an hour
-            throttleLoop(3600000);
-          } else if (duration.asMinutes() > 10) {
-            //over 10 min away, don't check again for 10 min
-            throttleLoop(600000);
-          } else if (duration.asMinutes() > 1.5) {
-            //over 1 min away, don't check again for 1 min
-            throttleLoop(60000);
-          }
+          throttleLoop(nextGame[0].StartTime);
         } else {
           throttleLoop();
         }
@@ -93,14 +96,32 @@ var LeagueManager = function(config, l) {
     });
   };
 
-  var throttleLoop = function(delay) {
-    console.log(league.leagueInfo.leagueName + ': Throttling loop ' + delay);
-    if (typeof delay === 'undefined') {
-      delay = config.leagues[league.leagueInfo.leagueName].throttleInterval;
+  var throttleLoop = function(startTime) {
+    var delay = config.leagues[league.leagueInfo.leagueName].throttleInterval;
+    if (typeof startTime !== 'undefined') {
+      var duration = moment.duration(moment(startTime) - moment());
+      if (duration.asHours() > 25) {
+        //over a day away, don't check again for a day
+        delay = (86400000);
+      } else if (duration.asHours() > 1.5) {
+        //over an hour away, don't check again for an hour
+        delay = (3600000);
+      } else if (duration.asMinutes() > 10) {
+        //over 10 min away, don't check again for 10 min
+        delay = (600000);
+      } else if (duration.asMinutes() > 1.5) {
+        //over 1 min away, don't check again for 1 min
+        delay = (60000);
+      }
     }
+    console.log(league.leagueInfo.leagueName + ': Throttling loop ' + delay);
     clearInterval(loopInterval);
     loopInterval = setInterval(loop, delay);
     status = statuses.throttled;
+    throttleInfo.delay = delay;
+    throttleInfo.nextStartTime = startTime.toLocaleString();
+    throttleInfo.throttleTime = moment().toDate().toLocaleString();
+    sendStatus();
   };
 
   var restoreLoop = function() {
@@ -108,6 +129,7 @@ var LeagueManager = function(config, l) {
     clearInterval(loopInterval);
     loopInterval = setInterval(loop, config.leagues[league.leagueInfo.leagueName].loopInterval);
     status = statuses.looping;
+    sendStatus();
   }
 
   var processGames = function(err, games) {

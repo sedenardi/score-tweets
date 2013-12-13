@@ -9,6 +9,8 @@ var events = require('events'),
 
 var Web = function(config, rootDir, leagues) {
   var self = this;
+  var leagueStatuses = {};
+  var twitStatuses = {};
   
   passport.serializeUser(function(user, done) {
     done(null, user);
@@ -119,6 +121,32 @@ var Web = function(config, rootDir, leagues) {
       }
   });
 
+  app.get('/GetLeagueStatus', function (req, res) {
+      if (typeof req.query.league !== 'undefined') {
+        var leagueName = req.query.league;
+        if (typeof leagues[leagueName] !== 'undefined') {
+          res.json(leagueStatuses[leagueName]);
+        } else {
+          res.json(402, { error: 'Specified league does not exist.'});
+        }
+      } else {
+        res.json(402, { error: 'Must specify league parameter.'});
+      }
+  });
+
+  app.get('/GetTwitterStatus', function (req, res) {
+      if (typeof req.query.league !== 'undefined') {
+        var leagueName = req.query.league;
+        if (typeof leagues[leagueName] !== 'undefined') {
+          res.json(twitStatuses[leagueName]);
+        } else {
+          res.json(402, { error: 'Specified league does not exist.'});
+        }
+      } else {
+        res.json(402, { error: 'Must specify league parameter.'});
+      }
+  });
+
   app.get('/login', function(req, res){
     res.render('login', { 
       user: req.user,
@@ -161,6 +189,15 @@ var Web = function(config, rootDir, leagues) {
         console.log('Created web server');
       });
     });
+  };
+
+  this.updateLeagueStatus = function(status){
+    console.log(JSON.stringify(status));
+    leagueStatuses[status.league] = status;
+  };
+
+  this.updateTwitStatus = function(status){
+    twitStatuses[status.league] = status;
   };
   
 };
