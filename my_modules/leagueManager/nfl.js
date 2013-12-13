@@ -88,7 +88,7 @@ var NFL = function() {
         break;
       default:
         gameState = 'Progress';
-        timeString = rawGame.score_array[3];
+        timeString = rawGame.score_array[3] ? rawGame.score_array[3] : '15:00';
         break;
     }
     var endIndex = rawGame.eid.toString().length - 2;
