@@ -15,7 +15,7 @@ var LeagueManager = function(config, l) {
     league = l,
     loopInterval = null,
     status = statuses.stopped,
-    throttleCheck = true;
+    throttleCheck = false;
 
   this.start = function() {
     if (loopInterval !== null) {
@@ -53,6 +53,7 @@ var LeagueManager = function(config, l) {
       console.log(league.leagueInfo.leagueName + ': Throttle Check');
       league.getGameArray(processGames);
     } else {
+      throttleCheck = true;
       league.getGameArray(processGames);
     }
   };
@@ -83,7 +84,6 @@ var LeagueManager = function(config, l) {
         insertGameInstance(newGame, function insertGameInstanceFinished(result) {
           newGame.InstanceID = result.insertId;
           console.log(league.leagueInfo.leagueName + ': Inserted new instance of: ' + newGame.GameSymbol);
-          throttleCheck = throttleCheck && !league.gameInProgress(newGame);
           var changeObj = {
             league: league,
             oldGame: oldGame[0],
@@ -100,6 +100,7 @@ var LeagueManager = function(config, l) {
         console.log(league.leagueInfo.leagueName + ': Inserted new game: ' + newGame.GameSymbol);
       });
     }
+    throttleCheck = throttleCheck && !league.gameInProgress(newGame);
   };
 
   var insertGame = function(game, next) {
