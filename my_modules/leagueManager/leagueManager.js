@@ -7,14 +7,15 @@ var LeagueManager = function(config, l) {
 
   var statuses = {
     stopped: 'Stopped',
-    fastLoop: 'Looping quickly.',
-    slowLoop: 'Looping slowly'
+    looping: 'Looping quickly',
+    throttled: 'Looping slowly'
   };
 
   var self = this,
     league = l,
     loopInterval = null,
-    status = statuses.stopped;
+    status = statuses.stopped,
+    throttleCheck = true;
 
   this.start = function() {
     if (loopInterval !== null) {
@@ -48,7 +49,12 @@ var LeagueManager = function(config, l) {
   };
 
   var loop = function() {
-    league.getGameArray(processGames);
+    if (throttleCheck) {
+      console.log(league.leagueInfo.leagueName + ': Throttle Check');
+      league.getGameArray(processGames);
+    } else {
+      league.getGameArray(processGames);
+    }
   };
 
   var processGames = function(err, games) {
@@ -77,6 +83,7 @@ var LeagueManager = function(config, l) {
         insertGameInstance(newGame, function insertGameInstanceFinished(result) {
           newGame.InstanceID = result.insertId;
           console.log(league.leagueInfo.leagueName + ': Inserted new instance of: ' + newGame.GameSymbol);
+          throttleCheck = throttleCheck && !league.gameInProgress(newGame);
           var changeObj = {
             league: league,
             oldGame: oldGame[0],

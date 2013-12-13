@@ -191,6 +191,11 @@ var NHL = function() {
     return linkStub + game.GameSymbol;
   };
 
+  this.gameInProgress = function(game) {
+    return game.State !== 'Scheduled' &&
+      game.State !== 'Final';
+  };
+
   this.insertGameQuery = function(game) {
     var stmnt = 
       'Insert into NHLGames(GameSymbol,Date,AwayTeamID,\
