@@ -1,7 +1,8 @@
 var events = require('events'),
   util = require('util'),
   http = require('http'),
-  db = require('../db/db.js');
+  db = require('../db/db.js'),
+  moment = require('moment');
 
 var LeagueManager = function(config, l) {
 
@@ -22,17 +23,16 @@ var LeagueManager = function(config, l) {
       console.log('Can not start LeagueManager, already running');
     } else if (typeof league === 'undefined') {
       console.log('Can not start LeagueManager, league is undefined. Call \'setLeague\' first.');
-    } else if (typeof config.leagues[league.leagueInfo.leagueName].refreshInterval === 'undefined') {
-      condole.log('Can not start LeagueManager, missing refresl interval in config');
+    } else if (typeof config.leagues[league.leagueInfo.leagueName].loopInterval === 'undefined') {
+      condole.log('Can not start LeagueManager, missing refresh interval in config');
     } else {
       console.log(league.leagueInfo.leagueName + ': starting League Manager');
       db.connect(config, league.leagueInfo.leagueName + ' LeagueManager', function startLoop(err) {
         if (err) {
           console.log(league.leagueInfo.leagueName + ': LeagueManager can not connect to DB. ' + JSON.stringify(err));
         } else {
-          loopInterval = setInterval(loop, config.leagues[league.leagueInfo.leagueName].refreshInterval);
+          restoreLoop();
           loop();
-          status = statuses.fastLoop;
         }
       });
     }
@@ -41,9 +41,11 @@ var LeagueManager = function(config, l) {
   this.end = function() {
     if (loopInterval === null) {
       console.log('Can not end process, not running');
+      return;
     }
     console.log(league.leagueInfo.leagueName + ': ending League Manager');
     clearInterval(loopInterval);
+    loopInterval = null;
     db.disconnect();
     status = statuses.stopped;
   };
@@ -51,12 +53,62 @@ var LeagueManager = function(config, l) {
   var loop = function() {
     if (throttleCheck) {
       console.log(league.leagueInfo.leagueName + ': Throttle Check');
-      league.getGameArray(processGames);
+      checkForThrottle();
     } else {
+      if (status === statuses.throttled) {
+        restoreLoop();
+      } 
       throttleCheck = true;
       league.getGameArray(processGames);
     }
   };
+
+  var checkForThrottle = function() {
+    var cmd = league.nextGameQuery();
+    db.query(cmd, function checkNext(nextGame){
+      if (nextGame.length) {
+        if (nextGame[0].StartTime) {
+          var duration = moment.duration(moment(nextGame[0].StartTime) - moment());
+          if (duration.asHours() > 25) {
+            //over a day away, don't check again for a day
+            throttleLoop(86400000);
+          } else if (duration.asHours() > 1.5) {
+            //over an hour away, don't check again for an hour
+            throttleLoop(3600000);
+          } else if (duration.asMinutes() > 10) {
+            //over 10 min away, don't check again for 10 min
+            throttleLoop(600000);
+          } else if (duration.asMinutes() > 1.5) {
+            //over 1 min away, don't check again for 1 min
+            throttleLoop(60000);
+          }
+        } else {
+          throttleLoop();
+        }
+      } else {
+        //no next game scheduled
+        throttleLoop();
+      }
+      league.getGameArray(processGames);
+    });
+  };
+
+  var throttleLoop = function(delay) {
+    console.log(league.leagueInfo.leagueName + ': Throttling loop ' + delay);
+    if (typeof delay === 'undefined') {
+      delay = config.leagues[league.leagueInfo.leagueName].throttleInterval;
+    }
+    clearInterval(loopInterval);
+    loopInterval = setInterval(loop, delay);
+    status = statuses.throttled;
+  };
+
+  var restoreLoop = function() {
+    console.log(league.leagueInfo.leagueName + ': Restoring loop');
+    clearInterval(loopInterval);
+    loopInterval = setInterval(loop, config.leagues[league.leagueInfo.leagueName].loopInterval);
+    status = statuses.looping;
+  }
 
   var processGames = function(err, games) {
     if (err) {
