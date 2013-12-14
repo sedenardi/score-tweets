@@ -69,7 +69,7 @@ var Web = function(config, rootDir, leagues) {
 
   app.get('/GetLatestGames', function (req, res) {
       if (typeof req.query.league !== 'undefined') {
-        var leagueName = req.query.league;
+        var leagueName = req.query.league.toUpperCase();
         if (typeof leagues[leagueName] !== 'undefined') {
           if (typeof req.query.hoursAgo === 'undefined' ||
             !isNaN(parseInt(req.query.hoursAgo))) {
@@ -99,7 +99,7 @@ var Web = function(config, rootDir, leagues) {
 
   app.get('/GetScheduledGames', function (req, res) {
       if (typeof req.query.league !== 'undefined') {
-        var leagueName = req.query.league;
+        var leagueName = req.query.league.toUpperCase();
         if (typeof leagues[leagueName] !== 'undefined') {
           var cmd = leagues[leagueName].scheduledGamesQuery(req.query.hoursAgo);
           db.queryWithError(cmd, function webDBReturn(err,data) {
@@ -123,7 +123,7 @@ var Web = function(config, rootDir, leagues) {
 
   app.get('/GetLeagueStatus', function (req, res) {
       if (typeof req.query.league !== 'undefined') {
-        var leagueName = req.query.league;
+        var leagueName = req.query.league.toUpperCase();
         if (typeof leagues[leagueName] !== 'undefined') {
           res.json(leagueStatuses[leagueName]);
         } else {
@@ -136,7 +136,7 @@ var Web = function(config, rootDir, leagues) {
 
   app.get('/GetTwitterStatus', function (req, res) {
       if (typeof req.query.league !== 'undefined') {
-        var leagueName = req.query.league;
+        var leagueName = req.query.league.toUpperCase();
         if (typeof leagues[leagueName] !== 'undefined') {
           res.json(twitStatuses[leagueName]);
         } else {
