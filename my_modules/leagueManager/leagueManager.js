@@ -84,7 +84,11 @@ var LeagueManager = function(config, l) {
     db.query(cmd, function checkNext(nextGame){
       if (nextGame.length) {
         if (nextGame[0].StartTime) {
-          throttleLoop(nextGame[0].StartTime);
+          if (moment.duration(moment(nextGame[0].StartTime) - moment()).asMinutes < 0) {
+            restoreLoop();
+          } else {
+            throttleLoop(nextGame[0].StartTime);
+          }
         } else {
           throttleLoop();
         }

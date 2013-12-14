@@ -192,7 +192,6 @@ var Web = function(config, rootDir, leagues) {
   };
 
   this.updateLeagueStatus = function(status){
-    console.log(JSON.stringify(status));
     leagueStatuses[status.league] = status;
   };
 
