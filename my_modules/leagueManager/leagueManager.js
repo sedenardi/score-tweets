@@ -127,6 +127,7 @@ var LeagueManager = function(config, l) {
       throttleInfo.nextStartTime = startTime.toLocaleString(); 
     }
     throttleInfo.throttleTime = moment().toDate().toLocaleString();
+    throttleInfo.nextCheck = moment().add(delay).toDate().toLocaleString();
     sendStatus();
   };
 
