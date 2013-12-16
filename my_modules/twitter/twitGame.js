@@ -63,12 +63,12 @@ var TwitGame = function(config, league) {
             console.log(logTag + ': throttling');
             status = statuses.throttled;
             setTimeout(undoThrottle,240000);
-            /*var e = {
+            var e = {
               source: 'TwitGame',
               message: 'ERROR',
               stack: 'Throttling'
             };
-            db.logError(e, function(){});*/
+            db.logError(e, function(){});
           }
           sendStatus();
         }
