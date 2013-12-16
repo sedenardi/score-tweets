@@ -20,8 +20,8 @@ var LeagueManager = function(config, l) {
     league = l,
     loopInterval = null,
     status = statuses.stopped,
-    throttleCheck = false,
-    throttleInfo = {};
+    throttleInfo = {},
+    nowPlaying = [''];
 
   this.start = function() {
     if (loopInterval !== null) {
@@ -67,14 +67,14 @@ var LeagueManager = function(config, l) {
   }
 
   var loop = function() {
-    if (throttleCheck) {
+    if (nowPlaying.length === 0) {
       console.log(league.leagueInfo.leagueName + ': Throttle Check');
       checkForThrottle();
     } else {
       if (status === statuses.throttled) {
         restoreLoop();
-      } 
-      throttleCheck = true;
+      }
+      nowPlaying.length = 0;
       league.getGameArray(processGames);
     }
   };
@@ -102,20 +102,20 @@ var LeagueManager = function(config, l) {
 
   var throttleLoop = function(startTime) {
     var delay = config.leagues[league.leagueInfo.leagueName].throttleInterval;
-    if (typeof startTime !== 'undefined') {
+    if (startTime) {
       var duration = moment.duration(moment(startTime) - moment());
       if (duration.asHours() > 25) {
         //over a day away, don't check again for a day
-        delay = (86400000);
+        delay = 86400000;
       } else if (duration.asHours() > 1.5) {
         //over an hour away, don't check again for an hour
-        delay = (3600000);
+        delay = 3600000;
       } else if (duration.asMinutes() > 10) {
         //over 10 min away, don't check again for 10 min
-        delay = (600000);
+        delay = 600000;
       } else if (duration.asMinutes() > 1.5) {
         //over 1 min away, don't check again for 1 min
-        delay = (60000);
+        delay = 60000;
       }
     }
     console.log(league.leagueInfo.leagueName + ': Throttling loop ' + delay);
@@ -123,7 +123,9 @@ var LeagueManager = function(config, l) {
     loopInterval = setInterval(loop, delay);
     status = statuses.throttled;
     throttleInfo.delay = delay;
-    throttleInfo.nextStartTime = startTime.toLocaleString();
+    if (startTime) {
+      throttleInfo.nextStartTime = startTime.toLocaleString(); 
+    }
     throttleInfo.throttleTime = moment().toDate().toLocaleString();
     sendStatus();
   };
@@ -139,6 +141,8 @@ var LeagueManager = function(config, l) {
   var processGames = function(err, games) {
     if (err) {
       db.logError(err,function(){});
+      nowPlaying.length = 0;
+      nowPlaying.push('');
       return;
     }
     console.log(league.leagueInfo.leagueName + ': processing ' + games.length + ' games @ ' + (new Date()).toLocaleString());
@@ -155,6 +159,10 @@ var LeagueManager = function(config, l) {
   };
 
   var processInstance = function(oldGame, newGame) {
+    if (league.gameInProgress(newGame)) {
+      console.log(league.leagueInfo.leagueName + ': in progress ' + newGame.GameSymbol);
+      nowPlaying.push(newGame);
+    }
     if (oldGame.length) {
       var changed = league.gameChanged(oldGame[0], newGame);
       if (changed) {
@@ -178,7 +186,6 @@ var LeagueManager = function(config, l) {
         console.log(league.leagueInfo.leagueName + ': Inserted new game: ' + newGame.GameSymbol);
       });
     }
-    throttleCheck = throttleCheck && !league.gameInProgress(newGame);
   };
 
   var insertGame = function(game, next) {

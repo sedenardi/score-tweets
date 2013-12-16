@@ -64,13 +64,21 @@ var queryWithError = function(cmd, next) {
 };
 
 var logError = function(error, next) {
-  /*if (typeof error.source !== 'undefined' &&
+  if (typeof error.source !== 'undefined' &&
     typeof error.message !== 'undefined' &&
     typeof error.stack !== 'undefined') {
-    var stmnt = 'Insert into Errors(Source,Message,Data) Select ?,?,?;';
-    var inserts = [error.source,error.message,error.stack];
-    query(stmnt,inserts,next);
-  }*/
+    var cmd = {
+      sql: 'Insert into Errors(Source,Message,Data) Select ?,?,?;',
+      inserts: [error.source,error.message,error.stack]
+    };
+    queryWithError(cmd, function errorWriteDone(err, res) {
+      if (err) {
+        console.log('MYSQL: ' + err);
+      } else {
+        next(res);
+      }
+    });
+  }
 };
 
 /***** EXPORTS *****/
