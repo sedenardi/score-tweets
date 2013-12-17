@@ -59,9 +59,12 @@ var Web = function(config, rootDir, leagues) {
     app.use(express.static(rootDir + config.web.folders.static));
   });
   
-  /*app.get('/', function (req, res) {
-      res.render('index', {user: req.user});
-  });*/
+  app.get('/', function (req, res) {
+    res.render('index', {
+      leagues: leagues,
+      leagueStatuses: leagueStatuses
+    });
+  });
 
   /*app.get('/account', ensureAuthenticated, function(req, res){
     res.render('account', { user: req.user });

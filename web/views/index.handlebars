@@ -1,0 +1,61 @@
+<ul id="homeTabs" class="nav nav-tabs">
+  <li class="home active"><a href="#home">Home</a></li>
+  {{#each leagues}}
+  <li class="leagueTab" data-league="{{leagueInfo.leagueName}}"><a href="#{{leagueInfo.leagueName}}">{{leagueInfo.leagueName}}</a></li>
+  {{/each}}
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane fade in active" id="home">
+  {{#each leagueStatuses}}
+    <div>
+    <h4>{{league}}</h4>
+    <pre>
+    {{json this}}
+    </pre>
+    </div>
+  {{/each}}
+  </div>
+  {{#each leagues}}
+  <div class="tab-pane fade" id="{{leagueInfo.leagueName}}">
+    <h4>Info</h4>
+    <div class="leagueInfo">
+    </div>
+    <h4>Schedule Games</h4>
+    <div class="scheduled">
+    </div>
+  </div>
+  {{/each}}
+</div>
+
+<script>
+  $('#homeTabs a').click(function (e) {
+    e.preventDefault();
+    $(this).tab('show');
+    var parent = $(this).parent('li');
+    if ($(parent).hasClass('leagueTab')) {
+      var leagueDiv = $('#' + $(parent).attr('data-league'));
+      $.ajax({
+        url: '/GetLeagueStatus',
+        type: 'GET',
+        data: {
+          league: $(parent).attr('data-league'),
+        },
+        success: function (response) {
+          $(leagueDiv).children('.leagueInfo').html('<pre>' +JSON.stringify(response,null,2) + '</pre>');
+        }
+      });
+      $.ajax({
+        url: '/GetLatestGames',
+        type: 'GET',
+        data: {
+          league: $(parent).attr('data-league'),
+          hoursAgo: 12
+        },
+        success: function (response) {
+          $(leagueDiv).children('.scheduled').html(response);
+        }
+      });
+    }
+  });
+</script>
