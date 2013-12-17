@@ -299,6 +299,7 @@ var NFL = function() {
       , home.TwitterAccount as HomeTwitterAccount\
       , home.TwitterHashtag as HomeTwitterHashtag\
       , instance.HomeScore\
+      , instance.RecordedOn\
       from NFLGameInstances instance\
         inner join NFLGames game\
           on game.GameID = instance.GameID\

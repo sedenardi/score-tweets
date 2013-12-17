@@ -67,8 +67,8 @@ var LeagueManager = function(config, l) {
   }
 
   var loop = function() {
+    console.log(league.leagueInfo.leagueName + ': Games in progress - ' + nowPlaying.length);
     if (nowPlaying.length === 0) {
-      console.log(league.leagueInfo.leagueName + ': Throttle Check');
       checkForThrottle();
     } else {
       if (status === statuses.throttled) {
@@ -129,6 +129,12 @@ var LeagueManager = function(config, l) {
     throttleInfo.throttleTime = moment().toDate().toLocaleString();
     throttleInfo.nextCheck = moment().add(delay).toDate().toLocaleString();
     sendStatus();
+    var e = {
+      source: league.leagueInfo.leagueName,
+      message: 'Throttling for ' + delay + 'ms',
+      stack: 'ThrottleInfo: ' + JSON.stringify(throttleInfo)
+    };
+    db.logError(e,function(){});
   };
 
   var restoreLoop = function() {
@@ -176,10 +182,20 @@ var LeagueManager = function(config, l) {
             oldGame: oldGame[0],
             newGame: newGame
           };
-          insertGameChangeTweet(changeObj, function insertTweetFinished() {
-            console.log(league.leagueInfo.leagueName + ': Created new tweet for: ' + newGame.GameSymbol);
-            self.emit('change', changeObj);
-          });
+          var duration = moment.duration(moment() - moment(oldGame[0].RecordedOn));
+          if (duration.asHours() < 2) {
+            insertGameChangeTweet(changeObj, function insertTweetFinished() {
+              console.log(league.leagueInfo.leagueName + ': Created new tweet for: ' + newGame.GameSymbol);
+              self.emit('change', changeObj);
+            });
+          } else {
+            var e = {
+              source: league.leagueInfo.leagueName,
+              message: 'Game stale',
+              stack: 'OldGame: ' + JSON.stringify(oldGame) + ', NewGame: ' + JSON.stringify(newGame)
+            };
+            db.logError(e,function(){});
+          }
         });
       }
     } else {

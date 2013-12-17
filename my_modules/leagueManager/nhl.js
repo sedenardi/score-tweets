@@ -255,6 +255,7 @@ var NHL = function() {
       , home.TwitterAccount as HomeTwitterAccount\
       , home.TwitterHashtag as HomeTwitterHashtag\
       , instance.HomeScore\
+      , instance.RecordedOn\
       from NHLGameInstances instance\
         inner join NHLGames game\
           on game.GameID = instance.GameID\
