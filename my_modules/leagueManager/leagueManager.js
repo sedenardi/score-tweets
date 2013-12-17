@@ -101,7 +101,7 @@ var LeagueManager = function(config, l) {
   };
 
   var throttleLoop = function(startTime) {
-    var delay = config.leagues[league.leagueInfo.leagueName].throttleInterval;
+    var delay = parseInt(config.leagues[league.leagueInfo.leagueName].throttleInterval);
     if (startTime) {
       var duration = moment.duration(moment(startTime) - moment());
       if (duration.asHours() > 25) {
