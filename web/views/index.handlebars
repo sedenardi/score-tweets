@@ -1,7 +1,7 @@
 <ul id="homeTabs" class="nav nav-tabs">
-  <li class="home active"><a href="#home">Home</a></li>
+  <li class="home active"><a data-toggle="tab" href="#home">Home</a></li>
   {{#each leagues}}
-  <li class="leagueTab" data-league="{{leagueInfo.leagueName}}"><a href="#{{leagueInfo.leagueName}}">{{leagueInfo.leagueName}}</a></li>
+  <li class="leagueTab" data-league="{{leagueInfo.leagueName}}"><a data-toggle="tab" href="#{{leagueInfo.leagueName}}">{{leagueInfo.leagueName}}</a></li>
   {{/each}}
 </ul>
 
@@ -29,6 +29,13 @@
 </div>
 
 <script>
+  $(document).ready(function() {
+    var url = document.location.toString();
+    if (url.match('#')) {
+      $('.nav-tabs a[href=#'+url.split('#')[1]+']').click();
+    }
+  });
+
   $('#homeTabs a').click(function (e) {
     e.preventDefault();
     $(this).tab('show');
@@ -56,6 +63,9 @@
           $(leagueDiv).children('.scheduled').html(response);
         }
       });
+      window.location.hash = '#' + $(parent).attr('data-league');
+    } else {
+      window.location.hash = '';
     }
   });
 </script>

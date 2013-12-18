@@ -47,7 +47,7 @@ var Web = function(config, rootDir, leagues) {
   app.configure(function() {
     app.set('views', rootDir + '/web/views');
     app.set('view engine', 'handlebars');
-    app.use(express.logger());
+    //app.use(express.logger());
     app.use(express.cookieParser());
     app.use(express.json());
     app.use(express.urlencoded())
