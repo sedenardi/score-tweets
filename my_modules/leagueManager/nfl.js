@@ -360,6 +360,61 @@ var NFL = function() {
     };
   };
 
+  this.ongoingGamesQuery = function() {
+    var stmnt = 
+      'Select\
+        \'NFL\' as League\
+      , instance.GameID\
+      , instance.InstanceID\
+      , (Select TwitterID\
+        from NFLTweets tweet\
+          inner join NFLGameInstances lastTweet\
+            on lastTweet.InstanceID = tweet.InstanceID\
+        where lastTweet.GameID = instance.GameID\
+        and tweet.TwitterID REGEXP \'[0-9]+\'\
+        order by tweet.RecordedOn desc limit 1) as LastTwitterID\
+      , game.GameSymbol\
+      , CONCAT(\'http://www.nfl.com/gamecenter/\',game.GameSymbol,\
+        \'/\',game.SeasonYear,\'/\',game.SeasonType,\
+        game.SeasonWeek,\'/\',away.Name,\
+        \'@\',home.Name) as GameLink\
+      , game.Date\
+      , state.State\
+      , game.SeasonYear\
+      , game.SeasonType\
+      , game.SeasonWeek\
+      , instance.Time\
+      , instance.Quarter\
+      , away.City as AwayTeamCity\
+      , away.Name as AwayTeamName\
+      , away.DisplayName as AwayTeamDisplayName\
+      , instance.AwayScore\
+      , home.City as HomeTeamCity\
+      , home.Name as HomeTeamName\
+      , home.DisplayName as HomeTeamDisplayName\
+      , instance.HomeScore\
+      from NFLGameInstances instance\
+        inner join NFLGames game\
+          on game.GameID = instance.GameID\
+        inner join NFLStates state\
+          on state.StateID = instance.StateID\
+        inner join NFLTeams away\
+          on away.TeamID = game.AwayTeamID\
+        inner join NFLTeams home\
+          on home.TeamID = game.HomeTeamID\
+      where state.State not like \'Scheduled\'\
+      and state.State not like \'Final\'\
+      and not exists\
+        (Select 1 from NFLGameInstances newerInstance\
+        where newerInstance.GameID = instance.GameID\
+        and instance.RecordedOn < newerInstance.RecordedOn);';
+    var params = [];
+    return {
+      sql: stmnt,
+      inserts: params
+    };
+  };
+
   this.nextGameQuery = function() {
     var stmnt = 
       'Select\

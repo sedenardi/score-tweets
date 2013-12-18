@@ -191,11 +191,6 @@ var NHL = function() {
     return linkStub + game.GameSymbol;
   };
 
-  this.gameInProgress = function(game) {
-    return game.State !== 'Scheduled' &&
-      game.State !== 'Final';
-  };
-
   this.insertGameQuery = function(game) {
     var stmnt = 
       'Insert into NHLGames(GameSymbol,Date,AwayTeamID,\
@@ -310,6 +305,55 @@ var NHL = function() {
   this.updateTweetQuery = function(TweetID, TwitterID) {
     var stmnt = 'Update NHLTweets set TwitterID = ? where TweetID = ?;';
     var params = [TwitterID, TweetID];
+    return {
+      sql: stmnt,
+      inserts: params
+    };
+  };
+
+  this.ongoingGamesQuery = function() {
+    var stmnt = 
+      'Select\
+        \'NHL\' as League\
+      , instance.GameID\
+      , instance.InstanceID\
+      , (Select TwitterID\
+        from NHLTweets tweet\
+          inner join NHLGameInstances lastTweet\
+            on lastTweet.InstanceID = tweet.InstanceID\
+        where lastTweet.GameID = instance.GameID\
+        and tweet.TwitterID REGEXP \'[0-9]+\'\
+        order by tweet.RecordedOn desc limit 1) as LastTwitterID\
+      , game.GameSymbol\
+      , CONCAT(?,game.GameSymbol) as GameLink\
+      , game.Date\
+      , state.State\
+      , instance.Time\
+      , instance.Period\
+      , away.City as AwayTeamCity\
+      , away.Name as AwayTeamName\
+      , away.DisplayName as AwayTeamDisplayName\
+      , instance.AwayScore\
+      , home.City as HomeTeamCity\
+      , home.Name as HomeTeamName\
+      , home.DisplayName as HomeTeamDisplayName\
+      , instance.HomeScore\
+      from NHLGameInstances instance\
+        inner join NHLGames game\
+          on game.GameID = instance.GameID\
+        inner join NHLStates state\
+          on state.StateID = instance.StateID\
+        inner join NHLTeams away\
+          on away.TeamID = game.AwayTeamID\
+        inner join NHLTeams home\
+          on home.TeamID = game.HomeTeamID\
+      where state.State not like \'Scheduled\'\
+      and state.State not like \'Final\'\
+      and not exists\
+        (Select 1 from NHLGameInstances newerInstance\
+        where newerInstance.GameID = instance.GameID\
+        and instance.RecordedOn < newerInstance.RecordedOn);';
+    var params = ['http://www.nhl.com/gamecenter/en/icetracker?id='];
     return {
       sql: stmnt,
       inserts: params

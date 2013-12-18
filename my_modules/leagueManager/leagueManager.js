@@ -20,8 +20,7 @@ var LeagueManager = function(config, l) {
     league = l,
     loopInterval = null,
     status = statuses.stopped,
-    throttleInfo = {},
-    nowPlaying = [''];
+    throttleInfo = {};
 
   this.start = function() {
     if (loopInterval !== null) {
@@ -67,16 +66,18 @@ var LeagueManager = function(config, l) {
   }
 
   var loop = function() {
-    console.log(league.leagueInfo.leagueName + ': Games in progress - ' + nowPlaying.length);
-    if (nowPlaying.length === 0) {
-      checkForThrottle();
-    } else {
-      if (status === statuses.throttled) {
-        restoreLoop();
+    var ongoing = league.ongoingGamesQuery();
+    db.query(ongoing, function ongoingGames(res) {
+      console.log(league.leagueInfo.leagueName + ': Games in progress - ' + res.length);
+      if (res.length === 0) {
+        checkForThrottle();
+      } else {
+        if (status === statuses.throttled) {
+          restoreLoop();
+        }
+        league.getGameArray(processGames);
       }
-      nowPlaying.length = 0;
-      league.getGameArray(processGames);
-    }
+    });
   };
 
   var checkForThrottle = function() {
@@ -166,10 +167,6 @@ var LeagueManager = function(config, l) {
   };
 
   var processInstance = function(oldGame, newGame) {
-    if (league.gameInProgress(newGame)) {
-      console.log(league.leagueInfo.leagueName + ': in progress ' + newGame.GameSymbol);
-      nowPlaying.push(newGame);
-    }
     if (oldGame.length) {
       var changed = league.gameChanged(oldGame[0], newGame);
       if (changed) {
@@ -183,7 +180,7 @@ var LeagueManager = function(config, l) {
             newGame: newGame
           };
           var duration = moment.duration(moment() - moment(oldGame[0].RecordedOn));
-          if (duration.asHours() < 2) {
+          if (duration.asHours() < 2 || oldGame.State === 'Scheduled') {
             insertGameChangeTweet(changeObj, function insertTweetFinished() {
               console.log(league.leagueInfo.leagueName + ': Created new tweet for: ' + newGame.GameSymbol);
               self.emit('change', changeObj);
