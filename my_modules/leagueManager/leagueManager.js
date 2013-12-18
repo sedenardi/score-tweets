@@ -180,7 +180,7 @@ var LeagueManager = function(config, l) {
             newGame: newGame
           };
           var duration = moment.duration(moment() - moment(oldGame[0].RecordedOn));
-          if (duration.asHours() < 2 || oldGame.State === 'Scheduled') {
+          if (duration.asHours() < 2 || oldGame[0].State === 'Scheduled') {
             insertGameChangeTweet(changeObj, function insertTweetFinished() {
               console.log(league.leagueInfo.leagueName + ': Created new tweet for: ' + newGame.GameSymbol);
               self.emit('change', changeObj);
