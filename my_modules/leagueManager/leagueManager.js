@@ -130,7 +130,7 @@ var LeagueManager = function(config, l) {
     }
     throttleInfo.throttleTime = moment().toDate().toLocaleString();
     throttleInfo.nextCheck = moment().add(delay).toDate().toLocaleString();
-    throttleInfo.duration = duration;
+    throttleInfo.duration = duration.asSeconds();
     sendStatus();
     var e = {
       source: league.leagueInfo.leagueName,
