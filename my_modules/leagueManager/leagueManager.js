@@ -85,7 +85,7 @@ var LeagueManager = function(config, l) {
     db.query(cmd, function checkNext(nextGame){
       if (nextGame.length) {
         if (nextGame[0].StartTime) {
-          if (moment.duration(moment(nextGame[0].StartTime) - moment()).asMinutes < 0) {
+          if (moment.duration(moment(nextGame[0].StartTime) - moment()).asMinutes() < 0) {
             restoreLoop();
           } else {
             throttleLoop(nextGame[0].StartTime);
@@ -103,8 +103,9 @@ var LeagueManager = function(config, l) {
 
   var throttleLoop = function(startTime) {
     var delay = parseInt(config.leagues[league.leagueInfo.leagueName].throttleInterval);
+    var duration;
     if (startTime) {
-      var duration = moment.duration(moment(startTime) - moment());
+      duration = moment.duration(moment(startTime) - moment());
       if (duration.asHours() > 25) {
         //over a day away, don't check again for a day
         delay = 86400000;
@@ -129,6 +130,7 @@ var LeagueManager = function(config, l) {
     }
     throttleInfo.throttleTime = moment().toDate().toLocaleString();
     throttleInfo.nextCheck = moment().add(delay).toDate().toLocaleString();
+    throttleInfo.duration = duration;
     sendStatus();
     var e = {
       source: league.leagueInfo.leagueName,
