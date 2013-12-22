@@ -153,8 +153,6 @@ var LeagueManager = function(config, l) {
   var processGames = function(err, games) {
     if (err) {
       db.logError(err,function(){});
-      nowPlaying.length = 0;
-      nowPlaying.push('');
       return;
     }
     console.log(league.leagueInfo.leagueName + ': processing ' + games.length + ' games @ ' + (new Date()).toLocaleString());
