@@ -54,6 +54,7 @@ var NFL = function() {
             } catch(e) {
               console.log('NFL: parsing error');
               e.source = 'NFL';
+              e.stack = e.stack + '\nOuter: ' + rawOuter + '\nInner: ' + rawInner;
               next(e); 
             }
           });
