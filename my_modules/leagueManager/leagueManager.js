@@ -118,7 +118,10 @@ var LeagueManager = function(config, l) {
       } else if (duration.asMinutes() > 1.5) {
         //over 1 min away, don't check again for 1 min
         delay = 60000;
+      } else {
+        delay = 60000;
       }
+      throttleInfo.duration = duration.asSeconds();
     }
     console.log(league.leagueInfo.leagueName + ': Throttling loop ' + delay);
     clearInterval(loopInterval);
@@ -130,7 +133,6 @@ var LeagueManager = function(config, l) {
     }
     throttleInfo.throttleTime = moment().toDate().toLocaleString();
     throttleInfo.nextCheck = moment().add(delay).toDate().toLocaleString();
-    throttleInfo.duration = duration.asSeconds();
     sendStatus();
     var e = {
       source: league.leagueInfo.leagueName,
