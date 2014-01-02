@@ -39,7 +39,7 @@ var NFL = function() {
               for (var i = 0; i < innerArray.length; i++) {
                 innerObj[innerArray[i][10]] = innerArray[i];
               }
-              outerObj = JSON.parse(rawOuter);
+              var outerObj = JSON.parse(rawOuter);
               var gameArray = [];
               for (var i = 0; i < outerObj.gms.length; i++) {
                 outerObj.gms[i].outer_w = outerObj.w;
