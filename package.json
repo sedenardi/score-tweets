@@ -16,7 +16,8 @@
     "handlebars": "*",
     "passport": "*",
     "passport-twitter": "*",
-    "ntwitter": "*"
+    "ntwitter": "*",
+    "xml2js": "*"
   },
   "engines": {
     "node": ">=0.10"

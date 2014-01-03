@@ -2,7 +2,7 @@ var fs = require('fs'),
   LeagueManager = require('./my_modules/leagueManager/leagueManager.js'),
   TwitGame = require('./my_modules/twitter/twitGame.js'),
   NHL = require('./my_modules/leagueManager/nhl-nhlcom.js'),
-  NFL = require('./my_modules/leagueManager/nfl-nflcom.js'),
+  NFL = require('./my_modules/leagueManager/nfl-nflcom-postseason.js'),
   Web = require('./my_modules/web/web.js');
 
 var configFile = './config.json';
