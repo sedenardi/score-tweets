@@ -105,10 +105,10 @@ var NFL = function() {
     game.Quarter = rawGame.q;
     game.AwayTeamDisplayName = rawGame.v;
     game.AwayTeamName = rawGame.vnn;
-    game.AwayScore = rawGame.vs;
+    game.AwayScore = (rawGame.vs === '' ? 0 : parseInt(rawGame.vs));
     game.HomeTeamDisplayName = rawGame.h;
     game.HomeTeamName = rawGame.hnn;
-    game.HomeScore = rawGame.hs;
+    game.HomeScore = (rawGame.hs === '' ? 0 : parseInt(rawGame.hs));
     game.RawInstance = JSON.stringify(rawGame,null,2);
     return game;
   };
