@@ -29,9 +29,9 @@ var NFL = function() {
         parseString(rawOuter, function finishXMLParse(err, pRes) {
           if (err) {
             console.log('NFL: outer parsing error');
-            e.source = 'NFL';
-            e.stack = e.stack + '\nOuter: ' + rawOuter;
-            next(e);
+            err.source = 'NFL';
+            err.stack = err.stack + '\nOuter: ' + rawOuter;
+            next(err);
           } else {
             var outerObj = pRes;
             var rawInner = '';
