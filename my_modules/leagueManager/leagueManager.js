@@ -198,8 +198,10 @@ var LeagueManager = function(config, l) {
         });
       }
     } else {
-      insertGameInstance(newGame, function insertGameInstanceFinished() {
-        console.log(league.leagueInfo.leagueName + ': Inserted new game: ' + newGame.GameSymbol);
+      insertGameInstance(newGame, function insertGameInstanceFinished(res) {
+        if (res.length) {
+          console.log(league.leagueInfo.leagueName + ': Inserted new game: ' + newGame.GameSymbol);
+        }
       });
     }
   };
