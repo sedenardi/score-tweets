@@ -172,8 +172,8 @@ var NFL = function() {
       InstanceID: newGame.InstanceID,
       TweetString: ''
     };
-    var scores = newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
-      newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ';
+    var scores = oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+      oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ';
     if (oldGame.State !== newGame.State) {
       if (oldGame.State === 'Scheduled' && newGame.State === 'Progress') {
         tweet.TweetString = 'Start of game: ' +
@@ -214,12 +214,12 @@ var NFL = function() {
           quarterArray[newGame.Quarter] + ' ' +
           self.makeGameLink(newGame);
       } else if (oldGame.AwayScore !== newGame.AwayScore) {
-        tweet.TweetString = newGame.AwayTeamName + ' score. ' +
+        tweet.TweetString = oldGame.AwayTeamName + ' score. ' +
           scores + newGame.Time + ' ' + 
           quarterArray[newGame.Quarter] + ' ' +
           self.makeGameLink(newGame);
       } else if (oldGame.HomeScore !== newGame.HomeScore) {
-        tweet.TweetString = newGame.HomeTeamName + ' score. ' +
+        tweet.TweetString = oldGame.HomeTeamName + ' score. ' +
           scores + newGame.Time + ' ' + 
           quarterArray[newGame.Quarter] + ' ' +
           self.makeGameLink(newGame);
