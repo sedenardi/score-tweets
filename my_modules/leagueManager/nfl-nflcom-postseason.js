@@ -46,7 +46,7 @@ var NFL = function() {
                   innerArray = JSON.parse(rawInner).ss;
                   var innerObj = { };
                   for (var i = 0; i < innerArray.length; i++) {
-                    innerObj[innerArray[i][10]] = innerArray[i];
+                    innerObj[innerArray[i][12]] = innerArray[i];
                   }
                   var gameArray = [];
                   for (var i = 0; i < outerObj.ss.gms[0].g.length; i++) {
@@ -177,7 +177,7 @@ var NFL = function() {
     if (oldGame.State !== newGame.State) {
       if (oldGame.State === 'Scheduled' && newGame.State === 'Progress') {
         tweet.TweetString = 'Start of game: ' +
-          newGame.AwayTeamName + ' vs ' + newGame.HomeTeamName + ' ' +
+          oldGame.AwayTeamName + ' vs ' + oldGame.HomeTeamName + ' ' +
           self.makeGameLink(newGame);
       }
      /* if (oldGame.State === 'Progress' && newGame.State === 'Halftime') {
