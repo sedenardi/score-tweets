@@ -1,6 +1,6 @@
 {
   "name": "score-tweet",
-  "version": "1.0.0",
+  "version": "1.0",
   "author": "Sanders DeNardi",
   "description": "Framework for sending out live score updates via Twitter.",
   "main": "score-tweets.js",
