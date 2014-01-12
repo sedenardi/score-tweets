@@ -26,51 +26,55 @@ var NFL = function() {
         rawOuter += chunk;
       });
       oRes.on('end', function outHttpEnd() {
-        parseString(rawOuter, function finishXMLParse(err, pRes) {
-          if (err) {
-            console.log('NFL: outer parsing error');
-            err.source = 'NFL';
-            err.stack = err.stack + '\nOuter: ' + rawOuter;
-            next(err);
-          } else {
-            var outerObj = pRes;
-            var rawInner = '';
-            var innerRequest = http.get(self.leagueInfo.updateURL2, function inHttpSetup(iRes) {
-              iRes.on('data', function inHttpData(chunk) {
-                rawInner += chunk;
-              });
-              iRes.on('end', function inHttpEnd() {
-                try {
-                  rawInner = rawInner.replace(/\,\,/g,',"",')
-                    .replace(/\,\,/g,',"",');
-                  innerArray = JSON.parse(rawInner).ss;
-                  var innerObj = { };
-                  for (var i = 0; i < innerArray.length; i++) {
-                    innerObj[innerArray[i][12]] = innerArray[i];
+        try {
+          parseString(rawOuter, function finishXMLParse(err, pRes) {
+            if (err) {
+              console.log('NFL: outer parsing error');
+              err.source = 'NFL';
+              err.stack = err.stack + '\nOuter: ' + rawOuter;
+              next(err);
+            } else {
+              var outerObj = pRes;
+              var rawInner = '';
+              var innerRequest = http.get(self.leagueInfo.updateURL2, function inHttpSetup(iRes) {
+                iRes.on('data', function inHttpData(chunk) {
+                  rawInner += chunk;
+                });
+                iRes.on('end', function inHttpEnd() {
+                  try {
+                    rawInner = rawInner.replace(/\,\,/g,',"",')
+                      .replace(/\,\,/g,',"",');
+                    innerArray = JSON.parse(rawInner).ss;
+                    var innerObj = { };
+                    for (var i = 0; i < innerArray.length; i++) {
+                      innerObj[innerArray[i][12]] = innerArray[i];
+                    }
+                    var gameArray = [];
+                    for (var i = 0; i < outerObj.ss.gms[0].g.length; i++) {
+                      outerObj.ss.gms[0].g[i].$.outer_w = outerObj.ss.gms[0].$.w;
+                      outerObj.ss.gms[0].g[i].$.outer_t = outerObj.ss.gms[0].$.t;
+                      outerObj.ss.gms[0].g[i].$.outer_y = outerObj.ss.gms[0].$.y;
+                      outerObj.ss.gms[0].g[i].$.outer_gd = outerObj.ss.gms[0].$.gd;
+                      outerObj.ss.gms[0].g[i].$.outer_bph = outerObj.ss.gms[0].$.bph;
+                      outerObj.ss.gms[0].g[i].$.score_array = innerObj[outerObj.ss.gms[0].g[i].$.gsis];
+                      gameArray.push(self.parseRawGame(outerObj.ss.gms[0].g[i].$));
+                    }
+                    next(null, gameArray);
+                  } catch(e) {
+                    console.log('NFL: parsing error');
+                    e.source = 'NFL';
+                    e.stack = e.stack + '\nOuter: ' + rawOuter + '\nInner: ' + rawInner;
+                    next(e); 
                   }
-                  var gameArray = [];
-                  for (var i = 0; i < outerObj.ss.gms[0].g.length; i++) {
-                    outerObj.ss.gms[0].g[i].$.outer_w = outerObj.ss.gms[0].$.w;
-                    outerObj.ss.gms[0].g[i].$.outer_t = outerObj.ss.gms[0].$.t;
-                    outerObj.ss.gms[0].g[i].$.outer_y = outerObj.ss.gms[0].$.y;
-                    outerObj.ss.gms[0].g[i].$.outer_gd = outerObj.ss.gms[0].$.gd;
-                    outerObj.ss.gms[0].g[i].$.outer_bph = outerObj.ss.gms[0].$.bph;
-                    outerObj.ss.gms[0].g[i].$.score_array = innerObj[outerObj.ss.gms[0].g[i].$.gsis];
-                    gameArray.push(self.parseRawGame(outerObj.ss.gms[0].g[i].$));
-                  }
-                  next(null, gameArray);
-                } catch(e) {
-                  console.log('NFL: parsing error');
-                  e.source = 'NFL';
-                  e.stack = e.stack + '\nOuter: ' + rawOuter + '\nInner: ' + rawInner;
-                  next(e); 
-                }
+                });
+              }).on('error', function inHttpEnd(e) {
+                console.log('NFL inner http Error: ' + e.message);
               });
-            }).on('error', function inHttpEnd(e) {
-              console.log('NFL inner http Error: ' + e.message);
-            });
-          }
-        });        
+            }
+          });
+        } catch (e) {
+          console.log('NFL XML Parse error');
+        }        
       });
     }).on('error', function outHttpErrir(e) {
       console.log('NFL outer http Error: ' + e.message);
