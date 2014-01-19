@@ -116,7 +116,7 @@ var NFL = function() {
     game.SeasonType = rawGame.outer_t;
     game.SeasonWeek = rawGame.outer_w;
     game.Time = timeString;
-    game.Quarter = rawGame.q;
+    game.Quarter = rawGame.score_array[2];
     game.AwayTeamDisplayName = rawGame.v;
     game.AwayTeamName = rawGame.vnn;
     game.AwayScore = (rawGame.vs === '' ? 0 : parseInt(rawGame.vs));
