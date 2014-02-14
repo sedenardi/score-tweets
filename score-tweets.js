@@ -1,8 +1,9 @@
 var fs = require('fs'),
   LeagueManager = require('./my_modules/leagueManager/leagueManager.js'),
   TwitGame = require('./my_modules/twitter/twitGame.js'),
-  NHL = require('./my_modules/leagueManager/nhl-nhlcom.js'),
-  NFL = require('./my_modules/leagueManager/nfl-nflcom-postseason.js'),
+  //NHL = require('./my_modules/leagueManager/nhl-nhlcom.js'),
+  NHL = require('./my_modules/leagueManager/nhl-nhlcom-olympics.js'),
+  //NFL = require('./my_modules/leagueManager/nfl-nflcom-postseason.js'),
   Web = require('./my_modules/web/web.js');
 
 var configFile = './config.json';
@@ -25,9 +26,9 @@ leagues.NHL = NHL;
 leagueManagers.NHL = new LeagueManager(config, NHL);
 twitters.NHL = new TwitGame(config, NHL);
 
-leagues.NFL = NFL;
+/*leagues.NFL = NFL;
 leagueManagers.NFL = new LeagueManager(config, NFL);
-twitters.NFL = new TwitGame(config, NFL);
+twitters.NFL = new TwitGame(config, NFL);*/
 
 var web = new Web(config, __dirname,leagues);
 
@@ -61,17 +62,14 @@ var twitStatus = function(status) {
 
 leagueManagers.NHL.on('change', leagueChange);
 leagueManagers.NHL.on('status', leagueStatus);
-
-leagueManagers.NFL.on('change', leagueChange);
-leagueManagers.NFL.on('status', leagueStatus);
-
 leagueManagers.NHL.start();
-leagueManagers.NFL.start();
-
 twitters.NHL.on('status', twitStatus);
-twitters.NFL.on('status', twitStatus);
-
 twitters.NHL.start();
-twitters.NFL.start();
+
+/*leagueManagers.NFL.on('change', leagueChange);
+leagueManagers.NFL.on('status', leagueStatus);
+leagueManagers.NFL.start();
+twitters.NFL.on('status', twitStatus);
+twitters.NFL.start();*/
 
 web.startServer();
