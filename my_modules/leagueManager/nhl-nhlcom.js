@@ -114,7 +114,10 @@ var NHL = function() {
       ( (oldGame.State !== newGame.State) ||
         (oldGame.Period !== newGame.Period) ||
         (oldGame.AwayScore !== newGame.AwayScore) ||
-        (oldGame.HomeScore !== newGame.HomeScore));
+        (oldGame.HomeScore !== newGame.HomeScore) ||
+          (oldGame.State === 'Scheduled' && 
+          newGame.State === 'Scheduled' && 
+          oldGame.Time !== newGame.Time));
   };
 
   this.gameChangeString = function(oldGame, newGame) {
