@@ -85,6 +85,7 @@ var Web = function(config, rootDir, leagues) {
                 res.json(500,err);
               } else {
                 res.render('gameList', {
+                  layout: false,
                   games: data
                 });
               }
@@ -112,6 +113,7 @@ var Web = function(config, rootDir, leagues) {
             } else {
               //res.json(200,data);
               res.render('gameList', {
+                layout: false,
                 games: data
               });
             }
