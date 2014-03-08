@@ -117,7 +117,8 @@ var NHL = function() {
         (oldGame.HomeScore !== newGame.HomeScore) ||
           (oldGame.State === 'Scheduled' && 
           newGame.State === 'Scheduled' && 
-          oldGame.Time !== newGame.Time));
+          oldGame.Time !== newGame.Time &&
+          newGame.Time.length));
   };
 
   this.gameChangeString = function(oldGame, newGame) {
