@@ -395,6 +395,8 @@ var NHL = function() {
         inner join NHLTeams home\
           on home.TeamID = game.HomeTeamID\
       where state.State like \'Scheduled\'\
+      and instance.Time not like \'PPD\'\
+      and game.Date >= CURDATE()\
       and not exists\
         (Select 1 from NHLGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
@@ -444,7 +446,8 @@ var NHL = function() {
         inner join NHLTeams home\
           on home.TeamID = game.HomeTeamID\
       where (instance.RecordedOn > DATE_SUB(NOW(),INTERVAL ? HOUR)\
-        or state.State like \'Scheduled\')\
+        or (state.State like \'Scheduled\'\
+          and game.Date >= CURDATE()))\
       and not exists\
         (Select 1 from NHLGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
