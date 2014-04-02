@@ -8,10 +8,12 @@ var LeagueManager = function(config, l) {
 
   var statuses = {
     stopped: 'stopped',
+    firstLoop: 'firstLoop',
     looping: 'looping',
     throttled: 'throttled'
   }, statusDescriptions = {
     stopped: 'Stopped, able to be started',
+    firstLoop: 'Looping through the first time to detect the next game',
     looping: 'Looping quickly, games are ongoing',
     throttled: 'Looping slowly, no games currently ongoing'
   };
@@ -20,7 +22,8 @@ var LeagueManager = function(config, l) {
     league = l,
     loopInterval = null,
     status = statuses.stopped,
-    throttleInfo = {};
+    throttleInfo = {},
+    firstRun = true;
 
   this.start = function() {
     if (loopInterval !== null) {
@@ -123,10 +126,16 @@ var LeagueManager = function(config, l) {
       }
       throttleInfo.duration = duration.asSeconds();
     }
+    if (firstRun) {
+      delay = config.leagues[league.leagueInfo.leagueName].loopInterval;
+      status = statuses.firstLoop;
+      firstRun = false;
+    } else {
+      status = statuses.throttled;
+    }
     console.log(league.leagueInfo.leagueName + ': Throttling loop ' + delay);
     clearInterval(loopInterval);
     loopInterval = setInterval(loop, delay);
-    status = statuses.throttled;
     throttleInfo.delay = delay;
     if (startTime) {
       throttleInfo.nextStartTime = startTime.toLocaleString(); 
