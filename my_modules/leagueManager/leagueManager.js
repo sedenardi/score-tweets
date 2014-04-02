@@ -201,7 +201,7 @@ var LeagueManager = function(config, l) {
       }
     } else {
       insertGameInstance(newGame, function insertGameInstanceFinished(res) {
-        if (res.length) {
+        if (res.insertId) {
           console.log(league.leagueInfo.leagueName + ': Inserted new game: ' + newGame.GameSymbol);
         }
       });

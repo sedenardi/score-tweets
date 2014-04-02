@@ -1,4 +1,5 @@
 tests/
 node_modules/
+helpers/
 config_real.json
 config_shell.json
