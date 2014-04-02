@@ -42,7 +42,7 @@ var NHL = function() {
     var gameState = '';
     var timeString = '';
     var periodString = '';
-    switch (rawGame.gs) {
+    switch (rawGame.gs.toString()) {
       case '1':
         gameState = 'Scheduled';
         if (rawGame.ts !== 'TODAY') {
@@ -94,7 +94,7 @@ var NHL = function() {
         date.setDate(parseInt(dateArr[1]));
         break;
     }
-    game.GameSymbol = rawGame.id;
+    game.GameSymbol = rawGame.id.toString();
     game.Date = date;
     game.State = gameState;
     game.Time = timeString;
