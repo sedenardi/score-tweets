@@ -48,12 +48,12 @@ var MLB = function() {
     var game = { };
     var awayScore = 0, homeScore = 0, inning = 0, topInning = 0;
     if (typeof rawGame.status.inning !== 'undefined')
-      inning = rawGame.status.inning;
+      inning = parseInt(rawGame.status.inning);
     if (typeof rawGame.status.top_inning !== 'undefined')
       topInning = (rawGame.status.top_inning === 'Y') ? 1 : 0;
     if (typeof rawGame.linescore !== 'undefined') {
-      awayScore = rawGame.linescore.r.away;
-      homeScore = rawGame.linescore.r.home;
+      awayScore = parseInt(rawGame.linescore.r.away);
+      homeScore = parseInt(rawGame.linescore.r.home);
     }
     game.GameSymbol = rawGame.gameday;
     game.DateTime = moment(rawGame.time_date + ' PM');
