@@ -3,3 +3,5 @@ node_modules/
 helpers/
 config_real.json
 config_shell.json
+config-test.json
+score-tweets-test.js

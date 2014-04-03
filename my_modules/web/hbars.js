@@ -38,6 +38,29 @@ var exphbs = function(rootDir, config) {
           5: 'Friday',
           6: 'Saturday'
         };
+        var numbers = {
+          1: '1st',
+          2: '2nd',
+          3: '3rd',
+          11: '11th',
+          12: '12th',
+          13: '13th'
+        };
+        var getNth = function(number) {
+          var n = parseInt(number);
+          var s = number.toString();
+          if (typeof numbers[s] !== 'undefined') {
+            return numbers[s];
+          } else if (n % 10 === 1) {
+            return s.substring(0, s.length - 1) + numbers['1'];
+          } else if (n % 10 === 2) {
+            return s.substring(0, s.length - 1) + numbers['2'];
+          } else if (n % 10 === 3) {
+            return s.substring(0, s.length - 1) + numbers['3'];
+          } else {
+            return s + 'th';
+          }
+        };
         if (game.League === 'NHL') {
           switch (game.State) {
             case 'Overtime':
@@ -87,6 +110,10 @@ var exphbs = function(rootDir, config) {
                 }
               }
           }
+        } else if (game.League === 'MLB') {
+          var topOrBottom = game.TopInning === 1 ? 'Top' : 'Bottom';
+          return topOrBottom + ' of ' + getNth(game.Inning) + ' - ' + 
+            game.State;
         } else {
           return game.State;
         }
