@@ -7,40 +7,53 @@ var MLB = function() {
 
   this.leagueInfo = {
     leagueName: 'MLB',
-    updateURL: function() {
-      var date = new Date();
-      var month = date.getMonth() + 1;
+    updateURL: function(yesterday) {
+      var date = yesterday ? new moment().subtract('days',1) : new moment();
+      var month = date.month() + 1;
+      var day = date.date();
       var url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' + 
-        date.getFullYear() + 
+        date.year() + 
         '/month_' + (month < 10 ? '0' : '') + month + 
-        '/day_' + (date.getDate() < 10 ? '0' : '') + date.getDate() + 
+        '/day_' + (day < 10 ? '0' : '') + day + 
         '/master_scoreboard.json';
       return url;
     }
   };
 
   this.getGameArray = function(next) {
-    var rawData = '';
-    var request = http.get(this.leagueInfo.updateURL(), function httpSetup(res) {
-      res.on('data', function httpData(chunk) {
-        rawData += chunk;
+    var t = this;
+    var yesterdayRaw = '', todayRaw = '';
+    var yRequest = http.get(t.leagueInfo.updateURL(true), function httpSetup(yRes) {
+      yRes.on('data', function httpData(chunk) {
+        yesterdayRaw += chunk;
       });
-      res.on('end', function httpEnd() {
-        try {
-          var rawArray = JSON.parse(rawData).data.games.game;
-          var gameArray = [];
-          for (var i = 0; i < rawArray.length; i++) {
-            gameArray.push(self.parseRawGame(rawArray[i]));
-          }
-          next(null, gameArray);
-        } catch(e) {
-          console.log('MLB: Parse Error ' + e);
-          e.source = 'MLB';
-          next(e);
-        }
+      yRes.on('end', function httpEnd() {
+        var tRequest = http.get(t.leagueInfo.updateURL(false), function httpSetup(tRes) {
+          tRes.on('data', function httpData(chunk) {
+            todayRaw += chunk;
+          });
+          tRes.on('end', function httpEnd() {
+            try {
+              var rawYArray = JSON.parse(yesterdayRaw).data.games.game;
+              var rawTArray = JSON.parse(todayRaw).data.games.game;
+              var rawArray = rawYArray.concat(rawTArray);
+              var gameArray = [];
+              for (var i = 0; i < rawArray.length; i++) {
+                gameArray.push(t.parseRawGame(rawArray[i]));
+              }
+              next(null, gameArray);
+            } catch(e) {
+              console.log('MLB: Parse Error ' + e);
+              e.source = 'MLB';
+              next(e);
+            }
+          });
+        }).on('error', function httpError(e) {
+          console.log('MLB http Today Error: ' + e.message);
+        });
       });
     }).on('error', function httpError(e) {
-      console.log('MLB http Error: ' + e.message);
+      console.log('MLB http Yesterday Error: ' + e.message);
     });
   };
 
