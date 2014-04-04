@@ -347,12 +347,12 @@ var MLB = function() {
           on away.TeamID = game.AwayTeamID\
         inner join MLBTeams home\
           on home.TeamID = game.HomeTeamID\
-      where instance.RecordedOn > DATE_SUB(NOW(),INTERVAL ? HOUR)\
+      where game.DateTime > DATE_SUB(NOW(),INTERVAL ? HOUR)\
       and not exists\
         (Select 1 from MLBGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
-      order by game.GameSymbol asc;';
+      order by game.DateTime asc;';
     var params = ['http://www.mlb.com/r/game?gid=',hoursAgo];
     return {
       sql: stmnt,
@@ -399,7 +399,7 @@ var MLB = function() {
         (Select 1 from MLBGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
-      order by game.GameSymbol asc;';
+      order by game.DateTime asc;';
     var params = ['http://www.mlb.com/r/game?gid='];
     return {
       sql: stmnt,
