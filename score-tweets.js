@@ -2,6 +2,7 @@ var fs = require('fs'),
   LeagueManager = require('./my_modules/leagueManager/leagueManager.js'),
   TwitGame = require('./my_modules/twitter/twitGame.js'),
   NHL = require('./my_modules/leagueManager/nhl-nhlcom.js'),
+  MLB = require('./my_modules/leagueManager/mlb-mlbcom.js'),
   //NFL = require('./my_modules/leagueManager/nfl-nflcom-postseason.js'),
   Web = require('./my_modules/web/web.js');
 
@@ -25,6 +26,10 @@ leagues.NHL = NHL;
 leagueManagers.NHL = new LeagueManager(config, NHL);
 twitters.NHL = new TwitGame(config, NHL);
 
+leagues.MLB = MLB;
+leagueManagers.MLB = new LeagueManager(config, MLB);
+twitters.MLB = new TwitGame(config, MLB);
+
 /*leagues.NFL = NFL;
 leagueManagers.NFL = new LeagueManager(config, NFL);
 twitters.NFL = new TwitGame(config, NFL);*/
@@ -33,8 +38,8 @@ var web = new Web(config, __dirname,leagues);
 
 web.on('auth', function receiveAuth(data) {
   if (config.twitter.accounts[data.profile.username] !== 'undefined') {
-    config.twitter.accounts[i].access_token_key = data.token;
-    config.twitter.accounts[i].access_token_secret = data.tokenSecret;
+    config.twitter.accounts[data.profile.username].access_token_key = data.token;
+    config.twitter.accounts[data.profile.username].access_token_secret = data.tokenSecret;
   }
   fs.writeFile(configFile, JSON.stringify(config,null,2), function(e) {
     if (e) {
@@ -64,6 +69,12 @@ leagueManagers.NHL.on('status', leagueStatus);
 leagueManagers.NHL.start();
 twitters.NHL.on('status', twitStatus);
 twitters.NHL.start();
+
+leagueManagers.MLB.on('change', leagueChange);
+leagueManagers.MLB.on('status', leagueStatus);
+leagueManagers.MLB.start();
+twitters.MLB.on('status', twitStatus);
+twitters.MLB.start();
 
 /*leagueManagers.NFL.on('change', leagueChange);
 leagueManagers.NFL.on('status', leagueStatus);
