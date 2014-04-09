@@ -139,7 +139,11 @@ var exphbs = function(rootDir, config) {
           table += '<tr>';
           for (var key in array[i]) {
             if (key !== 'parse' && key !== '_typeCast') {
-              table += '<td>' + array[i][key] + '</td>';
+              if (key === 'TopInning') {
+                table += '<td>' + array[i][key][0] + '</td>';
+              } else {
+                table += '<td>' + array[i][key] + '</td>';
+              }
             }
           }
           table += '</tr>';
