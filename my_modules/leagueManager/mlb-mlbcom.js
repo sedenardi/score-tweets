@@ -39,7 +39,13 @@ var MLB = function() {
               var rawArray = rawYArray.concat(rawTArray);
               var gameArray = [];
               for (var i = 0; i < rawArray.length; i++) {
-                gameArray.push(t.parseRawGame(rawArray[i]));
+                var exists = false;
+                for (var j = 0; j < gameArray.length; j++) {
+                  exists = exists || gameArray[j] === rawArray[i].gameday;
+                }
+                if (!exists) {
+                  gameArray.push(t.parseRawGame(rawArray[i]));
+                }
               }
               next(null, gameArray);
             } catch(e) {
@@ -74,7 +80,9 @@ var MLB = function() {
     game.Inning = inning;
     game.TopInning = topInning;
     game.AwayTeamID = rawGame.away_team_id;
+    game.AwayTeamName = rawGame.away_team_name;
     game.HomeTeamID = rawGame.home_team_id;
+    game.HomeTeamName = rawGame.home_team_name;
     game.AwayScore = awayScore;
     game.HomeScore = homeScore;
     game.RawInstance = JSON.stringify(rawGame,null,2);
@@ -110,7 +118,74 @@ var MLB = function() {
       InstanceID: newGame.InstanceID,
       TweetString: ''
     };
+    var scores = newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
+      newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ';
+    if (newGame.State === 'In Progress' &&
+      newGame.Inning === 1 && newGame.TopInning === 1 && 
+      newGame.AwayScore === 0 && newGame.HomeScore === 0) {
+      tweet.TweetString = 'Start of game: ' + 
+        newGame.AwayTeamName + ' vs ' + newGame.HomeTeamName + ' ' +
+        self.makeGameLink(newGame);
+    } else if (newGame.State === 'Game Over' &&
+      oldGame.State !== 'Game Over') {
+      tweet.TweetString = 'Final' + 
+        (newGame.Innings > 9 ? (' in ' + newGame.Innings + '.') : '.') + 
+        ' ' + scores + ' ' + self.makeGameLink(newGame);
+    } else if (oldGame.AwayScore === oldGame.HomeScore) {
+      if (newGame.AwayScore > newGame.HomeScore) {
+        tweet.TweetString = newGame.AwayTeamName + 
+          ' take the lead, ' + scores + ' ' + 
+          self.makeInningString(newGame) + ' ' + 
+          self.makeGameLink(newGame);
+      } else if (newGame.HomeScore > newGame.AwayScore){
+        tweet.TweetString = newGame.HomeTeamName + 
+          ' take the lead, ' + scores + ' ' + 
+          self.makeInningString(newGame) + ' ' + 
+          self.makeGameLink(newGame);
+      }
+    } else if (newGame.AwayScore === newGame.HomeScore) {
+      if (oldGame.AwayScore < oldGame.HomeScore) {
+        tweet.TweetString = newGame.AwayTeamName + 
+          ' tie it up, ' + scores + ' ' + 
+          self.makeInningString(newGame) + ' ' + 
+          self.makeGameLink(newGame);
+      } else if (oldGame.HomeScore < oldGame.AwayScore) {
+        tweet.TweetString = newGame.HomeTeamName + 
+          ' tie it up, ' + scores + ' ' + 
+          self.makeInningString(newGame) + ' ' + 
+          self.makeGameLink(newGame);
+      }
+    }
     return tweet;
+  };
+
+  this.getNth = function(number) {
+    var numbers = {
+      1: '1st',
+      2: '2nd',
+      3: '3rd',
+      11: '11th',
+      12: '12th',
+      13: '13th'
+    };
+    var n = parseInt(number);
+    var s = number.toString();
+    if (typeof numbers[s] !== 'undefined') {
+      return numbers[s];
+    } else if (n % 10 === 1) {
+      return s.substring(0, s.length - 1) + numbers['1'];
+    } else if (n % 10 === 2) {
+      return s.substring(0, s.length - 1) + numbers['2'];
+    } else if (n % 10 === 3) {
+      return s.substring(0, s.length - 1) + numbers['3'];
+    } else {
+      return s + 'th';
+    }
+  };
+
+  this.makeInningString = function(game) {
+    var topOrBottom = game.TopInning === 1 ? 'Top' : 'Bottom';
+    return topOrBottom + ' ' + self.getNth(game.Inning);
   };
 
   this.makeGameLink = function(game) {
@@ -184,29 +259,29 @@ var MLB = function() {
     };
   };
 
-  /*this.insertGameChangeTweetQuery = function(tweet) {
+  this.insertGameChangeTweetQuery = function(tweet) {
     var stmnt = 
-      'Insert ignore into NHLTweets(InstanceID,TweetString)\
+      'Insert ignore into MLBTweets(InstanceID,TweetString)\
       Select ?,?;';
     var params = [tweet.InstanceID, tweet.TweetString, tweet.InstanceID];
     return {
       sql: stmnt,
       inserts: params
     };
-  };*/
+  };
 
-  /*this.nextTweetQuery = function() {
+  this.nextTweetQuery = function() {
     var stmnt = 
       'Select\
         tweet.TweetID\
       , tweet.TweetString\
       , tweet.RecordedOn\
-      from NHLTweets tweet\
-        inner join NHLGameInstances instance\
+      from MLBTweets tweet\
+        inner join MLBGameInstances instance\
           on instance.InstanceID = tweet.InstanceID\
       where tweet.TwitterID is null\
       and not exists\
-        (select 1 from NHLGameInstances newerInstance\
+        (select 1 from MLBGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by tweet.RecordedOn asc limit 1;';
@@ -215,16 +290,16 @@ var MLB = function() {
       sql: stmnt,
       inserts: params
     };
-  };*/
+  };
 
-  /*this.updateTweetQuery = function(TweetID, TwitterID) {
-    var stmnt = 'Update NHLTweets set TwitterID = ? where TweetID = ?;';
+  this.updateTweetQuery = function(TweetID, TwitterID) {
+    var stmnt = 'Update MLBTweets set TwitterID = ? where TweetID = ?;';
     var params = [TwitterID, TweetID];
     return {
       sql: stmnt,
       inserts: params
     };
-  };*/
+  };
 
   this.ongoingGamesQuery = function() {
     var stmnt = 
@@ -404,6 +479,32 @@ var MLB = function() {
     return {
       sql: stmnt,
       inserts: params
+    };
+  };
+
+  this.gameStatusQuery = function(gameID) {
+    var stmnt = 
+      'Select\
+        \'MLB\' as League\
+      , instance.InstanceID\
+      , instance.GameID\
+      , instance.State\
+      , instance.Inning\
+      , instance.TopInning\
+      , instance.AwayScore as \'Away\'\
+      , instance.HomeScore as \'Home\'\
+      , instance.RecordedOn\
+      , tweets.TweetID\
+      , tweets.TweetString\
+      , tweets.RecordedOn as \'TweetRecordedOn\'\
+      from MLBGameInstances instance\
+        left join MLBTweets tweets\
+          on tweets.InstanceID = instance.InstanceID\
+      where instance.GameID = ?\
+      order by instance.RecordedOn asc;';
+    return {
+      sql: stmnt,
+      inserts: [gameID]
     };
   };
 };

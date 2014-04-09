@@ -508,6 +508,34 @@ var NHL = function() {
       inserts: params
     };
   };
+
+  this.gameStatusQuery = function(gameID) {
+    var stmnt = 
+      'Select\
+        \'NHL\' as League\
+      , instance.InstanceID\
+      , instance.GameID\
+      , state.State\
+      , instance.Time\
+      , instance.Period\
+      , instance.AwayScore as \'Away\'\
+      , instance.HomeScore as \'Home\'\
+      , instance.RecordedOn\
+      , tweets.TweetID\
+      , tweets.TweetString\
+      , tweets.RecordedOn as \'TweetRecordedOn\'\
+      from NHLGameInstances instance\
+        inner join NHLStates state\
+          on state.StateID = instance.StateID\
+        left join NHLTweets tweets\
+          on tweets.InstanceID = instance.InstanceID\
+      where instance.GameID = ?\
+      order by instance.RecordedOn asc;';
+    return {
+      sql: stmnt,
+      inserts: [gameID]
+    };
+  };
 };
 
 module.exports = new NHL();

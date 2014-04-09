@@ -29,6 +29,9 @@ var exphbs = function(rootDir, config) {
         return new Handlebars.SafeString(extSpan + tweetSpan);
       },
       state: function(game) {
+        var statusLink = '<a href="/GetGameStatus?gameID=' + game.GameID + 
+          '&league=' + game.League + '" target="_blank">';
+        var status = '';
         var dayArray = {
           0: 'Sunday',
           1: 'Monday',
@@ -66,21 +69,21 @@ var exphbs = function(rootDir, config) {
             case 'Overtime':
             case 'Intermission':
             case 'Progress':
-              return 'Last score - ' + game.Time + ' ' + game.Period;
+              status = statusLink + 'Last score - ' + game.Time + ' ' + game.Period + '</a>';
             case 'Shootout':
-              return 'Shootout';
+              status = statusLink + 'Shootout' + '</a>';
             case 'Final':
               if (game.Period) {
-                return 'Final ' + game.Period;
+                status = statusLink + 'Final ' + game.Period + '</a>';
               } else {
-                return 'Final';
+                status = statusLink + 'Final' + '</a>';
               }
             case 'Scheduled':
               if (game.Date !== '0000-00-00'){
                 if (game.Time) {
-                  return dayArray[game.Date.getDay()] + ' ' + game.Time;
+                  status = statusLink + dayArray[game.Date.getDay()] + ' ' + game.Time + '</a>';
                 } else {
-                  return dayArray[game.Date.getDay()];
+                  status = statusLink + dayArray[game.Date.getDay()] + '</a>';
                 }
               }
           }
@@ -112,11 +115,37 @@ var exphbs = function(rootDir, config) {
           }
         } else if (game.League === 'MLB') {
           var topOrBottom = game.TopInning === 1 ? 'Top' : 'Bottom';
-          return topOrBottom + ' of ' + getNth(game.Inning) + ' - ' + 
-            game.State;
+          status = statusLink + topOrBottom + ' of ' + getNth(game.Inning) + ' - ' + 
+            game.State + '</a>';
         } else {
           return game.State;
         }
+        return new Handlebars.SafeString(status);
+      },
+      tableize: function(array) {
+        if (!array.length) {
+          return 'Empty array';
+        }
+        var table = '<div class="table-resposive">' + 
+          '<table class="table table-striped table-bordered table-condensed">' + 
+          '<thead><tr>';
+        for (var key in array[0]) {
+          if (key !== 'parse' && key !== '_typeCast') {
+            table += '<th>' + key + '</th>';
+          }
+        }
+        table += '</tr></thead><tbody>';
+        for (var i = 0; i < array.length; i++) {
+          table += '<tr>';
+          for (var key in array[i]) {
+            if (key !== 'parse' && key !== '_typeCast') {
+              table += '<td>' + array[i][key] + '</td>';
+            }
+          }
+          table += '</tr>';
+        }
+        table += '</tbody></table></div>';
+        return new Handlebars.SafeString(table);
       }
     },
     layoutsDir: rootDir + config.web.folders.layouts,

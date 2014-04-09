@@ -152,6 +152,30 @@ var Web = function(config, rootDir, leagues) {
       }
   });
 
+  app.get('/GetGameStatus', function (req, res) {
+      if (typeof req.query.league !== 'undefined') {
+        var leagueName = req.query.league.toUpperCase();
+        if (typeof leagues[leagueName] !== 'undefined') {
+          var cmd = leagues[leagueName].gameStatusQuery(req.query.gameID);
+          db.queryWithError(cmd, function webDBReturn(err, data) {
+            if (err) {
+              console.log('web DB error');
+              res.json(500,err);
+            } else {
+              res.render('gameStatus', {
+                layout: false,
+                array: data
+              });
+            }
+          });
+        } else {
+          res.json(402, { error: 'Specified league does not exist.'});
+        }
+      } else {
+        res.json(402, { error: 'Must specify league parameter.'});
+      }
+  });
+
   app.get('/login', function(req, res){
     res.render('login', { 
       user: req.user,
