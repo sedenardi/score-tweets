@@ -1,6 +1,6 @@
 {
   "name": "score-tweet",
-  "version": "1.0",
+  "version": "2.0",
   "author": "Sanders DeNardi",
   "description": "Framework for sending out live score updates via Twitter.",
   "main": "score-tweets.js",
@@ -9,15 +9,15 @@
     "url": "https://github.com/sedenardi/score-tweets"
   },
   "dependencies" : {
-    "mysql": "*",
-    "moment": "*",
-    "express": "*",
-    "express3-handlebars": "*",
-    "handlebars": "*",
-    "passport": "*",
-    "passport-twitter": "*",
-    "ntwitter": "*",
-    "xml2js": "*"
+    "mysql": "~2.0.1",
+    "moment": "~2.5.1",
+    "express": "~3.4.8",
+    "express3-handlebars": "~0.5.0",
+    "handlebars": "~1.1.2",
+    "passport": "~0.1.17",
+    "passport-twitter": "~1.0.2",
+    "ntwitter": "~0.5.0",
+    "xml2js": "~0.4.1"
   },
   "engines": {
     "node": ">=0.10"
