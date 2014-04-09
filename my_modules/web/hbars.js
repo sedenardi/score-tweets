@@ -114,7 +114,7 @@ var exphbs = function(rootDir, config) {
               }
           }
         } else if (game.League === 'MLB') {
-          var topOrBottom = game.TopInning === 1 ? 'Top' : 'Bottom';
+          var topOrBottom = game.TopInning[0] === 1 ? 'Top' : 'Bottom';
           status = statusLink + topOrBottom + ' of ' + getNth(game.Inning) + ' - ' + 
             game.State + '</a>';
         } else {
