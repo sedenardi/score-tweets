@@ -155,6 +155,18 @@ var MLB = function() {
           self.makeInningString(newGame) + ' ' + 
           self.makeGameLink(newGame);
       }
+    } else if (oldGame.AwayScore < oldGame.HomeScore && 
+      newGame.HomeScore < newGame.AwayScore) {
+      tweet.TweetString = newGame.AwayTeamName + 
+        ' take the lead, ' + scores + ' ' + 
+        self.makeInningString(newGame) + ' ' + 
+        self.makeGameLink(newGame);
+    } else if (oldGame.AwayScore < oldGame.AwayScore && 
+      newGame.AwayScore < newGame.HomeScore) {
+      tweet.TweetString = newGame.HomeTeamName + 
+        ' take the lead, ' + scores + ' ' + 
+        self.makeInningString(newGame) + ' ' + 
+        self.makeGameLink(newGame);
     }
     return tweet;
   };
