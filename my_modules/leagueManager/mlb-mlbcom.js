@@ -386,8 +386,9 @@ var MLB = function() {
           on away.TeamID = game.AwayTeamID\
         inner join MLBTeams home\
           on home.TeamID = game.HomeTeamID\
-      where instance.State like \'Pre-Game\'\
-      or instance.State like \'Preview\'\
+      where (instance.State like \'Pre-Game\'\
+      or instance.State like \'Preview\')\
+      and game.DateTime >= CURRENT_TIME()\
       and not exists\
         (Select 1 from MLBGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
