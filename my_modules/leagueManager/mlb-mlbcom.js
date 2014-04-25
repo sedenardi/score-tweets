@@ -347,7 +347,9 @@ var MLB = function() {
           on away.TeamID = game.AwayTeamID\
         inner join MLBTeams home\
           on home.TeamID = game.HomeTeamID\
-      where instance.State like \'In Progress\'\
+      where (instance.State like \'In Progress\'\
+        or instance.State like \'Manager Challenge\'\
+        or instance.State like \'Review\')\
       and not exists\
         (Select 1 from MLBGameInstances newerInstance\
         where newerInstance.GameID = instance.GameID\
