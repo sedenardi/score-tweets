@@ -18,7 +18,10 @@ var NHL = function() {
       res.on('end', function httpEnd() {
         try {
           rawData = rawData.replace('loadScoreboard(','');
-          rawData = rawData.substring(0,(rawData.length-2));
+          rawData = rawData.substring(0,(rawData.length-1));
+          if (rawData[rawData.length-1] === ')') {
+            rawData = rawData.substring(0,(rawData.length-1));
+          }
           var rawArray = JSON.parse(rawData).games;
           var gameArray = [];
           for (var i = 0; i < rawArray.length; i++) {
