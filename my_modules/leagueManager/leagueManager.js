@@ -192,20 +192,10 @@ var LeagueManager = function(config, l) {
             oldGame: oldGame[0],
             newGame: newGame
           };
-          var duration = moment.duration(moment() - moment(oldGame[0].RecordedOn));
-          if (duration.asHours() < 2 || oldGame[0].State === 'Scheduled') {
-            insertGameChangeTweet(changeObj, function insertTweetFinished() {
-              console.log(league.leagueInfo.leagueName + ': Created new tweet for: ' + newGame.GameSymbol);
-              self.emit('change', changeObj);
-            });
-          } else {
-            var e = {
-              source: league.leagueInfo.leagueName,
-              message: 'Game stale',
-              stack: 'OldGame: ' + JSON.stringify(oldGame) + ', NewGame: ' + JSON.stringify(newGame)
-            };
-            db.logError(e,function(){});
-          }
+          insertGameChangeTweet(changeObj, function insertTweetFinished() {
+            console.log(league.leagueInfo.leagueName + ': Created new tweet for: ' + newGame.GameSymbol);
+            self.emit('change', changeObj);
+          });
         });
       }
     } else {

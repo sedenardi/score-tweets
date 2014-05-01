@@ -1,4 +1,5 @@
-var http = require('http');
+var http = require('http'),
+  moment = require('moment');
 
 var NHL = function() {
 
@@ -142,6 +143,13 @@ var NHL = function() {
       InstanceID: newGame.InstanceID,
       TweetString: ''
     };
+
+    var duration = moment.duration(moment() - moment(oldGame.RecordedOn));
+    if (!(duration.asHours() < 2 || 
+      (oldGame.State === 'Scheduled' && newGame.State !== 'Final'))) {
+      return tweet;
+    }
+
     var scores = oldGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
       oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ';
     if (oldGame.State !== newGame.State) {
@@ -150,22 +158,6 @@ var NHL = function() {
           oldGame.AwayTeamName + ' vs ' + oldGame.HomeTeamName + ' ' +
           self.makeGameLink(newGame);
       }
-      /*if (oldGame.State === 'Progress' && newGame.State === 'Intermission') {
-        tweet.TweetString = 'End of ' + newGame.Period + '. ' +
-          scores + self.makeGameLink(newGame);
-      }
-      if (oldGame.State === 'Intermission' && newGame.State === 'Progress') {
-        tweet.TweetString = 'Start of ' + newGame.Period + '. ' +
-          scores + self.makeGameLink(newGame);
-      }
-      if (oldGame.State === 'Progress' && newGame.State === 'Overtime') {
-        tweet.TweetString = 'Headed to OT. ' +
-          scores + self.makeGameLink(newGame);
-      }
-      if (oldGame.State === 'Overtime' && newGame.State === 'Shootout') {
-        tweet.TweetString = 'Headed to a shootout. ' +
-          scores + self.makeGameLink(newGame);
-      }*/
       if (newGame.State === 'Final') {
         if (newGame.Period === 'SO') {
           tweet.TweetString = 'Final SO. ' +
