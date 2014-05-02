@@ -74,10 +74,10 @@ var NHL = function() {
           gameState = 'Shootout';
         } else {
           timeString = rawGame.ts.split(' ')[0];
-          periodString = rawGame.ts.split(' ')[1];
-          if (periodString === 'OT') {
+          periodString = rawGame.ts.substring(rawGame.ts.indexOf(' ')+1);
+          if (periodString.indexOf('OT') !== -1) {
             gameState = 'Overtime';
-          } else if (periodString === 'SO') {
+          } else if (periodString.indexOf('SO') !== -1) {
             gameState = 'Shootout';
           } else {
             gameState = 'Progress';
