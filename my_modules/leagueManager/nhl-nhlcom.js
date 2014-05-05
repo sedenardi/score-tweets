@@ -392,6 +392,7 @@ var NHL = function() {
           on home.TeamID = game.HomeTeamID\
       where state.State like \'Scheduled\'\
       and instance.Time not like \'PPD\'\
+      and STR_TO_DATE(CONCAT(DATE_FORMAT(game.Date,\'%Y-%m-%d\'),\' \',instance.Time),\'%Y-%m-%d %h:%i %p\') is not null\
       and game.Date >= CURDATE()\
       and not exists\
         (Select 1 from NHLGameInstances newerInstance\
