@@ -193,16 +193,16 @@ var NHL = function() {
 
   this.insertGameQuery = function(game) {
     var stmnt = 
-      'Insert into NHLGames(GameSymbol,Date,AwayTeamID,\
+      'Insert into nhlgames(GameSymbol,Date,AwayTeamID,\
         HomeTeamID)\
       Select\
         ?,?,away.TeamID,home.TeamID\
-      from NHLTeams away\
-        inner join NHLTeams home\
+      from nhlteams away\
+        inner join nhlteams home\
           on LOWER(REPLACE(home.Name,\' \',\'\')) like ?\
       where LOWER(REPLACE(away.Name,\' \',\'\')) like ?\
       and not exists\
-        (Select 1 from NHLGames where GameSymbol like ?);';
+        (Select 1 from nhlgames where GameSymbol like ?);';
     var params = [game.GameSymbol, game.Date,
       game.HomeTeamName, game.AwayTeamName, game.GameSymbol];
     return {
@@ -213,12 +213,12 @@ var NHL = function() {
 
   this.insertGameInstanceQuery = function(game) {
     var stmnt = 
-      'Insert into NHLGameInstances(GameID,StateID,Time,\
+      'Insert into nhlgameinstances(GameID,StateID,Time,\
         Period,AwayScore,HomeScore,RawInstance)\
       Select\
         game.GameID,state.StateID,?,?,?,?,?\
-      from NHLStates state\
-        inner join NHLGames game\
+      from nhlstates state\
+        inner join nhlgames game\
           on game.GameSymbol like ?\
       where state.State = ?;';
     var params = [game.Time, game.Period, game.AwayScore,
@@ -251,15 +251,15 @@ var NHL = function() {
       , home.TwitterHashtag as HomeTwitterHashtag\
       , instance.HomeScore\
       , instance.RecordedOn\
-      from NHLGameInstances instance\
-        inner join NHLGames game\
+      from nhlgameinstances instance\
+        inner join nhlgames game\
           on game.GameID = instance.GameID\
           and game.GameSymbol like ?\
-        inner join NHLStates state\
+        inner join nhlstates state\
           on state.StateID = instance.StateID\
-        inner join NHLTeams away\
+        inner join nhlteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NHLTeams home\
+        inner join nhlteams home\
           on home.TeamID = game.HomeTeamID\
       order by ?? desc limit 1;';
     var params = [game.GameSymbol, 'instance.RecordedOn'];
@@ -271,7 +271,7 @@ var NHL = function() {
 
   this.insertGameChangeTweetQuery = function(tweet) {
     var stmnt = 
-      'Insert ignore into NHLTweets(InstanceID,TweetString)\
+      'Insert ignore into nhltweets(InstanceID,TweetString)\
       Select ?,?;';
     var params = [tweet.InstanceID, tweet.TweetString, tweet.InstanceID];
     return {
@@ -286,12 +286,12 @@ var NHL = function() {
         tweet.TweetID\
       , tweet.TweetString\
       , tweet.RecordedOn\
-      from NHLTweets tweet\
-        inner join NHLGameInstances instance\
+      from nhltweets tweet\
+        inner join nhlgameinstances instance\
           on instance.InstanceID = tweet.InstanceID\
       where tweet.TwitterID is null\
       and not exists\
-        (select 1 from NHLGameInstances newerInstance\
+        (select 1 from nhlgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by tweet.RecordedOn asc limit 1;';
@@ -303,7 +303,7 @@ var NHL = function() {
   };
 
   this.updateTweetQuery = function(TweetID, TwitterID) {
-    var stmnt = 'Update NHLTweets set TwitterID = ? where TweetID = ?;';
+    var stmnt = 'Update nhltweets set TwitterID = ? where TweetID = ?;';
     var params = [TwitterID, TweetID];
     return {
       sql: stmnt,
@@ -318,8 +318,8 @@ var NHL = function() {
       , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
-        from NHLTweets tweet\
-          inner join NHLGameInstances lastTweet\
+        from nhltweets tweet\
+          inner join nhlgameinstances lastTweet\
             on lastTweet.InstanceID = tweet.InstanceID\
         where lastTweet.GameID = instance.GameID\
         and tweet.TwitterID REGEXP \'[0-9]+\'\
@@ -338,19 +338,19 @@ var NHL = function() {
       , home.Name as HomeTeamName\
       , home.DisplayName as HomeTeamDisplayName\
       , instance.HomeScore\
-      from NHLGameInstances instance\
-        inner join NHLGames game\
+      from nhlgameinstances instance\
+        inner join nhlgames game\
           on game.GameID = instance.GameID\
-        inner join NHLStates state\
+        inner join nhlstates state\
           on state.StateID = instance.StateID\
-        inner join NHLTeams away\
+        inner join nhlteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NHLTeams home\
+        inner join nhlteams home\
           on home.TeamID = game.HomeTeamID\
       where state.State not like \'Scheduled\'\
       and state.State not like \'Final\'\
       and not exists\
-        (Select 1 from NHLGameInstances newerInstance\
+        (Select 1 from nhlgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn);';
     var params = ['http://www.nhl.com/gamecenter/en/icetracker?id='];
@@ -381,21 +381,21 @@ var NHL = function() {
       , home.Name as HomeTeamName\
       , home.DisplayName as HomeTeamDisplayName\
       , instance.HomeScore\
-      from NHLGameInstances instance\
-        inner join NHLGames game\
+      from nhlgameinstances instance\
+        inner join nhlgames game\
           on game.GameID = instance.GameID\
-        inner join NHLStates state\
+        inner join nhlstates state\
           on state.StateID = instance.StateID\
-        inner join NHLTeams away\
+        inner join nhlteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NHLTeams home\
+        inner join nhlteams home\
           on home.TeamID = game.HomeTeamID\
       where state.State like \'Scheduled\'\
       and instance.Time not like \'PPD\'\
       and STR_TO_DATE(CONCAT(DATE_FORMAT(game.Date,\'%Y-%m-%d\'),\' \',instance.Time),\'%Y-%m-%d %h:%i %p\') is not null\
       and game.Date >= CURDATE()\
       and not exists\
-        (Select 1 from NHLGameInstances newerInstance\
+        (Select 1 from nhlgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by StartTime asc limit 1;';
@@ -413,8 +413,8 @@ var NHL = function() {
       , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
-        from NHLTweets tweet\
-          inner join NHLGameInstances lastTweet\
+        from nhltweets tweet\
+          inner join nhlgameinstances lastTweet\
             on lastTweet.InstanceID = tweet.InstanceID\
         where lastTweet.GameID = instance.GameID\
         and tweet.TwitterID REGEXP \'[0-9]+\'\
@@ -433,20 +433,20 @@ var NHL = function() {
       , home.Name as HomeTeamName\
       , home.DisplayName as HomeTeamDisplayName\
       , instance.HomeScore\
-      from NHLGameInstances instance\
-        inner join NHLGames game\
+      from nhlgameinstances instance\
+        inner join nhlgames game\
           on game.GameID = instance.GameID\
-        inner join NHLStates state\
+        inner join nhlstates state\
           on state.StateID = instance.StateID\
-        inner join NHLTeams away\
+        inner join nhlteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NHLTeams home\
+        inner join nhlteams home\
           on home.TeamID = game.HomeTeamID\
       where (instance.RecordedOn > DATE_SUB(NOW(),INTERVAL ? HOUR)\
         or (state.State like \'Scheduled\'\
           and game.Date >= CURDATE()))\
       and not exists\
-        (Select 1 from NHLGameInstances newerInstance\
+        (Select 1 from nhlgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by game.GameSymbol asc;';
@@ -464,8 +464,8 @@ var NHL = function() {
       , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
-        from NHLTweets tweet\
-          inner join NHLGameInstances lastTweet\
+        from nhltweets tweet\
+          inner join nhlgameinstances lastTweet\
             on lastTweet.InstanceID = tweet.InstanceID\
         where lastTweet.GameID = instance.GameID\
         and tweet.TwitterID REGEXP \'[0-9]+\'\
@@ -484,18 +484,18 @@ var NHL = function() {
       , home.Name as HomeTeamName\
       , home.DisplayName as HomeTeamDisplayName\
       , instance.HomeScore\
-      from NHLGameInstances instance\
-        inner join NHLGames game\
+      from nhlgameinstances instance\
+        inner join nhlgames game\
           on game.GameID = instance.GameID\
-        inner join NHLStates state\
+        inner join nhlstates state\
           on state.StateID = instance.StateID\
-        inner join NHLTeams away\
+        inner join nhlteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NHLTeams home\
+        inner join nhlteams home\
           on home.TeamID = game.HomeTeamID\
       where state.State like \'Scheduled\'\
       and not exists\
-        (Select 1 from NHLGameInstances newerInstance\
+        (Select 1 from nhlgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by game.GameSymbol asc;';
@@ -521,10 +521,10 @@ var NHL = function() {
       , tweets.TweetID\
       , tweets.TweetString\
       , tweets.RecordedOn as \'TweetRecordedOn\'\
-      from NHLGameInstances instance\
-        inner join NHLStates state\
+      from nhlgameinstances instance\
+        inner join nhlstates state\
           on state.StateID = instance.StateID\
-        left join NHLTweets tweets\
+        left join nhltweets tweets\
           on tweets.InstanceID = instance.InstanceID\
       where instance.GameID = ?\
       order by instance.RecordedOn asc;';

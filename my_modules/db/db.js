@@ -68,7 +68,7 @@ var logError = function(error, next) {
     typeof error.message !== 'undefined' &&
     typeof error.stack !== 'undefined') {
     var cmd = {
-      sql: 'Insert into Errors(Source,Message,Data) Select ?,?,?;',
+      sql: 'Insert into errors(Source,Message,Data) Select ?,?,?;',
       inserts: [error.source,error.message,error.stack]
     };
     queryWithError(cmd, function errorWriteDone(err, res) {

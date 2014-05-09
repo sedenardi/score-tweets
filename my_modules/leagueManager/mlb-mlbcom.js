@@ -207,12 +207,12 @@ var MLB = function() {
 
   this.insertGameQuery = function(game) {
     var stmnt = 
-      'Insert into MLBGames(GameSymbol,DateTime,AwayTeamID, \
+      'Insert into mlbgames(GameSymbol,DateTime,AwayTeamID, \
         HomeTeamID) \
       Select \
         ?,?,?,? from DUAL \
       where not exists\
-        (Select 1 from MLBGames where GameSymbol like ?);';
+        (Select 1 from mlbgames where GameSymbol like ?);';
     var params = [game.GameSymbol, game.DateTime.toDate(),
       game.AwayTeamID, game.HomeTeamID, game.GameSymbol];
     return {
@@ -223,11 +223,11 @@ var MLB = function() {
 
   this.insertGameInstanceQuery = function(game) {
     var stmnt = 
-      'Insert into MLBGameInstances(GameID,State,Inning,\
+      'Insert into mlbgameinstances(GameID,State,Inning,\
         TopInning,AwayScore,HomeScore,RawInstance)\
       Select\
         game.GameID,?,?,?,?,?,?\
-      from MLBGames game\
+      from mlbgames game\
       where game.GameSymbol like ?;';
     var params = [game.State, game.Inning, game.TopInning, game.AwayScore,
       game.HomeScore, game.RawInstance, game.GameSymbol];
@@ -255,13 +255,13 @@ var MLB = function() {
       , home.Name as HomeTeamName\
       , instance.HomeScore\
       , instance.RecordedOn\
-      from MLBGameInstances instance\
-        inner join MLBGames game\
+      from mlbgameinstances instance\
+        inner join mlbgames game\
           on game.GameID = instance.GameID\
           and game.GameSymbol like ?\
-        inner join MLBTeams away\
+        inner join mlbteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join MLBTeams home\
+        inner join mlbteams home\
           on home.TeamID = game.HomeTeamID\
       order by instance.RecordedOn desc limit 1;';
     var params = [game.GameSymbol];
@@ -273,7 +273,7 @@ var MLB = function() {
 
   this.insertGameChangeTweetQuery = function(tweet) {
     var stmnt = 
-      'Insert ignore into MLBTweets(InstanceID,TweetString)\
+      'Insert ignore into mlbtweets(InstanceID,TweetString)\
       Select ?,?;';
     var params = [tweet.InstanceID, tweet.TweetString, tweet.InstanceID];
     return {
@@ -288,12 +288,12 @@ var MLB = function() {
         tweet.TweetID\
       , tweet.TweetString\
       , tweet.RecordedOn\
-      from MLBTweets tweet\
-        inner join MLBGameInstances instance\
+      from mlbtweets tweet\
+        inner join mlbgameinstances instance\
           on instance.InstanceID = tweet.InstanceID\
       where tweet.TwitterID is null\
       and not exists\
-        (select 1 from MLBGameInstances newerInstance\
+        (select 1 from mlbgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by tweet.RecordedOn asc limit 1;';
@@ -305,7 +305,7 @@ var MLB = function() {
   };
 
   this.updateTweetQuery = function(TweetID, TwitterID) {
-    var stmnt = 'Update MLBTweets set TwitterID = ? where TweetID = ?;';
+    var stmnt = 'Update mlbtweets set TwitterID = ? where TweetID = ?;';
     var params = [TwitterID, TweetID];
     return {
       sql: stmnt,
@@ -320,8 +320,8 @@ var MLB = function() {
       , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
-        from MLBTweets tweet\
-          inner join MLBGameInstances lastTweet\
+        from mlbtweets tweet\
+          inner join mlbgameinstances lastTweet\
             on lastTweet.InstanceID = tweet.InstanceID\
         where lastTweet.GameID = instance.GameID\
         and tweet.TwitterID REGEXP \'[0-9]+\'\
@@ -340,18 +340,18 @@ var MLB = function() {
       , home.City as HomeTeamCity\
       , home.Name as HomeTeamName\
       , instance.HomeScore\
-      from MLBGameInstances instance\
-        inner join MLBGames game\
+      from mlbgameinstances instance\
+        inner join mlbgames game\
           on game.GameID = instance.GameID\
-        inner join MLBTeams away\
+        inner join mlbteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join MLBTeams home\
+        inner join mlbteams home\
           on home.TeamID = game.HomeTeamID\
       where (instance.State like \'In Progress\'\
         or instance.State like \'Manager Challenge\'\
         or instance.State like \'Review\')\
       and not exists\
-        (Select 1 from MLBGameInstances newerInstance\
+        (Select 1 from mlbgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn);';
     var params = ['http://www.mlb.com/r/game?gid='];
@@ -381,18 +381,18 @@ var MLB = function() {
       , home.City as HomeTeamCity\
       , home.Name as HomeTeamName\
       , instance.HomeScore\
-      from MLBGameInstances instance\
-        inner join MLBGames game\
+      from mlbgameinstances instance\
+        inner join mlbgames game\
           on game.GameID = instance.GameID\
-        inner join MLBTeams away\
+        inner join mlbteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join MLBTeams home\
+        inner join mlbteams home\
           on home.TeamID = game.HomeTeamID\
       where (instance.State like \'Pre-Game\'\
       or instance.State like \'Preview\')\
-      and game.DateTime >= CURRENT_TIME()\
+      and game.DateTime >= NOW()\
       and not exists\
-        (Select 1 from MLBGameInstances newerInstance\
+        (Select 1 from mlbgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by StartTime asc limit 1;';
@@ -410,8 +410,8 @@ var MLB = function() {
       , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
-        from MLBTweets tweet\
-          inner join MLBGameInstances lastTweet\
+        from mlbtweets tweet\
+          inner join mlbgameinstances lastTweet\
             on lastTweet.InstanceID = tweet.InstanceID\
         where lastTweet.GameID = instance.GameID\
         and tweet.TwitterID REGEXP \'[0-9]+\'\
@@ -430,16 +430,16 @@ var MLB = function() {
       , home.City as HomeTeamCity\
       , home.Name as HomeTeamName\
       , instance.HomeScore\
-      from MLBGameInstances instance\
-        inner join MLBGames game\
+      from mlbgameinstances instance\
+        inner join mlbgames game\
           on game.GameID = instance.GameID\
-        inner join MLBTeams away\
+        inner join mlbteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join MLBTeams home\
+        inner join mlbteams home\
           on home.TeamID = game.HomeTeamID\
       where game.DateTime > DATE_SUB(NOW(),INTERVAL ? HOUR)\
       and not exists\
-        (Select 1 from MLBGameInstances newerInstance\
+        (Select 1 from mlbgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by game.DateTime asc;';
@@ -457,8 +457,8 @@ var MLB = function() {
       , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
-        from MLBTweets tweet\
-          inner join MLBGameInstances lastTweet\
+        from mlbtweets tweet\
+          inner join mlbgameinstances lastTweet\
             on lastTweet.InstanceID = tweet.InstanceID\
         where lastTweet.GameID = instance.GameID\
         and tweet.TwitterID REGEXP \'[0-9]+\'\
@@ -477,16 +477,16 @@ var MLB = function() {
       , home.City as HomeTeamCity\
       , home.Name as HomeTeamName\
       , instance.HomeScore\
-      from MLBGameInstances instance\
-        inner join MLBGames game\
+      from mlbgameinstances instance\
+        inner join mlbgames game\
           on game.GameID = instance.GameID\
-        inner join MLBTeams away\
+        inner join mlbteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join MLBTeams home\
+        inner join mlbteams home\
           on home.TeamID = game.HomeTeamID\
       where instance.State like \'Pre-Game\'\
       and not exists\
-        (Select 1 from MLBGameInstances newerInstance\
+        (Select 1 from mlbgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by game.DateTime asc;';
@@ -512,8 +512,8 @@ var MLB = function() {
       , tweets.TweetID\
       , tweets.TweetString\
       , tweets.RecordedOn as \'TweetRecordedOn\'\
-      from MLBGameInstances instance\
-        left join MLBTweets tweets\
+      from mlbgameinstances instance\
+        left join mlbtweets tweets\
           on tweets.InstanceID = instance.InstanceID\
       where instance.GameID = ?\
       order by instance.RecordedOn asc;';
