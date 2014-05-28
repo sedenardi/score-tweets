@@ -75,7 +75,7 @@ var LeagueManager = function(config, l) {
       if (res.length === 0) {
         checkForThrottle();
       } else {
-        if (status === statuses.throttled) {
+        if (status !== statuses.looping) {
           restoreLoop();
         }
         league.getGameArray(processGames);
