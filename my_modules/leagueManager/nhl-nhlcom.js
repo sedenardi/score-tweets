@@ -154,6 +154,9 @@ var NHL = function() {
       oldGame.HomeTeamName + ' ' + newGame.HomeScore + ' ';
     if (oldGame.State !== newGame.State) {
       if (oldGame.State === 'Scheduled' && newGame.State === 'Progress') {
+        if (newGame.Period !== '1st') {
+          return tweet;
+        }
         tweet.TweetString = 'Start of game: ' +
           oldGame.AwayTeamName + ' vs ' + oldGame.HomeTeamName + ' ' +
           self.makeGameLink(newGame);
