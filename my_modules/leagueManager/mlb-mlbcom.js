@@ -161,7 +161,7 @@ var MLB = function() {
         ' take the lead, ' + scores + ' ' + 
         self.makeInningString(newGame) + ' ' + 
         self.makeGameLink(newGame);
-    } else if (oldGame.AwayScore < oldGame.AwayScore && 
+    } else if (oldGame.HomeScore < oldGame.AwayScore && 
       newGame.AwayScore < newGame.HomeScore) {
       tweet.TweetString = newGame.HomeTeamName + 
         ' take the lead, ' + scores + ' ' + 
