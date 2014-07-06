@@ -52,6 +52,11 @@ var query = function(cmd, next) {
   connection.query(sql, function(err, res) {
     if (err) {
       console.log('MYSQL: ' + sql + ' \n' + err);
+      logError({
+        source: 'MYSQL',
+        message: err,
+        stack: sql
+      });
     } else {
       next(res);
     }
@@ -74,7 +79,7 @@ var logError = function(error, next) {
     queryWithError(cmd, function errorWriteDone(err, res) {
       if (err) {
         console.log('MYSQL: ' + err);
-      } else {
+      } else if (typeof next === 'function') {
         next(res);
       }
     });

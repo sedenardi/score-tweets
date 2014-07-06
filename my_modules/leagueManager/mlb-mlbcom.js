@@ -66,7 +66,7 @@ var MLB = function() {
   this.parseRawGame = function(rawGame) {
     var game = { };
     var awayScore = 0, homeScore = 0, inning = 0, topInning = 0;
-    if (typeof rawGame.status.inning !== 'undefined')
+    if (typeof rawGame.status.inning !== 'undefined' && rawGame.status.inning !== '')
       inning = parseInt(rawGame.status.inning);
     if (typeof rawGame.status.top_inning !== 'undefined')
       topInning = (rawGame.status.top_inning === 'Y') ? 1 : 0;
