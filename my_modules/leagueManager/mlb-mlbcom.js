@@ -38,6 +38,10 @@ var MLB = function() {
               var rawTArray = JSON.parse(todayRaw).data.games.game;
               var rawArray = rawYArray.concat(rawTArray);
               var gameArray = [];
+              if (typeof rawTArray === 'undefined') {
+                next(null, gameArray);
+                return;
+              }
               for (var i = 0; i < rawArray.length; i++) {
                 var exists = false;
                 for (var j = 0; j < gameArray.length; j++) {
@@ -350,6 +354,7 @@ var MLB = function() {
       where (instance.State like \'In Progress\'\
         or instance.State like \'Manager Challenge\'\
         or instance.State like \'Review\')\
+      and instance.RecordedOn > DATE_SUB(NOW(),INTERVAL 24 HOUR)\
       and not exists\
         (Select 1 from mlbgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
