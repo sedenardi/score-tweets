@@ -36,7 +36,9 @@ var MLB = function() {
             try {
               var rawYArray = JSON.parse(yesterdayRaw).data.games.game;
               var rawTArray = JSON.parse(todayRaw).data.games.game;
-              var rawArray = rawYArray.concat(rawTArray);
+              var rawArray = [];
+              if (typeof rawYArray !== 'undefined') rawArray = rawArray.concat(rawYArray);
+              if (typeof rawTArray !== 'undefined') rawArray = rawArray.concat(rawTArray);
               var gameArray = [];
               if (typeof rawTArray === 'undefined') {
                 next(null, gameArray);
