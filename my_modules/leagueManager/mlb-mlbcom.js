@@ -397,6 +397,7 @@ var MLB = function() {
           on home.TeamID = game.HomeTeamID\
       where (instance.State like \'Pre-Game\'\
       or instance.State like \'Preview\')\
+      or instance.State like \'Warmup\')\
       and game.DateTime >= NOW()\
       and not exists\
         (Select 1 from mlbgameinstances newerInstance\
