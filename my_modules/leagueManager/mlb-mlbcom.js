@@ -126,6 +126,12 @@ var MLB = function() {
     };
     var scores = newGame.AwayTeamName + ' ' + newGame.AwayScore + ', ' +
       newGame.HomeTeamName + ' ' + newGame.HomeScore + ' ';
+    
+    var leadString = ' take the lead, ';
+    if (newGame.Inning > oldGame.Inning) {
+      leadString = ' lead, ';
+    }
+    
     if (newGame.State === 'In Progress' &&
       newGame.Inning === 1 && newGame.TopInning === 1 && 
       newGame.AwayScore === 0 && newGame.HomeScore === 0) {
@@ -137,20 +143,26 @@ var MLB = function() {
       tweet.TweetString = 'Final' + 
         (newGame.Innings > 9 ? (' in ' + newGame.Innings + '.') : '.') + 
         ' ' + scores + ' ' + self.makeGameLink(newGame);
-    } else if (oldGame.AwayScore === oldGame.HomeScore) {
+    } else if (oldGame.AwayScore === oldGame.HomeScore) {      
       if (newGame.AwayScore > newGame.HomeScore) {
         tweet.TweetString = newGame.AwayTeamName + 
-          ' take the lead, ' + scores + ' ' + 
+          leadString + scores + ' ' + 
           self.makeInningString(newGame) + ' ' + 
           self.makeGameLink(newGame);
       } else if (newGame.HomeScore > newGame.AwayScore){
         tweet.TweetString = newGame.HomeTeamName + 
-          ' take the lead, ' + scores + ' ' + 
+          leadString + scores + ' ' + 
           self.makeInningString(newGame) + ' ' + 
           self.makeGameLink(newGame);
       }
     } else if (newGame.AwayScore === newGame.HomeScore) {
-      if (oldGame.AwayScore < oldGame.HomeScore) {
+      if (newGame.Inning > oldGame.Inning) {
+        tweet.TweetString = newGame.AwayTeamName + 
+          ' and ' + newGame.HomeTeamName +
+          ' are tied, ' + scores + ' ' + 
+          self.makeInningString(newGame) + ' ' + 
+          self.makeGameLink(newGame);
+      } else if (oldGame.AwayScore < oldGame.HomeScore) {
         tweet.TweetString = newGame.AwayTeamName + 
           ' tie it up, ' + scores + ' ' + 
           self.makeInningString(newGame) + ' ' + 
@@ -164,13 +176,13 @@ var MLB = function() {
     } else if (oldGame.AwayScore < oldGame.HomeScore && 
       newGame.HomeScore < newGame.AwayScore) {
       tweet.TweetString = newGame.AwayTeamName + 
-        ' take the lead, ' + scores + ' ' + 
+        leadString + scores + ' ' + 
         self.makeInningString(newGame) + ' ' + 
         self.makeGameLink(newGame);
     } else if (oldGame.HomeScore < oldGame.AwayScore && 
       newGame.AwayScore < newGame.HomeScore) {
       tweet.TweetString = newGame.HomeTeamName + 
-        ' take the lead, ' + scores + ' ' + 
+        leadString + scores + ' ' + 
         self.makeInningString(newGame) + ' ' + 
         self.makeGameLink(newGame);
     }
