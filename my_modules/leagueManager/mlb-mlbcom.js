@@ -396,7 +396,7 @@ var MLB = function() {
         inner join mlbteams home\
           on home.TeamID = game.HomeTeamID\
       where (instance.State like \'Pre-Game\'\
-      or instance.State like \'Preview\')\
+      or instance.State like \'Preview\'\
       or instance.State like \'Warmup\')\
       and game.DateTime >= NOW()\
       and not exists\
