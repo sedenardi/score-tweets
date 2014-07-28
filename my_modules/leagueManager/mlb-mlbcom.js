@@ -138,8 +138,8 @@ var MLB = function() {
       tweet.TweetString = 'Start of game: ' + 
         newGame.AwayTeamName + ' vs ' + newGame.HomeTeamName + ' ' +
         self.makeGameLink(newGame);
-    } else if (newGame.State === 'Game Over' &&
-      oldGame.State !== 'Game Over') {
+    } else if ((newGame.State === 'Game Over' || newGame.State === 'Final') &&
+      !(oldGame.State === 'Game Over' || oldGame.State === 'Final')) {
       tweet.TweetString = 'Final' + 
         (newGame.Innings > 9 ? (' in ' + newGame.Innings + '.') : '.') + 
         ' ' + scores + ' ' + self.makeGameLink(newGame);
