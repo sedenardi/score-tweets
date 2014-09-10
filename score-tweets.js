@@ -3,7 +3,7 @@ var fs = require('fs'),
   TwitGame = require('./my_modules/twitter/twitGame.js'),
   //NHL = require('./my_modules/leagueManager/nhl-nhlcom.js'),
   MLB = require('./my_modules/leagueManager/mlb-mlbcom.js'),
-  //NFL = require('./my_modules/leagueManager/nfl-nflcom-postseason.js'),
+  NFL = require('./my_modules/leagueManager/nfl-nflcom.js'),
   Web = require('./my_modules/web/web.js');
 
 var configFile = './config.json';
@@ -30,9 +30,9 @@ leagues.MLB = MLB;
 leagueManagers.MLB = new LeagueManager(config, MLB);
 twitters.MLB = new TwitGame(config, MLB);
 
-/*leagues.NFL = NFL;
+leagues.NFL = NFL;
 leagueManagers.NFL = new LeagueManager(config, NFL);
-twitters.NFL = new TwitGame(config, NFL);*/
+twitters.NFL = new TwitGame(config, NFL);
 
 var web = new Web(config, __dirname,leagues);
 
@@ -76,10 +76,10 @@ leagueManagers.MLB.start();
 twitters.MLB.on('status', twitStatus);
 twitters.MLB.start();
 
-/*leagueManagers.NFL.on('change', leagueChange);
+leagueManagers.NFL.on('change', leagueChange);
 leagueManagers.NFL.on('status', leagueStatus);
 leagueManagers.NFL.start();
 twitters.NFL.on('status', twitStatus);
-twitters.NFL.start();*/
+twitters.NFL.start();
 
 web.startServer();
