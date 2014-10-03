@@ -224,7 +224,9 @@ var LeagueManager = function(config, l) {
 
   var insertGameChangeTweet = function(changeObj, next) {
     var tweet = league.gameChangeTweet(changeObj.oldGame, changeObj.newGame);
-    if (tweet.TweetString.length) {
+    if (league.leagueInfo.leagueName === 'NHL') {
+      console.log('NHL Tweet *would be* created.');
+    } else if (tweet.TweetString.length) {
       var cmd = league.insertGameChangeTweetQuery(tweet);
       db.query(cmd, next);
     }

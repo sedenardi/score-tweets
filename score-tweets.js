@@ -1,7 +1,7 @@
 var fs = require('fs'),
   LeagueManager = require('./my_modules/leagueManager/leagueManager.js'),
   TwitGame = require('./my_modules/twitter/twitGame.js'),
-  //NHL = require('./my_modules/leagueManager/nhl-nhlcom.js'),
+  NHL = require('./my_modules/leagueManager/nhl-nhlcom.js'),
   MLB = require('./my_modules/leagueManager/mlb-mlbcom.js'),
   NFL = require('./my_modules/leagueManager/nfl-nflcom.js'),
   Web = require('./my_modules/web/web.js');
@@ -22,9 +22,9 @@ var leagues = {},
   leagueManagers = {},
   twitters = {};
 
-/*leagues.NHL = NHL;
+leagues.NHL = NHL;
 leagueManagers.NHL = new LeagueManager(config, NHL);
-twitters.NHL = new TwitGame(config, NHL);*/
+twitters.NHL = new TwitGame(config, NHL);
 
 leagues.MLB = MLB;
 leagueManagers.MLB = new LeagueManager(config, MLB);
@@ -64,11 +64,11 @@ var twitStatus = function(status) {
   web.updateTwitStatus(status);
 };
 
-/*leagueManagers.NHL.on('change', leagueChange);
+leagueManagers.NHL.on('change', leagueChange);
 leagueManagers.NHL.on('status', leagueStatus);
 leagueManagers.NHL.start();
-twitters.NHL.on('status', twitStatus);
-twitters.NHL.start();*/
+//twitters.NHL.on('status', twitStatus);
+twitters.NHL.start();
 
 leagueManagers.MLB.on('change', leagueChange);
 leagueManagers.MLB.on('status', leagueStatus);
