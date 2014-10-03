@@ -367,6 +367,7 @@ var MLB = function() {
           on home.TeamID = game.HomeTeamID\
       where (instance.State like \'In Progress\'\
         or instance.State like \'Manager Challenge\'\
+        or instance.State like \'Warmup\'\
         or instance.State like \'Review\')\
       and instance.RecordedOn > DATE_SUB(NOW(),INTERVAL 24 HOUR)\
       and not exists\
