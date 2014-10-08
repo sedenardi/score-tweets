@@ -40,14 +40,14 @@ var MLB = function() {
               if (typeof rawYArray !== 'undefined') rawArray = rawArray.concat(rawYArray);
               if (typeof rawTArray !== 'undefined') rawArray = rawArray.concat(rawTArray);
               var gameArray = [];
-              if (typeof rawTArray === 'undefined') {
+              if (!rawArray.length) {
                 next(null, gameArray);
                 return;
               }
               for (var i = 0; i < rawArray.length; i++) {
                 var exists = false;
                 for (var j = 0; j < gameArray.length; j++) {
-                  exists = exists || gameArray[j] === rawArray[i].gameday;
+                  exists = exists || gameArray[j].GameSymbol === rawArray[i].gameday;
                 }
                 if (!exists) {
                   gameArray.push(t.parseRawGame(rawArray[i]));
@@ -186,6 +186,12 @@ var MLB = function() {
         self.makeInningString(newGame) + ' ' + 
         self.makeGameLink(newGame);
     }
+
+    if (tweet.TweetString.indexOf('Final') !== -1 &&
+      moment.duration(moment(oldGame.RecordedOn) - moment()).asHours() > 6) {
+      tweet.TweetString = '';
+    }
+
     return tweet;
   };
 
