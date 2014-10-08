@@ -67,7 +67,7 @@ var twitStatus = function(status) {
 leagueManagers.NHL.on('change', leagueChange);
 leagueManagers.NHL.on('status', leagueStatus);
 leagueManagers.NHL.start();
-//twitters.NHL.on('status', twitStatus);
+twitters.NHL.on('status', twitStatus);
 twitters.NHL.start();
 
 leagueManagers.MLB.on('change', leagueChange);
