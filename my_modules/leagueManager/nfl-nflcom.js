@@ -86,6 +86,7 @@ var NFL = function() {
         break;
       case '5':
         gameState = 'Overtime';
+        timeString = rawGame.score_array[3] ? rawGame.score_array[3] : '15:00';
         break;
       default:
         gameState = 'Progress';
