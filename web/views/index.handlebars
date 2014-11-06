@@ -43,7 +43,7 @@
     if ($(parent).hasClass('leagueTab')) {
       var leagueDiv = $('#' + $(parent).attr('data-league'));
       $.ajax({
-        url: '/GetLeagueStatus',
+        url: 'GetLeagueStatus',
         type: 'GET',
         data: {
           league: $(parent).attr('data-league'),
@@ -53,7 +53,7 @@
         }
       });
       $.ajax({
-        url: '/GetLatestGames',
+        url: 'GetLatestGames',
         type: 'GET',
         data: {
           league: $(parent).attr('data-league'),

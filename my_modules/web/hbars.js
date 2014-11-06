@@ -29,7 +29,7 @@ var exphbs = function(rootDir, config) {
         return new Handlebars.SafeString(extSpan + tweetSpan);
       },
       state: function(game) {
-        var statusLink = '<a href="/GetGameStatus?gameID=' + game.GameID + 
+        var statusLink = '<a href="GetGameStatus?gameID=' + game.GameID + 
           '&league=' + game.League + '" target="_blank">';
         var status = '';
         var dayArray = {
