@@ -145,12 +145,6 @@ var LeagueManager = function(config, l) {
     throttleInfo.throttleTime = moment().toDate().toLocaleString();
     throttleInfo.nextCheck = moment().add(delay).toDate().toLocaleString();
     sendStatus();
-    var e = {
-      source: league.leagueInfo.leagueName,
-      message: 'Throttling for ' + delay + 'ms',
-      stack: 'ThrottleInfo: ' + JSON.stringify(throttleInfo)
-    };
-    db.logError(e,function(){});
   };
 
   var restoreLoop = function() {
