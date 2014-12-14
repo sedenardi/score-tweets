@@ -175,12 +175,16 @@ var NHL = function() {
       }
     } else {
       var isOT = (newGame.State === 'Overtime' || newGame.State === 'Shootout');
-      if (oldGame.AwayScore !== newGame.AwayScore && !isOT) {
+      if (oldGame.AwayScore > newGame.AwayScore ||
+        oldGame.HomeScore > newGame.HomeScore) {
+        tweet.TweetString = 'Score Correction. ' + scores +
+          newGame.Time + ' ' + newGame.Period + ' ' +
+          self.makeGameLink(newGame);
+      } else if (oldGame.AwayScore !== newGame.AwayScore && !isOT) {
         tweet.TweetString = oldGame.AwayTeamName + ' score. ' +
           scores + newGame.Time + ' ' + newGame.Period + ' ' +
           self.makeGameLink(newGame);
-      }
-      if (oldGame.HomeScore !== newGame.HomeScore && !isOT) {
+      } else if (oldGame.HomeScore !== newGame.HomeScore && !isOT) {
         tweet.TweetString = oldGame.HomeTeamName + ' score. ' +
           scores + newGame.Time + ' ' + newGame.Period + ' ' +
           self.makeGameLink(newGame);
