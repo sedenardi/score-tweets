@@ -255,16 +255,16 @@ var NFL = function() {
 
   this.insertGameQuery = function(game) {
     var stmnt = 
-      'Insert into NFLGames(GameSymbol,Date,SeasonYear,SeasonType,\
+      'Insert into nflgames(GameSymbol,Date,SeasonYear,SeasonType,\
         SeasonWeek,AwayTeamID,HomeTeamID)\
       Select\
         ?,?,?,?,?,away.TeamID,home.TeamID\
-      from NFLTeams away\
-        inner join NFLTeams home\
+      from nflteams away\
+        inner join nflteams home\
           on LOWER(REPLACE(home.Name,\' \',\'\')) like ?\
       where LOWER(REPLACE(away.Name,\' \',\'\')) like ?\
       and not exists\
-        (Select 1 from NFLGames where GameSymbol like ?);';
+        (Select 1 from nflgames where GameSymbol like ?);';
     var params = [game.GameSymbol, game.Date, game.SeasonYear, game.SeasonType,
       game.SeasonWeek, game.HomeTeamName, game.AwayTeamName, game.GameSymbol];
     return {
@@ -275,12 +275,12 @@ var NFL = function() {
 
   this.insertGameInstanceQuery = function(game) {
     var stmnt = 
-      'Insert into NFLGameInstances(GameID,StateID,Time,\
+      'Insert into nflgameinstances(GameID,StateID,Time,\
         Quarter,AwayScore,HomeScore,RawInstance)\
       Select\
         game.GameID,state.StateID,?,?,?,?,?\
-      from NFLStates state\
-        inner join NFLGames game\
+      from nflstates state\
+        inner join nflgames game\
           on game.GameSymbol like ?\
       where state.State = ?;';
     var params = [game.Time, game.Quarter, game.AwayScore,
@@ -316,15 +316,15 @@ var NFL = function() {
       , home.TwitterHashtag as HomeTwitterHashtag\
       , instance.HomeScore\
       , instance.RecordedOn\
-      from NFLGameInstances instance\
-        inner join NFLGames game\
+      from nflgameinstances instance\
+        inner join nflgames game\
           on game.GameID = instance.GameID\
           and game.GameSymbol like ?\
-        inner join NFLStates state\
+        inner join nflstates state\
           on state.StateID = instance.StateID\
-        inner join NFLTeams away\
+        inner join nflteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NFLTeams home\
+        inner join nflteams home\
           on home.TeamID = game.HomeTeamID\
       order by ?? desc limit 1;';
     var params = [game.GameSymbol, 'instance.RecordedOn'];
@@ -336,7 +336,7 @@ var NFL = function() {
 
   this.insertGameChangeTweetQuery = function(tweet) {
     var stmnt = 
-      'Insert ignore into NFLTweets(InstanceID,TweetString)\
+      'Insert ignore into nfltweets(InstanceID,TweetString)\
       Select ?,?;';
     var params = [tweet.InstanceID, tweet.TweetString, tweet.InstanceID];
     return {
@@ -351,12 +351,12 @@ var NFL = function() {
         tweet.TweetID\
       , tweet.TweetString\
       , tweet.RecordedOn\
-      from NFLTweets tweet\
-        inner join NFLGameInstances instance\
+      from nfltweets tweet\
+        inner join nflgameinstances instance\
           on instance.InstanceID = tweet.InstanceID\
       where tweet.TwitterID is null\
       and not exists\
-        (select 1 from NFLGameInstances newerInstance\
+        (select 1 from nflgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by tweet.RecordedOn asc limit 1;';
@@ -368,7 +368,7 @@ var NFL = function() {
   };
 
   this.updateTweetQuery = function(TweetID, TwitterID) {
-    var stmnt = 'Update NFLTweets set TwitterID = ? where TweetID = ?;';
+    var stmnt = 'Update nfltweets set TwitterID = ? where TweetID = ?;';
     var params = [TwitterID, TweetID];
     return {
       sql: stmnt,
@@ -383,8 +383,8 @@ var NFL = function() {
       , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
-        from NFLTweets tweet\
-          inner join NFLGameInstances lastTweet\
+        from nfltweets tweet\
+          inner join nflgameinstances lastTweet\
             on lastTweet.InstanceID = tweet.InstanceID\
         where lastTweet.GameID = instance.GameID\
         and tweet.TwitterID REGEXP \'[0-9]+\'\
@@ -409,19 +409,19 @@ var NFL = function() {
       , home.Name as HomeTeamName\
       , home.DisplayName as HomeTeamDisplayName\
       , instance.HomeScore\
-      from NFLGameInstances instance\
-        inner join NFLGames game\
+      from nflgameinstances instance\
+        inner join nflgames game\
           on game.GameID = instance.GameID\
-        inner join NFLStates state\
+        inner join nflstates state\
           on state.StateID = instance.StateID\
-        inner join NFLTeams away\
+        inner join nflteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NFLTeams home\
+        inner join nflteams home\
           on home.TeamID = game.HomeTeamID\
       where state.State not like \'Scheduled\'\
       and state.State not like \'Final\'\
       and not exists\
-        (Select 1 from NFLGameInstances newerInstance\
+        (Select 1 from nflgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn);';
     var params = [];
@@ -458,18 +458,18 @@ var NFL = function() {
       , home.Name as HomeTeamName\
       , home.DisplayName as HomeTeamDisplayName\
       , instance.HomeScore\
-      from NFLGameInstances instance\
-        inner join NFLGames game\
+      from nflgameinstances instance\
+        inner join nflgames game\
           on game.GameID = instance.GameID\
-        inner join NFLStates state\
+        inner join nflstates state\
           on state.StateID = instance.StateID\
-        inner join NFLTeams away\
+        inner join nflteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NFLTeams home\
+        inner join nflteams home\
           on home.TeamID = game.HomeTeamID\
       where state.State like \'Scheduled\'\
       and not exists\
-        (Select 1 from NFLGameInstances newerInstance\
+        (Select 1 from nflgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by StartTime asc limit 1;';
@@ -487,8 +487,8 @@ var NFL = function() {
       , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
-        from NFLTweets tweet\
-          inner join NFLGameInstances lastTweet\
+        from nfltweets tweet\
+          inner join nflgameinstances lastTweet\
             on lastTweet.InstanceID = tweet.InstanceID\
         where lastTweet.GameID = instance.GameID\
         and tweet.TwitterID REGEXP \'[0-9]+\'\
@@ -513,19 +513,19 @@ var NFL = function() {
       , home.Name as HomeTeamName\
       , home.DisplayName as HomeTeamDisplayName\
       , instance.HomeScore\
-      from NFLGameInstances instance\
-        inner join NFLGames game\
+      from nflgameinstances instance\
+        inner join nflgames game\
           on game.GameID = instance.GameID\
-        inner join NFLStates state\
+        inner join nflstates state\
           on state.StateID = instance.StateID\
-        inner join NFLTeams away\
+        inner join nflteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NFLTeams home\
+        inner join nflteams home\
           on home.TeamID = game.HomeTeamID\
       where (instance.RecordedOn > DATE_SUB(NOW(),INTERVAL ? HOUR)\
         or state.State like \'Scheduled\')\
       and not exists\
-        (Select 1 from NFLGameInstances newerInstance\
+        (Select 1 from nflgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by game.GameSymbol asc;';
@@ -543,8 +543,8 @@ var NFL = function() {
       , instance.GameID\
       , instance.InstanceID\
       , (Select TwitterID\
-        from NFLTweets tweet\
-          inner join NFLGameInstances lastTweet\
+        from nfltweets tweet\
+          inner join nflgameinstances lastTweet\
             on lastTweet.InstanceID = tweet.InstanceID\
         where lastTweet.GameID = instance.GameID\
         and tweet.TwitterID REGEXP \'[0-9]+\'\
@@ -569,18 +569,18 @@ var NFL = function() {
       , home.Name as HomeTeamName\
       , home.DisplayName as HomeTeamDisplayName\
       , instance.HomeScore\
-      from NFLGameInstances instance\
-        inner join NFLGames game\
+      from nflgameinstances instance\
+        inner join nflgames game\
           on game.GameID = instance.GameID\
-        inner join NFLStates state\
+        inner join nflstates state\
           on state.StateID = instance.StateID\
-        inner join NFLTeams away\
+        inner join nflteams away\
           on away.TeamID = game.AwayTeamID\
-        inner join NFLTeams home\
+        inner join nflteams home\
           on home.TeamID = game.HomeTeamID\
       where state.State like \'Scheduled\'\
       and not exists\
-        (Select 1 from NFLGameInstances newerInstance\
+        (Select 1 from nflgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
         and instance.RecordedOn < newerInstance.RecordedOn)\
       order by game.GameSymbol asc;';

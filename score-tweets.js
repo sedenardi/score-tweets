@@ -3,7 +3,8 @@ var fs = require('fs'),
   TwitGame = require('./my_modules/twitter/twitGame.js'),
   NHL = require('./my_modules/leagueManager/nhl-nhlcom.js'),
   MLB = require('./my_modules/leagueManager/mlb-mlbcom.js'),
-  NFL = require('./my_modules/leagueManager/nfl-nflcom.js'),
+  //NFL = require('./my_modules/leagueManager/nfl-nflcom.js'),
+  NFL = require('./my_modules/leagueManager/nfl-nflcom-postseason.js'),
   Web = require('./my_modules/web/web.js');
 
 var configFile = './config.json';
