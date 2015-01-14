@@ -181,13 +181,35 @@ var NHL = function() {
           newGame.Time + ' ' + newGame.Period + ' ' +
           self.makeGameLink(newGame);
       } else if (oldGame.AwayScore !== newGame.AwayScore && !isOT) {
-        tweet.TweetString = oldGame.AwayTeamName + ' score. ' +
-          scores + newGame.Time + ' ' + newGame.Period + ' ' +
-          self.makeGameLink(newGame);
+        if (newGame.AwayScore === newGame.HomeScore) {
+          tweet.TweetString = oldGame.AwayTeamName + ' tie it up. ' +
+            scores + newGame.Time + ' ' + newGame.Period + ' ' +
+            self.makeGameLink(newGame);
+        } else if (oldGame.AwayScore <= oldGame.HomeScore &&
+            newGame.AwayScore > newGame.HomeScore) {
+          tweet.TweetString = oldGame.AwayTeamName + ' take the lead. ' +
+            scores + newGame.Time + ' ' + newGame.Period + ' ' +
+            self.makeGameLink(newGame);
+        } else {
+          tweet.TweetString = oldGame.AwayTeamName + ' score. ' +
+            scores + newGame.Time + ' ' + newGame.Period + ' ' +
+            self.makeGameLink(newGame);
+        }
       } else if (oldGame.HomeScore !== newGame.HomeScore && !isOT) {
-        tweet.TweetString = oldGame.HomeTeamName + ' score. ' +
-          scores + newGame.Time + ' ' + newGame.Period + ' ' +
-          self.makeGameLink(newGame);
+        if (newGame.AwayScore === newGame.HomeScore) {
+          tweet.TweetString = oldGame.HomeTeamName + ' tie it up. ' +
+            scores + newGame.Time + ' ' + newGame.Period + ' ' +
+            self.makeGameLink(newGame);
+        } else if (oldGame.HomeScore <= oldGame.AwayScore &&
+            newGame.HomeScore > newGame.AwayScore) {
+          tweet.TweetString = oldGame.HomeTeamName + ' take the lead. ' +
+            scores + newGame.Time + ' ' + newGame.Period + ' ' +
+            self.makeGameLink(newGame);
+        } else {
+          tweet.TweetString = oldGame.HomeTeamName + ' score. ' +
+            scores + newGame.Time + ' ' + newGame.Period + ' ' +
+            self.makeGameLink(newGame);
+        }
       }
     }
     return tweet;
