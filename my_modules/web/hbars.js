@@ -29,9 +29,8 @@ var exphbs = function(rootDir, config) {
         return new Handlebars.SafeString(extSpan + tweetSpan);
       },
       state: function(game) {
-        var statusLink = '<a href="GetGameStatus?gameID=' + game.GameID + 
+        var status = '<a href="GetGameStatus?gameID=' + game.GameID + 
           '&league=' + game.League + '" target="_blank">';
-        var status = '';
         var dayArray = {
           0: 'Sunday',
           1: 'Monday',
@@ -69,23 +68,27 @@ var exphbs = function(rootDir, config) {
             case 'Overtime':
             case 'Intermission':
             case 'Progress':
-              status = statusLink + 'Last score - ' + game.Time + ' ' + game.Period + '</a>';
+              status += game.Time + ' ' + game.Period + '</a>';
+              break;
             case 'Shootout':
-              status = statusLink + 'Shootout' + '</a>';
+              status += 'Shootout' + '</a>';
+              break;
             case 'Final':
               if (game.Period) {
-                status = statusLink + 'Final ' + game.Period + '</a>';
+                status += 'Final ' + game.Period + '</a>';
               } else {
-                status = statusLink + 'Final' + '</a>';
+                status += 'Final' + '</a>';
               }
+              break;
             case 'Scheduled':
               if (game.Date !== '0000-00-00'){
                 if (game.Time) {
-                  status = statusLink + dayArray[game.Date.getDay()] + ' ' + game.Time + '</a>';
+                  status += dayArray[game.Date.getDay()] + ' ' + game.Time + '</a>';
                 } else {
-                  status = statusLink + dayArray[game.Date.getDay()] + '</a>';
+                  status += dayArray[game.Date.getDay()] + '</a>';
                 }
               }
+              break;
           }
         } else if (game.League === 'NFL') {
           var quarterArray = {
@@ -95,16 +98,19 @@ var exphbs = function(rootDir, config) {
             4: '4th',
             5: 'OT'
           };
-          status += statusLink;
           switch (game.State) {
             case 'Overtime':
               status += game.Time + ' Overtime';
+              break;
             case 'Halftime':
               status += 'Halftime';
+              break;
             case 'Progress':
-              status += 'Last score - ' + game.Time + ' ' + quarterArray[game.Quarter];
+              status += game.Time + ' ' + quarterArray[game.Quarter];
+              break;
             case 'Final':
               status += 'Final';
+              break;
             case 'Scheduled':
               if (game.Date !== '0000-00-00'){
                 if (game.Time) {
@@ -113,11 +119,12 @@ var exphbs = function(rootDir, config) {
                   status += dayArray[game.Date.getDay()];
                 }
               }
+              break;
           }
           status += '</a>'; 
         } else if (game.League === 'MLB') {
           var topOrBottom = game.TopInning[0] === 1 ? 'Top' : 'Bottom';
-          status = statusLink + topOrBottom + ' of ' + getNth(game.Inning) + ' - ' + 
+          status += topOrBottom + ' of ' + getNth(game.Inning) + ' - ' + 
             game.State + '</a>';
         } else {
           return game.State;
