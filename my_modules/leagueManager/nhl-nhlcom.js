@@ -527,6 +527,7 @@ var NHL = function() {
       , instance.RecordedOn\
       , tweets.TweetID\
       , tweets.TweetString\
+      , tweets.TwitterID\
       , tweets.RecordedOn as \'TweetRecordedOn\'\
       from nhlgameinstances instance\
         inner join nhlstates state\

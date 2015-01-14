@@ -591,6 +591,35 @@ var NFL = function() {
       inserts: params
     };
   };
+
+  this.gameStatusQuery = function(gameID) {
+    var stmnt = 
+      'Select\
+        \'NFL\' as League\
+      , instance.InstanceID\
+      , instance.GameID\
+      , state.State\
+      , instance.Time\
+      , instance.Quarter\
+      , instance.AwayScore as \'Away\'\
+      , instance.HomeScore as \'Home\'\
+      , instance.RecordedOn\
+      , tweets.TweetID\
+      , tweets.TweetString\
+      , tweets.TwitterID\
+      , tweets.RecordedOn as \'TweetRecordedOn\'\
+      from nflgameinstances instance\
+        inner join nflstates state\
+          on state.StateID = instance.StateID\
+        left join nfltweets tweets\
+          on tweets.InstanceID = instance.InstanceID\
+      where instance.GameID = ?\
+      order by instance.RecordedOn asc;';
+    return {
+      sql: stmnt,
+      inserts: [gameID]
+    };
+  };
 };
 
 module.exports = new NFL();

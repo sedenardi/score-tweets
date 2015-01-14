@@ -95,24 +95,26 @@ var exphbs = function(rootDir, config) {
             4: '4th',
             5: 'OT'
           };
+          status += statusLink;
           switch (game.State) {
             case 'Overtime':
-              return game.Time + ' Overtime';
+              status += game.Time + ' Overtime';
             case 'Halftime':
-              return 'Halftime';
+              status += 'Halftime';
             case 'Progress':
-              return 'Last score - ' + game.Time + ' ' + quarterArray[game.Quarter];
+              status += 'Last score - ' + game.Time + ' ' + quarterArray[game.Quarter];
             case 'Final':
-              return 'Final';
+              status += 'Final';
             case 'Scheduled':
               if (game.Date !== '0000-00-00'){
                 if (game.Time) {
-                  return dayArray[game.Date.getDay()] + ' ' + game.Time;
+                  status += dayArray[game.Date.getDay()] + ' ' + game.Time;
                 } else {
-                  return dayArray[game.Date.getDay()];
+                  status += dayArray[game.Date.getDay()];
                 }
               }
           }
+          status += '</a>'; 
         } else if (game.League === 'MLB') {
           var topOrBottom = game.TopInning[0] === 1 ? 'Top' : 'Bottom';
           status = statusLink + topOrBottom + ' of ' + getNth(game.Inning) + ' - ' + 
@@ -126,11 +128,16 @@ var exphbs = function(rootDir, config) {
         if (!array.length) {
           return 'Empty array';
         }
+        var makeTwitterLink = function(instance) {
+          return '<a href="https://twitter.com/' + instance.League + 
+            'TweetZone/status/' + instance.TwitterID +
+            '" target="_blank">' + instance.TweetString + '</a>';
+        };
         var table = '<div class="table-resposive">' + 
           '<table class="table table-striped table-bordered table-condensed">' + 
           '<thead><tr>';
         for (var key in array[0]) {
-          if (key !== 'parse' && key !== '_typeCast') {
+          if (key !== 'parse' && key !== '_typeCast' && key !== 'TwitterID') {
             table += '<th>' + key + '</th>';
           }
         }
@@ -138,9 +145,11 @@ var exphbs = function(rootDir, config) {
         for (var i = 0; i < array.length; i++) {
           table += '<tr>';
           for (var key in array[i]) {
-            if (key !== 'parse' && key !== '_typeCast') {
+            if (key !== 'parse' && key !== '_typeCast' && key !== 'TwitterID') {
               if (key === 'TopInning') {
                 table += '<td>' + array[i][key][0] + '</td>';
+              } else if (key === 'TweetString' && array[i][key]) {
+                table += '<td>' + makeTwitterLink(array[i]) + '</td>';
               } else {
                 table += '<td>' + array[i][key] + '</td>';
               }
