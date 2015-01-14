@@ -420,6 +420,7 @@ var NFL = function() {
           on home.TeamID = game.HomeTeamID\
       where state.State not like \'Scheduled\'\
       and state.State not like \'Final\'\
+      and game.Date > DATE_SUB(NOW(),INTERVAL 2 DAY)\
       and not exists\
         (Select 1 from nflgameinstances newerInstance\
         where newerInstance.GameID = instance.GameID\
