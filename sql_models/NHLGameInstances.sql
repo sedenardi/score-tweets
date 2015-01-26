@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS `nhlgameinstances` (
   `AwayScore` TINYINT(4) NOT NULL,
   `HomeScore` TINYINT(4) NOT NULL,
   `RecordedOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `RawInstance` VARCHAR(1000) NOT NULL,
   PRIMARY KEY (`InstanceID`),
   INDEX `FK_NHLGameInstances_StateID` (`StateID`),
   INDEX `IX_NHLGameInstances_GameID_RecordedOn` (`GameID`, `RecordedOn`),

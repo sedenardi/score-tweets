@@ -105,7 +105,6 @@ var NHL = function() {
     game.HomeTeamCity = rawGame.htn;
     game.HomeTeamName = rawGame.htn;
     game.HomeScore = (rawGame.hts === '' ? 0 : parseInt(rawGame.hts));
-    game.RawInstance = JSON.stringify(rawGame,null,2);
     return game;
   };
 
@@ -217,15 +216,15 @@ var NHL = function() {
   this.insertGameInstanceQuery = function(game) {
     var stmnt = 
       'Insert into NHLGameInstances(GameID,StateID,Time,\
-        Period,AwayScore,HomeScore,RawInstance)\
+        Period,AwayScore,HomeScore)\
       Select\
-        game.GameID,state.StateID,?,?,?,?,?\
+        game.GameID,state.StateID,?,?,?,?\
       from NHLStates state\
         inner join NHLGames game\
           on game.GameSymbol like ?\
       where state.State = ?;';
     var params = [game.Time, game.Period, game.AwayScore,
-      game.HomeScore, game.RawInstance, game.GameSymbol, game.State];
+      game.HomeScore, game.GameSymbol, game.State];
     return {
       sql: stmnt,
       inserts: params

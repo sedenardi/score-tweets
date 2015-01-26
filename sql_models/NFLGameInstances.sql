@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS `nflgameinstances` (
   `AwayScore` TINYINT(4) NOT NULL,
   `HomeScore` TINYINT(4) NOT NULL,
   `RecordedOn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `RawInstance` VARCHAR(1000) NOT NULL,
   PRIMARY KEY (`InstanceID`),
   INDEX `FK_NFLGameInstances_StateID` (`StateID`),
   INDEX `IX_NFLGameInstances_GameID_RecordedOn` (`GameID`, `RecordedOn`),

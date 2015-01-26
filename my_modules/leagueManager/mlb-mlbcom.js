@@ -91,7 +91,6 @@ var MLB = function() {
     game.HomeTeamName = rawGame.home_team_name;
     game.AwayScore = awayScore;
     game.HomeScore = homeScore;
-    game.RawInstance = JSON.stringify(rawGame,null,2);
     return game;
   };
 
@@ -248,13 +247,13 @@ var MLB = function() {
   this.insertGameInstanceQuery = function(game) {
     var stmnt = 
       'Insert into mlbgameinstances(GameID,State,Inning,\
-        TopInning,AwayScore,HomeScore,RawInstance)\
+        TopInning,AwayScore,HomeScore)\
       Select\
-        game.GameID,?,?,?,?,?,?\
+        game.GameID,?,?,?,?,?\
       from mlbgames game\
       where game.GameSymbol like ?;';
     var params = [game.State, game.Inning, game.TopInning, game.AwayScore,
-      game.HomeScore, game.RawInstance, game.GameSymbol];
+      game.HomeScore, game.GameSymbol];
     return {
       sql: stmnt,
       inserts: params
