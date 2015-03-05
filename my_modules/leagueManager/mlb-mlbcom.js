@@ -235,9 +235,14 @@ var MLB = function() {
       Select \
         ?,?,?,? from DUAL \
       where not exists\
-        (Select 1 from mlbgames where GameSymbol like ?);';
+        (Select 1 from mlbgames where GameSymbol like ?)\
+      and exists\
+        (select 1 from mlbteams where TeamID = ?)\
+      and exists\
+        (select 1 from mlbteams where TeamID = ?);';
     var params = [game.GameSymbol, game.DateTime.toDate(),
-      game.AwayTeamID, game.HomeTeamID, game.GameSymbol];
+      game.AwayTeamID, game.HomeTeamID, game.GameSymbol,
+      game.AwayTeamID, game.HomeTeamID];
     return {
       sql: stmnt,
       inserts: params
