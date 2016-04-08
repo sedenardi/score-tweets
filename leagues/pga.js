@@ -1,10 +1,10 @@
 'use strict';
 
 var Promise = Promise || require('bluebird');
-var Scores = require('./models/Scores');
+var Scores = require('../models/pga/Scores');
 
-var prev = require('../../examples/pga/1460053094402.json');
-var next = require('../../examples/pga/1460075363587.json');
+var prev = require('../examples/pga/1460123336093.json');
+var next = require('../examples/pga/1460123743812.json');
 
 var prevObj = Scores.parse(prev);
 var nextObj = Scores.parse(next);

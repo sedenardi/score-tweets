@@ -98,9 +98,9 @@ Player.prototype.changeString = function() {
   return this.First + ' ' + this.Last +
     ' shot ' + score +
     ' on ' + this.Holes[1].Hole.toString() +
-    '. ' + this.RoundTotal +
-    ' today, ' + this.EventTotal + ' overall. ' +
-    this.ordinalPosition();
+    '. ' + (this.RoundTotal === 0 ? 'Even' : this.RoundTotal) +
+    ' today, ' + (this.EventTotal === 0 ? 'even' : this.EventTotal) +
+    ' overall. ' + this.ordinalPosition();
 };
 
 module.exports = Player;
