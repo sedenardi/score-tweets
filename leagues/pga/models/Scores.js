@@ -23,6 +23,9 @@ Scores.prototype.getChanges = function(prev) {
   return _(this.Players)
     .map(function(p) {
       var otherPlayer = prev.getPlayer(p);
+      if (!otherPlayer) {
+        console.log(p);
+      }
       return p.scoreChange(otherPlayer);
     })
     .filter(function(p) { return p; })

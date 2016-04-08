@@ -4,17 +4,13 @@ var Hole = function(hole) {
   this.Hole = hole.Hole;
   this.Strokes = hole.Strokes;
   this.Par = hole.Par;
-  this.PointsRound = hole.PointsRound;
-  this.PointsEvent = hole.PointsEvent;
 };
 
 Hole.parse = function(raw) {
   return new Hole({
     Hole: raw.course_hole_id,
     Strokes: raw.strokes,
-    Par: raw.par,
-    PointsRound: raw.points_round,
-    PointsEvent: raw.points_event
+    Par: raw.par
   });
 };
 

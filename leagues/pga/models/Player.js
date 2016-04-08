@@ -6,6 +6,9 @@ var _ = require('lodash');
 var Player = function(player) {
   this.First = player.First;
   this.Last = player.Last;
+  this.RoundTotal = player.RoundTotal;
+  this.EventTotal = player.EventTotal;
+  this.Position = player.Position;
   this.Holes = _.map(player.Holes, function(h) { return new Hole(h); });
 };
 
@@ -13,6 +16,9 @@ Player.parse = function(raw) {
   return new Player({
     First: raw.player_bio.first_name,
     Last: raw.player_bio.last_name,
+    RoundTotal: raw.today,
+    EventTotal: raw.total,
+    Position: raw.current_position,
     Holes: _.map(raw.holes, function(h) { return Hole.parse(h); })
   });
 };
@@ -43,11 +49,42 @@ Player.prototype.scoreChange = function(otherPlayer) {
       return new Player({
         First: this.First,
         Last: this.Last,
+        RoundTotal: this.RoundTotal,
+        EventTotal: this.EventTotal,
+        Position: this.Position,
         Holes: [otherHole, latestHole]
       });
     }
   }
   return null;
+};
+
+Player.prototype.positionNum = function() {
+  if (isNaN(parseInt(this.Position.replace(/[^\d]/, '')))) {
+    return -1;
+  } else {
+    return parseInt(this.Position.replace(/[^\d]/, ''));
+  }
+};
+
+Player.prototype.ordinalPosition = function() {
+  var str = '';
+  var num = this.positionNum();
+  if (num === -1) {
+    return str;
+  }
+  var ones = num % 10;
+  var teens = num % 100;
+  if (ones === 1 && teens !== 11) {
+    str = this.Position + 'st';
+  } else if (ones === 2 && teens !== 12) {
+    str = this.Position + 'nd';
+  } else if (ones === 3 && teens !== 13) {
+    str = this.Position + 'rd';
+  } else {
+    str = this.Position + 'th';
+  }
+  return str + ' place.';
 };
 
 Player.prototype.changeString = function() {
@@ -61,8 +98,9 @@ Player.prototype.changeString = function() {
   return this.First + ' ' + this.Last +
     ' shot ' + score +
     ' on ' + this.Holes[1].Hole.toString() +
-    '. ' + this.Holes[1].PointsRound +
-    ' today, ' + this.Holes[1].PointsEvent + ' overall.';    
+    '. ' + this.RoundTotal +
+    ' today, ' + this.EventTotal + ' overall. ' +
+    this.ordinalPosition();
 };
 
 module.exports = Player;
