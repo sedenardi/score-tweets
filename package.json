@@ -8,18 +8,24 @@
     "type": "git",
     "url": "https://github.com/sedenardi/score-tweets"
   },
-  "dependencies" : {
-    "mysql": "~2.0.1",
-    "moment": "~2.5.1",
+  "dependencies": {
+    "bluebird": "^3.3.4",
     "express": "~3.4.8",
     "express3-handlebars": "~0.5.0",
     "handlebars": "~1.1.2",
+    "lodash": "^4.8.2",
+    "moment": "~2.5.1",
+    "mysql": "~2.0.1",
+    "ntwitter": "~0.5.0",
     "passport": "~0.1.17",
     "passport-twitter": "~1.0.2",
-    "ntwitter": "~0.5.0",
     "xml2js": "~0.4.1"
   },
   "engines": {
     "node": ">=0.10"
+  },
+  "devDependencies": {
+    "babel-eslint": "^6.0.2",
+    "eslint": "^2.7.0"
   }
 }
