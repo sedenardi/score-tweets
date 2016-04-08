@@ -87,6 +87,16 @@ Player.prototype.ordinalPosition = function() {
   return str + ' place.';
 };
 
+Player.prototype.round = function() {
+  return this.RoundTotal === 0 ? 'Even' :
+    (this.RoundTotal > 0 ? ('+' + this.RoundTotal) : this.RoundTotal.toString());
+};
+
+Player.prototype.event = function() {
+  return this.EventTotal === 0 ? 'even' :
+    (this.EventTotal > 0 ? ('+' + this.EventTotal) : this.EventTotal.toString());
+};
+
 Player.prototype.changeString = function() {
   if (this.Holes.length !== 2) {
     return null;
@@ -97,9 +107,9 @@ Player.prototype.changeString = function() {
   }
   return this.First + ' ' + this.Last +
     ' shot ' + score +
-    ' on ' + this.Holes[1].Hole.toString() +
-    '. ' + (this.RoundTotal === 0 ? 'Even' : this.RoundTotal) +
-    ' today, ' + (this.EventTotal === 0 ? 'even' : this.EventTotal) +
+    ' on hole ' + this.Holes[1].Hole.toString() +
+    '. ' + this.round() +
+    ' today, ' + this.event() +
     ' overall. ' + this.ordinalPosition();
 };
 
