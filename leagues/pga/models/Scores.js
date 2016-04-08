@@ -21,6 +21,7 @@ Scores.prototype.getPlayer = function(otherPlayer) {
 
 Scores.prototype.getChanges = function(prev) {
   return _(this.Players)
+    .filter(function(p) { return p.positionNum() <= 10; })
     .map(function(p) {
       var otherPlayer = prev.getPlayer(p);
       if (!otherPlayer) {
