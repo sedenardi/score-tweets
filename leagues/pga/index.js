@@ -12,11 +12,9 @@ var moment = require('moment');
 var Scores = require('../../models/pga/Scores');
 var url = 'http://www.pgatour.com/data/r/014/leaderboard-v2.json';
 
-// var prev = require('../../examples/pga/1460143583372.json');
-// var next = require('../../examples/pga/1460152861154.json');
-//
-// var prevObj = Scores.parse(prev);
-// var nextObj = Scores.parse(next);
+var prev = require('../../examples/pga/1460152977741.json');
+
+var prevObj = Scores.parse(prev);
 
 var compareAndSave = function(newObj) {
   return dynamo.get({TableName: 'Leagues', Key: {League: 'PGA'}}).then(function(res) {
@@ -67,17 +65,27 @@ var fetchNextFromWeb = function() {
   });
 };
 
-module.exports = function(cb) {
-  fetchNextFromWeb().then(function(nextObj) {
-    if (!nextObj) {
-      console.log('Bad data from ' + url);
-      return Promise.reject('Bad data from ' + url);
-    }
-    return compareAndSave(nextObj);
-  }).then(function() {
-    cb(null, 'done');
-  }).catch(function(err) {
-    console.log(err);
-    cb(err);
-  });
+module.exports = {
+  web: function(cb) {
+    fetchNextFromWeb().then(function(nextObj) {
+      if (!nextObj) {
+        console.log('Bad data from ' + url);
+        return Promise.reject('Bad data from ' + url);
+      }
+      return compareAndSave(nextObj);
+    }).then(function() {
+      cb(null, 'done');
+    }).catch(function(err) {
+      console.log(err);
+      cb(err);
+    });
+  },
+  test: function(cb) {
+    compareAndSave(prevObj).then(function() {
+      cb(null, 'done');
+    }).catch(function(err) {
+      console.log(err);
+      cb(err);
+    });
+  }
 };
