@@ -23,7 +23,7 @@ Hole.prototype.scoreChanged = function(otherHole) {
 };
 
 Hole.prototype.scoreType = function() {
-  var diff = this.Par - this.Strokes;
+  var diff = this.Strokes - this.Par;
   if (isNaN(diff)) {
     return null;
   }
