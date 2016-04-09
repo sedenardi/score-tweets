@@ -13,7 +13,7 @@ var leagueTable = {
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 1,
-    WriteCapacityUnits: 1
+    WriteCapacityUnits: 8
   }
 };
 

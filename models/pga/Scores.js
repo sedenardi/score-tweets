@@ -36,11 +36,4 @@ Scores.prototype.getChanges = function(prev) {
     .value();
 };
 
-Scores.prototype.dynamoObj = function() {
-  return {
-    League: 'PGA',
-    Scores: JSON.stringify(this)
-  };
-};
-
 module.exports = Scores;
