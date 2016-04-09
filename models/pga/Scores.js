@@ -9,6 +9,9 @@ var Scores = function(scores) {
 };
 
 Scores.parse = function(raw) {
+  if (!raw || !raw.time_stamp || !raw.leaderboard || !raw.leaderboard.players) {
+    return null;
+  }
   return new Scores({
     Timestamp: parseInt(raw.time_stamp),
     Players: _.map(raw.leaderboard.players, function(p) { return Player.parse(p); })
