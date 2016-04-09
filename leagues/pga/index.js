@@ -38,7 +38,14 @@ var compare = function(newObj) {
   }).then(function() {
     return zlib.gzipAsync(JSON.stringify(newObj));
   }).then(function(zipped) {
-    return dynamo.put({TableName: 'Leagues', Item: {League: 'PGA', Scores: zipped}});
+    return dynamo.put({
+      TableName: 'Leagues',
+      Item: {
+        League: 'PGA',
+        Scores: zipped,
+        CreatedOn: (new Date()).toISOString()
+      }
+    });
   }).then(function() {
     console.log('New Item Saved');
   }).catch(function(err) {
