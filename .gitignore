@@ -1,5 +1,5 @@
-tests/
+examples/
 node_modules/
-helpers/
-score-tweets-test.js
 .DS_Store
+config.js
+test.js

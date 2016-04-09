@@ -5,7 +5,7 @@ var _ = require('lodash');
 
 var Scores = function(scores) {
   this.Timestamp = scores.Timestamp;
-  this.Players = scores.Players;
+  this.Players = _.map(scores.Players, function(p) { return new Player(p); });
 };
 
 Scores.parse = function(raw) {
@@ -16,7 +16,9 @@ Scores.parse = function(raw) {
 };
 
 Scores.prototype.getPlayer = function(otherPlayer) {
-  return _.find(this.Players, function(p) { return p.equals(otherPlayer); });
+  return _.find(this.Players, function(p) {
+    return p.equals(otherPlayer);
+  });
 };
 
 Scores.prototype.getChanges = function(prev) {
@@ -25,13 +27,20 @@ Scores.prototype.getChanges = function(prev) {
     .map(function(p) {
       var otherPlayer = prev.getPlayer(p);
       if (!otherPlayer) {
-        console.log(p);
+        return null;
       }
       return p.scoreChange(otherPlayer);
     })
     .filter(function(p) { return p; })
     .map(function(p) { return p.changeString(); })
     .value();
+};
+
+Scores.prototype.dynamoObj = function() {
+  return {
+    League: 'PGA',
+    Scores: JSON.stringify(this)
+  };
 };
 
 module.exports = Scores;
