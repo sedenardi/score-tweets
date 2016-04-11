@@ -9,6 +9,11 @@ var Scores = function(scores) {
 };
 
 Scores.parse = function(raw) {
+  try {
+    raw = JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
   if (!raw || !raw.time_stamp || !raw.leaderboard || !raw.leaderboard.players) {
     return null;
   }
