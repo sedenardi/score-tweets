@@ -41,6 +41,7 @@ Scores.prototype.getChanges = function(prev) {
     })
     .filter(function(g) { return g; })
     .map(function(g) { return g.changeString(); })
+    .filter(function(g) { return g; })
     .value();
 };
 
