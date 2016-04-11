@@ -10,7 +10,7 @@ var Scores = function(scores) {
 
 Scores.parse = function(raw) {
   try {
-    raw = JSON.parse(raw);
+    raw = JSON.parse(raw[0]);
   } catch (e) {
     return null;
   }

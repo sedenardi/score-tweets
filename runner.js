@@ -12,7 +12,10 @@ module.exports = function(league) {
   var moment = require('moment');
 
   var fetchNextFromWeb = function() {
-    return request.get(league.url).then(function(res) {
+    var requests = league.urls().map(function(url) {
+      return request.get(url);
+    });
+    return Promise.all(requests).then(function(res) {
       var next = league.Scores.parse(res);
       return Promise.resolve(next);
     });
@@ -70,8 +73,8 @@ module.exports = function(league) {
       fetchNextFromWeb().then(function(res) {
         nextObj = res;
         if (!nextObj) {
-          console.log('Bad data from ' + league.url);
-          return Promise.reject('Bad data from ' + league.url);
+          console.log('Bad data from ' + league.urls()[0]);
+          return Promise.reject('Bad data from ' + league.urls()[0]);
         }
         return getFromDynamo();
       }).then(function(oldObj) {
@@ -94,8 +97,8 @@ module.exports = function(league) {
       fetchNextFromWeb().then(function(res) {
         nextObj = res;
         if (!nextObj) {
-          console.log('Bad data from ' + league.url);
-          return Promise.reject('Bad data from ' + league.url);
+          console.log('Bad data from ' + league.urls()[0]);
+          return Promise.reject('Bad data from ' + league.urls()[0]);
         }
         return getFromDynamo();
       }).then(function(oldObj) {

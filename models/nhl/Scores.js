@@ -8,7 +8,7 @@ var Scores = function(scores) {
 };
 
 Scores.parse = function(raw) {
-  raw = raw.trim().replace('loadScoreboard(', '');
+  raw = raw[0].trim().replace('loadScoreboard(', '');
   raw = raw.slice(0, -1);
   var json = null;
   try {
