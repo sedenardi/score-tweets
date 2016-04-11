@@ -35,7 +35,8 @@ Hole.prototype.scoreType = function() {
     case 1: return 'a bogey';
     case 2: return 'a double bogey';
     case 3: return 'a triple bogey';
-    default: return diff.toString();
+    case 4: return 'a quadruple bogey';
+    default: return ('+' + diff.toString());
   }
 };
 
