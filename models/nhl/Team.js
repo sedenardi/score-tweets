@@ -38,8 +38,8 @@ var Team = function(team) {
   this.City = team.City;
 };
 
-Team.parse = function(rawName) {
-  return new Team(teamMap[rawName]);
+Team.parse = function(rawTeam) {
+  return new Team(teamMap[rawTeam]);
 };
 
 module.exports = Team;

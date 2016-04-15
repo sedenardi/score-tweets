@@ -8,19 +8,23 @@ var Scores = function(scores) {
 };
 
 Scores.parse = function(raw) {
-  raw = raw[0].trim().replace('loadScoreboard(', '');
-  raw = raw.slice(0, -1);
-  var json = null;
-  try {
-    json = JSON.parse(raw);
-  } catch(e) {
-    return null;
-  }
-  if (!json.games) {
-    return null;
-  }
+  var games = _(raw)
+    .map(function(res) {
+      var json = null;
+      try {
+        json = JSON.parse(res);
+      } catch(e) {
+        return null;
+      }
+      if (!json.data || !json.data.games || !json.data.games.game) {
+        return null;
+      }
+      return _.map(json.data.games.game, function(g) { return Game.parse(g); });
+    })
+    .flatten()
+    .value();
   return new Scores({
-    Games: _.map(json.games, function(g) { return Game.parse(g); })
+    Games: games
   });
 };
 

@@ -92,10 +92,11 @@ module.exports = function(league) {
         cb(err);
       });
     },
-    test: function(nextObj, cb) {
+    getChanges: function(cb) {
       var nextObj = null;
       fetchNextFromWeb().then(function(res) {
         nextObj = res;
+        console.log('New games: ' + nextObj.Games.length);
         if (!nextObj) {
           console.log('Bad data from ' + league.urls()[0]);
           return Promise.reject('Bad data from ' + league.urls()[0]);
@@ -103,9 +104,12 @@ module.exports = function(league) {
         return getFromDynamo();
       }).then(function(oldObj) {
         if (oldObj) {
+          console.log('Old games: ' + oldObj.Games.length);
           var changes = nextObj.getChanges(oldObj);
           if (changes.length) {
             console.log(changes);
+          } else {
+            console.log('No Changes');
           }
           return Promise.resolve();
         } else {
@@ -119,7 +123,13 @@ module.exports = function(league) {
         console.log(err);
         cb(err);
       });
+    },
+    fetch: function(cb) {
+      fetchNextFromWeb().then(function(res) {
+        cb(null, res);
+      }).catch(function(err) {
+        cb(err);
+      });
     }
   };
-
 };

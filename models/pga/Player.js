@@ -2,6 +2,7 @@
 
 var Hole = require('./Hole');
 var _ = require('lodash');
+var ordinal = require('../../lib/ordinal');
 
 var Player = function(player) {
   this.First = player.First;
@@ -67,26 +68,6 @@ Player.prototype.positionNum = function() {
   }
 };
 
-Player.prototype.ordinalPosition = function() {
-  var str = '';
-  var num = this.positionNum();
-  if (num === -1) {
-    return str;
-  }
-  var ones = num % 10;
-  var teens = num % 100;
-  if (ones === 1 && teens !== 11) {
-    str = this.Position + 'st';
-  } else if (ones === 2 && teens !== 12) {
-    str = this.Position + 'nd';
-  } else if (ones === 3 && teens !== 13) {
-    str = this.Position + 'rd';
-  } else {
-    str = this.Position + 'th';
-  }
-  return str + ' place.';
-};
-
 Player.prototype.round = function() {
   return this.RoundTotal === 0 ? 'Even' :
     (this.RoundTotal > 0 ? ('+' + this.RoundTotal) : this.RoundTotal.toString());
@@ -110,7 +91,7 @@ Player.prototype.changeString = function() {
     ' on hole ' + this.Holes[1].Hole.toString() +
     '. ' + this.round() +
     ' today, ' + this.event() +
-    ' overall. ' + this.ordinalPosition();
+    ' overall. ' + ordinal(this.positionNum());
 };
 
 module.exports = Player;

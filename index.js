@@ -3,6 +3,7 @@
 var runner = require('./runner');
 var PGA = require('./leagues/pga');
 var NHL = require('./leagues/nhl');
+var MLB = require('./leagues/mlb');
 
 module.exports = {
   pga: function(event, context) {
