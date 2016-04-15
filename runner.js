@@ -21,11 +21,11 @@ module.exports = function(league) {
     });
   };
 
-  var getFromDynamo = function() {
+  var getFromDynamo = function(allTime) {
     return dynamo.get({TableName: 'Leagues', Key: {League: league.leagueName}}).then(function(res) {
       if (res.Item) {
         var timeSinceLast = moment.duration(moment().diff(res.Item.CreatedOn));
-        if (timeSinceLast.asMinutes() >= 20) {
+        if (timeSinceLast.asMinutes() >= 20 && !allTime) {
           console.log('Skipping because existing item is too old');
           return Promise.resolve(null);
         }
@@ -92,7 +92,7 @@ module.exports = function(league) {
         cb(err);
       });
     },
-    getChanges: function(cb) {
+    getChanges: function(cb, allTime) {
       var nextObj = null;
       fetchNextFromWeb().then(function(res) {
         nextObj = res;
@@ -101,7 +101,7 @@ module.exports = function(league) {
           console.log('Bad data from ' + league.urls()[0]);
           return Promise.reject('Bad data from ' + league.urls()[0]);
         }
-        return getFromDynamo();
+        return getFromDynamo(allTime);
       }).then(function(oldObj) {
         if (oldObj) {
           console.log('Old games: ' + oldObj.Games.length);
