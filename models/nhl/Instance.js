@@ -76,7 +76,7 @@ Instance.prototype.scoreChanged = function(prevInstance) {
 Instance.prototype.changeString = function(prevInstance, game) {
   var str = '';
   var scores = game.AwayTeam.Name + ' ' + this.AwayScore + ', ' +
-    game.HomeTeam.Name + ' ' + this.HomeScore + ' ';
+    game.HomeTeam.Name + ' ' + this.HomeScore + '. ';
   if (prevInstance.State !== this.State) {
     if (prevInstance.State === 'Scheduled' && this.State === 'Progress') {
       if (this.Period !== '1st') {

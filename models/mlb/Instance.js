@@ -41,13 +41,13 @@ Instance.prototype.scoreChanged = function(prevInstance) {
 
 Instance.prototype.inningString = function() {
   var topOrBottom = this.TopInning ? 'Top' : 'Bottom';
-  return topOrBottom + ' ' + ordinal(this.Inning);
+  return topOrBottom + ' ' + ordinal(this.Inning) + ' inning.';
 };
 
 Instance.prototype.changeString = function(prevInstance, game) {
   var str = '';
   var scores = game.AwayTeam.Name + ' ' + this.AwayScore + ', ' +
-    game.HomeTeam.Name + ' ' + this.HomeScore + ' ';
+    game.HomeTeam.Name + ' ' + this.HomeScore + '. ';
 
   var leadString = ' take the lead. ';
   if (this.Inning > prevInstance.Inning) {
@@ -63,23 +63,23 @@ Instance.prototype.changeString = function(prevInstance, game) {
     str = 'Final' + (this.Inning > 9 ? (' in ' + this.Inning + '.') : '.') + ' ' + scores;
   } else if (prevInstance.AwayScore === prevInstance.HomeScore) {
     if (this.AwayScore > this.HomeScore) {
-      str = game.AwayTeam.Name + leadString + scores + ' ' + this.inningString();
+      str = game.AwayTeam.Name + leadString + scores + this.inningString();
     } else if (this.HomeScore > this.AwayScore){
-      str = game.HomeTeam.Name + leadString + scores + ' ' + this.inningString();
+      str = game.HomeTeam.Name + leadString + scores + this.inningString();
     }
   } else if (this.AwayScore === this.HomeScore) {
     if (this.Inning > prevInstance.Inning) {
       str = game.AwayTeam.Name + ' and ' + game.HomeTeam.Name + ' are tied, ' +
-        scores + '. ' + this.inningString();
+        scores + this.inningString();
     } else if (prevInstance.AwayScore < prevInstance.HomeScore) {
-      str = game.AwayTeam.Name + ' tie it up, ' + scores + ' ' + this.inningString();
+      str = game.AwayTeam.Name + ' tie it up, ' + scores + this.inningString();
     } else if (prevInstance.HomeScore < prevInstance.AwayScore) {
-      str = game.HomeTeam.Name + ' tie it up, ' + scores + ' ' + this.inningString();
+      str = game.HomeTeam.Name + ' tie it up, ' + scores + this.inningString();
     }
   } else if (prevInstance.AwayScore < prevInstance.HomeScore && this.HomeScore < this.AwayScore) {
-    str = game.AwayTeam.Name + leadString + scores + ' ' + this.inningString();
+    str = game.AwayTeam.Name + leadString + scores + this.inningString();
   } else if (prevInstance.HomeScore < prevInstance.AwayScore && this.AwayScore < this.HomeScore) {
-    str = game.HomeTeam.Name + leadString + scores + ' ' + this.inningString();
+    str = game.HomeTeam.Name + leadString + scores + this.inningString();
   }
 
   return str ? (str.trim() + ' ' + game.makeGameLink()) : '';

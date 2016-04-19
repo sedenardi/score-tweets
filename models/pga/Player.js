@@ -91,7 +91,7 @@ Player.prototype.changeString = function() {
     ' on hole ' + this.Holes[1].Hole.toString() +
     '. ' + this.round() +
     ' today, ' + this.event() +
-    ' overall. ' + ordinal(this.positionNum());
+    ' overall. ' + ordinal(this.positionNum()) + ' place.';
 };
 
 module.exports = Player;
