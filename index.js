@@ -13,5 +13,9 @@ module.exports = {
   nhl: function(event, context) {
     var league = runner(NHL);
     league.web(context.done);
+  },
+  mlb: function(event, context) {
+    var league = runner(MLB);
+    league.web(context.done);
   }
 };
