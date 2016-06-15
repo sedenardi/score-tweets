@@ -17,8 +17,9 @@ module.exports = {
         return Promise.resolve([]);
       }
       var current = _.find(tour.trns, function(t) {
-        return now > moment(t.date.start) &&
-          now < moment(t.date.end).add(1, 'd');
+        return  now > moment(t.date.start) && now < moment(t.date.end).add(1, 'd') &&
+                t.FedExCup === 'Yes' &&
+                t.primaryEvent === 'Y';
       });
       if (!current) {
         return Promise.resolve([]);
