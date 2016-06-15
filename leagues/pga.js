@@ -11,7 +11,7 @@ module.exports = {
   urls: function()  {
     return request.get('http://www.pgatour.com/data/r/current/schedule.json').then(function(res) {
       var schedule = JSON.parse(res);
-      var now = moment().add(2, 'd');
+      var now = moment();
       var tour = _.find(schedule.tours, {desc: 'PGA TOUR'});
       if (!tour) {
         return Promise.resolve([]);

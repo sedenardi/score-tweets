@@ -12,10 +12,10 @@ Scores.parse = function(raw) {
   try {
     raw = JSON.parse(raw[0]);
   } catch (e) {
-    return null;
+    return new Scores({ Timestamp: 0, Players: [] });
   }
   if (!raw || !raw.time_stamp || !raw.leaderboard || !raw.leaderboard.players) {
-    return null;
+    return new Scores({ Timestamp: 0, Players: [] });
   }
   return new Scores({
     Timestamp: parseInt(raw.time_stamp),
