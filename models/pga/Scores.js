@@ -23,6 +23,10 @@ Scores.parse = function(raw) {
   });
 };
 
+Scores.prototype.getScores = function() {
+  return this.Players;
+};
+
 Scores.prototype.getPlayer = function(otherPlayer) {
   return _.find(this.Players, function(p) {
     return p.equals(otherPlayer);
@@ -31,7 +35,7 @@ Scores.prototype.getPlayer = function(otherPlayer) {
 
 Scores.prototype.getChanges = function(prev) {
   return _(this.Players)
-    .filter(function(p) { return p.positionNum() <= 10; })
+    .filter(function(p) { return p.positionNum() && p.positionNum() <= 10; })
     .map(function(p) {
       var otherPlayer = prev.getPlayer(p);
       if (!otherPlayer) {

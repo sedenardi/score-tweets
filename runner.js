@@ -98,7 +98,7 @@ module.exports = function(league) {
       var nextObj = null;
       fetchNextFromWeb().then(function(res) {
         nextObj = res;
-        console.log('New games: ' + nextObj.Games.length);
+        console.log('New scores: ' + nextObj.getScores().length);
         if (!nextObj) {
           console.log('Bad data from ' + league.urls()[0]);
           return Promise.reject('Bad data from ' + league.urls()[0]);
@@ -106,7 +106,7 @@ module.exports = function(league) {
         return getFromDynamo(allTime);
       }).then(function(oldObj) {
         if (oldObj) {
-          console.log('Old games: ' + oldObj.Games.length);
+          console.log('Old scores: ' + oldObj.getScores().length);
           var changes = nextObj.getChanges(oldObj);
           if (changes.length) {
             console.log(changes);

@@ -24,6 +24,10 @@ Scores.parse = function(raw) {
   });
 };
 
+Scores.prototype.getScores = function() {
+  return this.Games;
+};
+
 Scores.prototype.getGame = function(otherGame) {
   return _.find(this.Games, function(g) {
     return g.GameSymbol === otherGame.GameSymbol;
