@@ -12,12 +12,14 @@ module.exports = function(league) {
   var moment = require('moment');
 
   var fetchNextFromWeb = function() {
-    var requests = league.urls().map(function(url) {
-      return request.get(url);
-    });
-    return Promise.all(requests).then(function(res) {
-      var next = league.Scores.parse(res);
-      return Promise.resolve(next);
+    return league.urls().then(function(urls) {
+      var requests = urls.map(function(url) {
+        return request.get(url);
+      });
+      return Promise.all(requests).then(function(res) {
+        var next = league.Scores.parse(res);
+        return Promise.resolve(next);
+      });
     });
   };
 

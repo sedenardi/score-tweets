@@ -1,5 +1,6 @@
 'use strict';
 
+var Promise = Promise || require('bluebird');
 var moment = require('moment');
 
 module.exports = {
@@ -14,7 +15,7 @@ module.exports = {
     return url;
   },
   urls: function() {
-    return [this.url(true), this.url(false)];
+    return Promise.resolve([this.url(true), this.url(false)]);
   },
   Scores: require('../models/mlb/Scores')
 };
