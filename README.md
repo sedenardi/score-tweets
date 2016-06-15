@@ -3,40 +3,40 @@ score-tweets
 
 score-tweets is a framework for sending out live score updates via Twitter. This pings different leagues' sites to get score information, detect changes in score, then tweet out the score.
 
-score-tweets also provides an express front end to view the scoring changes, tweet history, and manage server settings.
+score-tweets runs on the AWS Lambda environment in response to scheduled events, and stores each league's scores in a AWS DynamoDB
 
-### score-tweets.js
-The main server.
+### index.js
+The AWS Lambda handler.
 
-### db.js
-Mysql/MariaDB connection handling, plus tailored query methods.
+### runner.js
+Main league runner to fetch, compare, send out, and store scores.
 
-### web.js
-Express web server, handles twitter authentication via passport(-twitter).
+### leagues/
+Configs for each leagues which contains the URL and model location for the league.
 
-### helpers.js
-Collection of Handbars helpers.
+### models/
+Models for each league that contain parsing and comparing methods.
 
-### leagueManager.js
-Fetches, compares, and stores scores for a given league.
+### lib/dynamo.js
+Promise wrapper for AWS DynamoDB calls.
 
-### nhl.js & nfl.js
-Object definition, methods for parsing games, and queries for NHL & NFL games.
+### lib/request.js
+Promise wrapper for the request library.
 
-### twitGame.js
-Tweeter. Throttles queued tweets.
+### lib/twitter.js
+Promise wrapper for the twitter library, adds retrying if Twitter throttles us.
 
-### config.js
-Account information, server names, and constants.
+### lib/ordinal.js
+Creates ordinal strings out of numbers (for innings and such).
 
-### /sql_models
-Table definitions for leagues, plus teams information for each specified league.
+### init.js
+Sets up AWS DynamoDB tables.
 
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2013 Sanders DeNardi
+Copyright (c) 2016 Sanders DeNardi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
