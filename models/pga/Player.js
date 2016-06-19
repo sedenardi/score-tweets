@@ -19,7 +19,7 @@ Player.parse = function(raw) {
     Last: raw.player_bio.last_name,
     RoundTotal: raw.today,
     EventTotal: raw.total,
-    Position: !isNaN(parseInt(raw.current_position)) ? parseInt(raw.current_position) : '',
+    Position: raw.current_position,
     Holes: _.map(raw.holes, function(h) { return Hole.parse(h); })
   });
 };
