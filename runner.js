@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(league) {
+module.exports = function(league, test) {
 
   var Promise = Promise || require('bluebird');
   var zlib = require('bluebird').promisifyAll(require('zlib'));
@@ -48,7 +48,12 @@ module.exports = function(league) {
       console.log('Found ' + changes.length + ' changes.');
     }
     var tweets = _.map(changes, function(status) {
-      return twitter.post(status);
+      if (!test) {
+        return twitter.post(status);
+      } else {
+        console.log(status);
+        return Promise.resolve();
+      }
     });
     return Promise.all(tweets);
   };
