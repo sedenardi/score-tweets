@@ -5,7 +5,7 @@ const ordinal = require('../../lib/ordinal');
 class Instance {
   constructor(instance) {
     this.State = instance.State;
-    this.Quarter = instance.Period;
+    this.Quarter = instance.Quarter;
     this.Time = instance.Time;
     this.HomeScore = instance.HomeScore;
     this.AwayScore = instance.AwayScore;
