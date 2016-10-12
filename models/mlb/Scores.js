@@ -17,9 +17,13 @@ Scores.parse = function(raw) {
         return null;
       }
       if (!json.data || !json.data.games || !json.data.games.game) {
-        return null;
+        return [];
       }
-      return _.map(json.data.games.game, function(g) { return Game.parse(g); });
+      if (json.data.games.game.length === undefined) {
+        return [Game.parse(json.data.games.game)];
+      } else {
+        return _.map(json.data.games.game, function(g) { return Game.parse(g); });
+      }
     })
     .flatten()
     .value();
