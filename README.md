@@ -5,6 +5,10 @@ score-tweets is a framework for sending out live score updates via Twitter. This
 
 score-tweets runs on the AWS Lambda environment in response to scheduled events, and stores each league's scores in a AWS DynamoDB
 
+NHL: [NHLTweetZone](https://twitter.com/NHLTweetZone)
+MLB: [MLBTweetZone](https://twitter.com/MLBTweetZone)
+NFL: [NFLTweetZone](https://twitter.com/NFLTweetZone)
+
 ### index.js
 The AWS Lambda handler.
 
