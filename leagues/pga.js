@@ -28,6 +28,7 @@ module.exports = {
     });
   },
   Scores: require('../models/pga/Scores'),
+  occasionalFetch: true,
   twitterName: 'PGATweetZone',
   seqTweet: true
 };

@@ -27,7 +27,7 @@ module.exports = function(league, testObj) {
     return dynamo.get({TableName: 'Leagues', Key: {League: league.leagueName}}).then(function(res) {
       if (res.Item) {
         var timeSinceLast = moment.duration(moment().diff(res.Item.CreatedOn));
-        if (timeSinceLast.asMinutes() >= 20 && !allTime) {
+        if (timeSinceLast.asMinutes() >= 20 && !allTime && !league.occasionalFetch) {
           console.log('Skipping because existing item is too old');
           return Promise.resolve(null);
         }
