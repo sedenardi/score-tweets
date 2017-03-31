@@ -62,7 +62,7 @@ Player.prototype.scoreChange = function(otherPlayer) {
 
 Player.prototype.positionNum = function() {
   if (isNaN(parseInt(this.Position.replace(/[^\d]/, '')))) {
-    return -1;
+    return null;
   } else {
     return parseInt(this.Position.replace(/[^\d]/, ''));
   }
@@ -92,6 +92,18 @@ Player.prototype.changeString = function() {
     '. ' + this.round() +
     ' today, ' + this.event() +
     ' overall. ' + ordinal(this.positionNum()) + ' place.';
+};
+
+Player.prototype.isFinished = function() {
+  return _.every(this.Holes, (h) => { return h.isFinished(); });
+};
+
+Player.prototype.isLeaderboard = function() {
+  return this.positionNum() && this.positionNum() <= 10;
+};
+
+Player.prototype.leaderString = function() {
+  return `${this.Position} ${this.First} ${this.Last} (${this.EventTotal})`;
 };
 
 module.exports = Player;

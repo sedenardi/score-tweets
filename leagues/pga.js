@@ -7,7 +7,6 @@ var request = require('../lib/request');
 
 module.exports = {
   leagueName: 'PGA',
-  scheduleURL: 'http://www.pgatour.com/data/r/current/schedule.json',
   urls: function()  {
     return request.get('http://www.pgatour.com/data/r/current/schedule.json').then(function(res) {
       var schedule = JSON.parse(res);
@@ -24,7 +23,8 @@ module.exports = {
       if (!current) {
         return Promise.resolve([]);
       }
-      return Promise.resolve([`http://www.pgatour.com/data/r/${current.permNum}/leaderboard-v2.json`]);
+      var url = `http://www.pgatour.com/data/r/${current.permNum}/leaderboard-v2.json`;
+      return Promise.resolve([url]);
     });
   },
   Scores: require('../models/pga/Scores')

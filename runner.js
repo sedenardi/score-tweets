@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(league, test) {
+module.exports = function(league, testObj) {
 
   var Promise = Promise || require('bluebird');
   var zlib = require('bluebird').promisifyAll(require('zlib'));
@@ -48,17 +48,20 @@ module.exports = function(league, test) {
       console.log('Found ' + changes.length + ' changes.');
     }
     var tweets = _.map(changes, function(status) {
-      if (!test) {
-        return twitter.post(status);
-      } else {
+      if (testObj && testObj.noTweet) {
         console.log(status);
         return Promise.resolve();
+      } else {
+        return twitter.post(status);
       }
     });
     return Promise.all(tweets);
   };
 
   var saveNewObj = function(newObj) {
+    if (testObj && testObj.noSave) {
+      return Promise.resolve();
+    }
     return zlib.gzipAsync(JSON.stringify(newObj)).then(function(zipped) {
       return dynamo.put({
         TableName: 'Leagues',
