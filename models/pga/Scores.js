@@ -2,6 +2,7 @@
 
 var Player = require('./Player');
 var _ = require('lodash');
+const moment = require('moment-timezone');
 
 var Scores = function(scores) {
   this.Timestamp = scores.Timestamp;
@@ -57,7 +58,7 @@ Scores.prototype.getChanges = function(prev, league) {
       res.push(`@${league.twitterName}\n${v}`);
     }
     return res;
-  }, [this.Tournament]);
+  }, [`${this.Tournament}, ${moment().tz('America/New_York').format('h:mma z')}`]);
   return tweets;
 };
 
