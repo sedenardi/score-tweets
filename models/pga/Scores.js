@@ -39,7 +39,7 @@ Scores.prototype.isFinished = function() {
   return _.every(this.Players, (p) => { return p.isFinished(); });
 };
 
-Scores.prototype.getChanges = function(prev) {
+Scores.prototype.getChanges = function(prev, league) {
   if (this.isFinished() && prev.isFinished()) {
     return [];
   }
@@ -54,7 +54,7 @@ Scores.prototype.getChanges = function(prev) {
     if (nextStr.length < 140) {
       res[res.length - 1] = nextStr;
     } else {
-      res.push(v);
+      res.push(`@${league.twitterName}\n${v}`);
     }
     return res;
   }, [this.Tournament]);

@@ -43,19 +43,28 @@ module.exports = function(league, testObj) {
   };
 
   var compareAndTweet = function(oldObj, newObj) {
-    var changes = newObj.getChanges(oldObj);
+    var changes = newObj.getChanges(oldObj, league);
     if (changes.length) {
       console.log('Found ' + changes.length + ' changes.');
     }
-    var tweets = _.map(changes, function(status) {
+    if (league.seqTweet) {
       if (testObj && testObj.noTweet) {
-        console.log(status);
+        console.log(changes);
         return Promise.resolve();
       } else {
-        return twitter.post(status);
+        return twitter.seqPost(changes);
       }
-    });
-    return Promise.all(tweets);
+    } else {
+      var tweets = _.map(changes, function(status) {
+        if (testObj && testObj.noTweet) {
+          console.log(status);
+          return Promise.resolve();
+        } else {
+          return twitter.post(status);
+        }
+      });
+      return Promise.all(tweets);
+    }
   };
 
   var saveNewObj = function(newObj) {
@@ -115,7 +124,7 @@ module.exports = function(league, testObj) {
       }).then(function(oldObj) {
         if (oldObj) {
           console.log('Old scores: ' + oldObj.getScores().length);
-          var changes = nextObj.getChanges(oldObj);
+          var changes = nextObj.getChanges(oldObj, league);
           if (changes.length) {
             console.log(changes);
           } else {

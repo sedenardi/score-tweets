@@ -27,5 +27,7 @@ module.exports = {
       return Promise.resolve([url]);
     });
   },
-  Scores: require('../models/pga/Scores')
+  Scores: require('../models/pga/Scores'),
+  twitterName: 'PGATweetZone',
+  seqTweet: true
 };
