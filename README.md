@@ -8,6 +8,7 @@ score-tweets runs on the AWS Lambda environment in response to scheduled events,
 NHL: [NHLTweetZone](https://twitter.com/NHLTweetZone)
 MLB: [MLBTweetZone](https://twitter.com/MLBTweetZone)
 NFL: [NFLTweetZone](https://twitter.com/NFLTweetZone)
+PGA: [PGATweetZone](https://twitter.com/PGATweetZone)
 
 ### index.js
 The AWS Lambda handler.
