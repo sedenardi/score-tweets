@@ -26,6 +26,10 @@ Scores.parse = function(raw) {
       }
     })
     .flatten()
+    .filter((g) => {
+      return g.GameType !== 'S' && g.GameType !== 'E' &&
+        g.HomeTeam && g.AwayTeam;
+    })
     .value();
   return new Scores({
     Games: games

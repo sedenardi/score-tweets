@@ -39,6 +39,7 @@ var Team = function(team) {
 };
 
 Team.parse = function(rawTeam) {
+  if (!teamMap[rawTeam]) { return null; }
   return new Team(teamMap[rawTeam]);
 };
 

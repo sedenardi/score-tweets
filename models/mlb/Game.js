@@ -6,18 +6,21 @@ var _ = require('lodash');
 
 var Game = function(game) {
   this.GameSymbol = game.GameSymbol;
-  this.HomeTeam = new Team(game.HomeTeam);
-  this.AwayTeam = new Team(game.AwayTeam);
+  this.GameType = game.GameType;
+  this.HomeTeam = game.HomeTeam ? new Team(game.HomeTeam) : null;
+  this.AwayTeam = game.AwayTeam ? new Team(game.AwayTeam) : null;
   this.Instances = _.map(game.Instances, function(i) { return new Instance(i); });
 };
 
 Game.parse = function(raw) {
-  return new Game({
+  var g = new Game({
     GameSymbol: raw.id,
+    GameType: raw.game_type,
     HomeTeam: Team.parse(raw.home_team_id),
     AwayTeam: Team.parse(raw.away_team_id),
     Instances: [Instance.parse(raw)]
   });
+  return g;
 };
 
 Game.prototype.scoreChange = function(prevGame) {
