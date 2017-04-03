@@ -44,12 +44,16 @@ Scores.prototype.getChanges = function(prev, league) {
   if (this.isFinished() && prev.isFinished()) {
     return [];
   }
-  const leaders = _(this.Players)
-    .filter(function(p) { return p.isLeaderboard(); })
+  const leaders = _.filter(this.Players, (p) => { return p.isLeaderboard(); });
+  const anyPlaying = _.some(leaders, (p) => { return !p.isFinished(); });
+  if (!anyPlaying) {
+    return [];
+  }
+  const strings = _(leaders)
     .orderBy([function(p) { return p.positionNum(); }], ['asc'])
     .map(function(p) { return p.leaderString(); })
     .value();
-  const tweets = _.reduce(leaders, function(res, v) {
+  const tweets = _.reduce(strings, function(res, v) {
     let nextStr = res[res.length - 1];
     nextStr += `\n${v}`;
     if (nextStr.length < 140) {
