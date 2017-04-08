@@ -5,6 +5,7 @@ var PGA = require('./leagues/pga');
 var NHL = require('./leagues/nhl');
 var MLB = require('./leagues/mlb');
 var NFL = require('./leagues/nfl');
+const api = require('./api');
 
 module.exports = {
   pga: function(event, context) {
@@ -22,5 +23,12 @@ module.exports = {
   nfl: function(event, context) {
     var league = runner(NFL);
     league.web(context.done);
+  },
+  getFinalScore: function(event, context) {
+    api.getFinalScore(event.query).then((res) => {
+      context.done(null, res);
+    }).catch((err) => {
+      context.done(err);
+    });
   }
 };

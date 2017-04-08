@@ -32,6 +32,11 @@ Player.prototype.equals = function(otherPlayer) {
   return this.hash() === otherPlayer.hash();
 };
 
+Player.prototype.nameEquals = function(name) {
+  return `${this.First}${this.Last}`.replace(/\W/g, '').toLowerCase() ===
+    name.replace(/\W/g, '').toLowerCase();
+};
+
 Player.prototype.getHole = function(hole) {
   return _.find(this.Holes, {Hole: hole});
 };

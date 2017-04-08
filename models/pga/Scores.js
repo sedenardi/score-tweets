@@ -66,4 +66,28 @@ Scores.prototype.getChanges = function(prev, league) {
   return tweets;
 };
 
+Scores.prototype.getPlayers = function(names) {
+  const scores = _.chain(this.Players)
+    .filter((p) => {
+      if (p.Last === 'Moore') {
+        console.log(p);
+        console.log(p.isFinished());
+        console.log(names);
+      }
+      return p.isFinished() && _.some(names, (n) => { return p.nameEquals(n); });
+    })
+    .map((p) => {
+      const n = _.find(names, (n) => { return p.nameEquals(n); });
+      return {
+        Name: n,
+        Score: p.RoundTotal + 72
+      };
+    })
+    .value();
+  return _.reduce(scores, (res, v) => {
+    res[v.Name] = v.Score;
+    return res;
+  }, {});
+};
+
 module.exports = Scores;
