@@ -22,7 +22,10 @@ Scores.parse = function(raw) {
   return new Scores({
     Timestamp: parseInt(raw.time_stamp),
     Tournament: raw.debug.tournament_in_schedule_file_name,
-    Players: _.map(raw.leaderboard.players, function(p) { return Player.parse(p); })
+    Players: _.chain(raw.leaderboard.players)
+      .filter((p) => { return p.status !== 'cut'; })
+      .map((p) => { return Player.parse(p); })
+      .value()
   });
 };
 
@@ -46,7 +49,7 @@ Scores.prototype.getChanges = function(prev, league) {
   }
   const leaders = _.filter(this.Players, (p) => { return p.isLeaderboard(); });
   const anyPlaying = _.some(leaders, (p) => { return !p.isFinished(); });
-  if (!anyPlaying) {
+  if (!anyPlaying.length) {
     return [];
   }
   const strings = _(leaders)
