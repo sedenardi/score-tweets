@@ -31,6 +31,7 @@ var teamMap = {
   flyers: { Name: 'Flyers', City: 'Philadelphia' },
   penguins: { Name: 'Penguins', City: 'Pittsburgh' },
   capitals: { Name: 'Capitals', City: 'Washington' },
+  goldenknights: { Name: 'Golden Knights', City: 'Las Vegas' }
 };
 
 var Team = function(team) {
