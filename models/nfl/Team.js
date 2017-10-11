@@ -12,7 +12,7 @@ const teamMap = {
   JAC: { Name: 'Jaguars', City: 'Jacksonville'},
   GB: { Name: 'Packers', City: 'Green Bay'},
   KC: { Name: 'Chiefs', City: 'Kansas City'},
-  SD: { Name: 'Chargers', City: 'San Diego'},
+  LAC: { Name: 'Chargers', City: 'Los Angeles'},
   NO: { Name: 'Saints', City: 'New Orleans'},
   OAK: { Name: 'Raiders', City: 'Oakland'},
   NYJ: { Name: 'Jets', City: 'New York'},
