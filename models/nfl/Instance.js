@@ -23,6 +23,7 @@ class Instance {
     let str = '';
     const scores = game.AwayTeam.Name + ' ' + this.AwayScore + ', ' +
       game.HomeTeam.Name + ' ' + this.HomeScore + '. ';
+    const leadString = ' take the lead. ';
     const time = `${this.Time} ${ordinal(this.Quarter)} quarter.`;
     if (this.State !== prevInstance.State) {
       if (prevInstance.State === 'Pregame' && this.State === 'Progress') {
@@ -34,10 +35,22 @@ class Instance {
     } else if ((this.Quarter === prevInstance.Quarter && prevInstance.timeNum() >= this.timeNum()) || (prevInstance.Quarter < this.Quarter)) {
       if (prevInstance.AwayScore > this.AwayScore || prevInstance.HomeScore > this.HomeScore) {
         str = `Score correction. ${scores} ${time}`;
-      } else if (prevInstance.AwayScore !== this.AwayScore) {
-        str = `${game.AwayTeam.Name} score. ${scores} ${time}`;
-      } else if (prevInstance.HomeScore !== this.HomeScore) {
-        str = `${game.HomeTeam.Name} score. ${scores} ${time}`;
+      } else if (prevInstance.AwayScore === prevInstance.HomeScore) {
+        if (this.AwayScore > this.HomeScore) {
+          str = game.AwayTeam.Name + leadString + scores + time;
+        } else if (this.HomeScore > this.AwayScore){
+          str = game.HomeTeam.Name + leadString + scores + time;
+        }
+      } else if (this.AwayScore === this.HomeScore) {
+        if (prevInstance.AwayScore < prevInstance.HomeScore) {
+          str = game.AwayTeam.Name + ' tie it up. ' + scores + time;
+        } else if (prevInstance.HomeScore < prevInstance.AwayScore) {
+          str = game.HomeTeam.Name + ' tie it up. ' + scores + time;
+        }
+      } else if (prevInstance.AwayScore < prevInstance.HomeScore && this.HomeScore < this.AwayScore) {
+        str = game.AwayTeam.Name + leadString + scores + time;
+      } else if (prevInstance.HomeScore < prevInstance.AwayScore && this.AwayScore < this.HomeScore) {
+        str = game.HomeTeam.Name + leadString + scores + time;
       }
     }
     return str ? (str.trim() + ' ' + game.makeGameLink()) : '';
