@@ -23,6 +23,40 @@ module.exports = function(league, testObj) {
     });
   };
 
+  const final = (closeDB, db, res) => {
+    return (closeDB ? db.end() : Promise.resolve()).then(() => {
+      return Promise.resolve(res);
+    });
+  };
+
+  const getFromStore = function(db, allTime) {
+    let closeDB = false;
+    if (!db) {
+      db = require('./lib/db')();
+      closeDB = true;
+    }
+    const sql = `
+    select * from score_tweet.Leagues t1
+    where League = ?
+    and not exists (
+      select 1 from score_tweet.Leagues t2
+      where t2.League = t1.League
+      and t2.id > t1.id
+    );`;
+    return db.query(sql, [league.leagueName]).then((res) => {
+      if (!res[0]) { return final(closeDB, db, null); }
+
+      const timeSinceLast = moment.duration(moment().diff(res[0].CreatedOn));
+      if (timeSinceLast.asMinutes() >= 20 && !allTime && !league.occasionalFetch) {
+        console.log('Skipping because existing item is too old');
+        return final(closeDB, db, null);
+      }
+      const scores = JSON.parse(res[0].Data);
+      const oldObj = new league.Scores(scores);
+      return final(closeDB, db, oldObj);
+    });
+  };
+
   var getFromDynamo = function(allTime) {
     return dynamo.get({TableName: 'Leagues', Key: {League: league.leagueName}}).then(function(res) {
       if (res.Item) {
@@ -87,6 +121,7 @@ module.exports = function(league, testObj) {
   };
 
   return {
+    getFromStore,
     web: function(cb) {
       var nextObj = null;
       fetchNextFromWeb().then(function(res) {
