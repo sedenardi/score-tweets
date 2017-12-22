@@ -2,19 +2,19 @@
 
 module.exports = function(league, testObj) {
 
-  var config = require('./config');
-  var twitter = require('./lib/twitter')(config, league.leagueName);
-  var request = require('./lib/request');
-  var _ = require('lodash');
-  var moment = require('moment');
+  const config = require('./config');
+  const twitter = require('./lib/twitter')(config, league.leagueName);
+  const request = require('./lib/request');
+  const _ = require('lodash');
+  const moment = require('moment');
 
-  var fetchNextFromWeb = function() {
-    return league.urls().then(function(urls) {
-      var requests = urls.map(function(url) {
+  const fetchNextFromWeb = function() {
+    return league.urls().then((urls) => {
+      const requests = urls.map((url) => {
         return request.get(url);
       });
-      return Promise.all(requests).then(function(res) {
-        var next = league.Scores.parse(res);
+      return Promise.all(requests).then((res) => {
+        const next = league.Scores.parse(res);
         return Promise.resolve(next);
       });
     });
@@ -55,8 +55,8 @@ module.exports = function(league, testObj) {
     });
   };
 
-  var compareAndTweet = function(oldObj, newObj) {
-    var changes = newObj.getChanges(oldObj, league);
+  const compareAndTweet = function(oldObj, newObj) {
+    const changes = newObj.getChanges(oldObj, league);
     if (changes.length) {
       console.log('Found ' + changes.length + ' changes.');
     }
@@ -68,7 +68,7 @@ module.exports = function(league, testObj) {
         return twitter.seqPost(changes);
       }
     } else {
-      var tweets = _.map(changes, function(status) {
+      const tweets = _.map(changes, (status) => {
         if (testObj && testObj.noTweet) {
           console.log(status);
           return Promise.resolve();
@@ -104,7 +104,7 @@ module.exports = function(league, testObj) {
   return {
     getFromStore,
     web: function(cb) {
-      var nextObj = null;
+      let nextObj = null;
       const db = require('./lib/db')();
       fetchNextFromWeb().then((res) => {
         nextObj = res;
@@ -131,7 +131,7 @@ module.exports = function(league, testObj) {
       });
     },
     getChanges: function(cb, allTime) {
-      var nextObj = null;
+      let nextObj = null;
       const db = require('./lib/db')();
       fetchNextFromWeb().then((res) => {
         nextObj = res;
@@ -144,7 +144,7 @@ module.exports = function(league, testObj) {
       }).then((oldObj) => {
         if (oldObj) {
           console.log('Old scores: ' + oldObj.getScores().length);
-          var changes = nextObj.getChanges(oldObj, league);
+          const changes = nextObj.getChanges(oldObj, league);
           if (changes.length) {
             console.log(changes);
           } else {
@@ -166,9 +166,9 @@ module.exports = function(league, testObj) {
       });
     },
     fetch: function(cb) {
-      fetchNextFromWeb().then(function(res) {
+      fetchNextFromWeb().then((res) => {
         cb(null, res);
-      }).catch(function(err) {
+      }).catch((err) => {
         cb(err);
       });
     }

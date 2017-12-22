@@ -1,13 +1,13 @@
 'use strict';
 
-var Player = require('./Player');
-var _ = require('lodash');
+const Player = require('./Player');
+const _ = require('lodash');
 const moment = require('moment-timezone');
 
-var Scores = function(scores) {
+const Scores = function(scores) {
   this.Timestamp = scores.Timestamp;
   this.Tournament = scores.Tournament;
-  this.Players = _.map(scores.Players, function(p) { return new Player(p); });
+  this.Players = _.map(scores.Players, (p) => { return new Player(p); });
 };
 
 Scores.parse = function(raw) {
@@ -53,10 +53,10 @@ Scores.prototype.getChanges = function(prev, league) {
     return [];
   }
   const strings = _(leaders)
-    .orderBy([function(p) { return p.positionNum(); }], ['asc'])
-    .map(function(p) { return p.leaderString(); })
+    .orderBy([(p) => { return p.positionNum(); }], ['asc'])
+    .map((p) => { return p.leaderString(); })
     .value();
-  const tweets = _.reduce(strings, function(res, v) {
+  const tweets = _.reduce(strings, (res, v) => {
     let nextStr = res[res.length - 1];
     nextStr += `\n${v}`;
     if (nextStr.length < 140) {

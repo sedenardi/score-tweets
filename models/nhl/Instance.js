@@ -1,6 +1,6 @@
 'use strict';
 
-var Instance = function(instance) {
+const Instance = function(instance) {
   this.State = instance.State;
   this.Period = instance.Period;
   this.Time = instance.Time;
@@ -9,7 +9,7 @@ var Instance = function(instance) {
 };
 
 Instance.parse = function(raw) {
-  var instanceObj = {
+  const instanceObj = {
     HomeScore: (raw.hts === '' ? 0 : parseInt(raw.hts)),
     AwayScore: (raw.ats === '' ? 0 : parseInt(raw.ats))
   };
@@ -74,8 +74,8 @@ Instance.prototype.scoreChanged = function(prevInstance) {
 };
 
 Instance.prototype.changeString = function(prevInstance, game) {
-  var str = '';
-  var scores = game.AwayTeam.Name + ' ' + this.AwayScore + ', ' +
+  let str = '';
+  const scores = game.AwayTeam.Name + ' ' + this.AwayScore + ', ' +
     game.HomeTeam.Name + ' ' + this.HomeScore + '. ';
   if (prevInstance.State !== this.State) {
     if (prevInstance.State === 'Scheduled' && this.State === 'Progress') {
@@ -94,7 +94,7 @@ Instance.prototype.changeString = function(prevInstance, game) {
       }
     }
   } else {
-    var isOT = (this.State === 'Overtime' || this.State === 'Shootout');
+    const isOT = (this.State === 'Overtime' || this.State === 'Shootout');
     if (prevInstance.AwayScore > this.AwayScore ||
       prevInstance.HomeScore > this.HomeScore) {
       str = 'Score Correction. ' + scores + this.Time + ' ' + this.Period;

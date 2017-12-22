@@ -1,12 +1,12 @@
 'use strict';
 
-var moment = require('moment');
+const moment = require('moment');
 
 module.exports = {
   leagueName: 'MLB',
   url: function(yesterday) {
-    var date = yesterday ? moment().subtract(1, 'days') : moment();
-    var url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' +
+    const date = yesterday ? moment().subtract(1, 'days') : moment();
+    const url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' +
       date.format('YYYY') +
       '/month_' + date.format('MM') +
       '/day_' + date.format('DD') +

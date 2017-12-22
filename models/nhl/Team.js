@@ -1,6 +1,6 @@
 'use strict';
 
-var teamMap = {
+const teamMap = {
   ducks: { Name: 'Ducks', City: 'Anaheim' },
   flames: { Name: 'Flames', City: 'Calgary' },
   oilers: { Name: 'Oilers', City: 'Edmonton' },
@@ -34,7 +34,7 @@ var teamMap = {
   goldenknights: { Name: 'Golden Knights', City: 'Las Vegas' }
 };
 
-var Team = function(team) {
+const Team = function(team) {
   this.Name = team.Name;
   this.City = team.City;
 };

@@ -1,20 +1,20 @@
 'use strict';
 
-var moment = require('moment');
-var _ = require('lodash');
-var request = require('../lib/request');
+const moment = require('moment');
+const _ = require('lodash');
+const request = require('../lib/request');
 
 module.exports = {
   leagueName: 'PGA',
   urls: function()  {
-    return request.get('http://www.pgatour.com/data/r/current/schedule.json').then(function(res) {
-      var schedule = JSON.parse(res);
-      var now = moment();
-      var tour = _.find(schedule.tours, {desc: 'PGA TOUR'});
+    return request.get('http://www.pgatour.com/data/r/current/schedule.json').then((res) => {
+      const schedule = JSON.parse(res);
+      const now = moment();
+      const tour = _.find(schedule.tours, {desc: 'PGA TOUR'});
       if (!tour) {
         return Promise.resolve([]);
       }
-      var current = _.find(tour.trns, function(t) {
+      const current = _.find(tour.trns, (t) => {
         return  now > moment(t.date.start) && now < moment(t.date.end).add(1, 'd') &&
                 t.FedExCup === 'Yes' &&
                 t.primaryEvent === 'Y';
@@ -22,7 +22,7 @@ module.exports = {
       if (!current) {
         return Promise.resolve([]);
       }
-      var url = `http://www.pgatour.com/data/r/${current.permNum}/leaderboard-v2.json`;
+      const url = `http://www.pgatour.com/data/r/${current.permNum}/leaderboard-v2.json`;
       return Promise.resolve([url]);
     });
   },
