@@ -1,24 +1,30 @@
 'use strict';
 
 const PGA = require('./leagues/pga');
-const config = require('./config');
-const dynamo = require('./lib/dynamo')(config);
-const zlib = require('bluebird').promisifyAll(require('zlib'));
 const _ = require('lodash');
 
 const getFinalScore = function(params) {
+  const db = require('./lib/db')();
   let names = params.names;
   if (typeof names === 'string') {
     names = _.map(names.split(','), (s) => { return s.trim(); });
   }
-  return dynamo.get({TableName: 'Leagues', Key: {League: PGA.leagueName}}).then((res) => {
-    if (!res.Item) {
-      return Promise.resolve({ });
-    }
-    return zlib.gunzipAsync(res.Item.Scores).then((unzipped) => {
-      const scores = JSON.parse(unzipped);
+  const sql = `
+  select * from score_tweet.Leagues t1
+  where League = 'PGA'
+  and not exists (
+    select 1 from score_tweet.Leagues t2
+    where t2.League = t1.League
+    and t2.id > t1.id
+  );`;
+  return db.query(sql).then((res) => {
+    let players = { };
+    if (res[0]) {
+      const scores = JSON.parse(res[0].Data);
       const scoreObj = new PGA.Scores(scores);
-      const players = scoreObj.getPlayers(names);
+      players = scoreObj.getPlayers(names);
+    }
+    return db.end().then(() => {
       return Promise.resolve(players);
     });
   });
