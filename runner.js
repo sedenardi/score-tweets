@@ -2,10 +2,10 @@
 
 module.exports = function(league, testObj) {
 
-  var Promise = Promise || require('bluebird');
-  var zlib = require('bluebird').promisifyAll(require('zlib'));
+  // var Promise = Promise || require('bluebird');
+  // var zlib = require('bluebird').promisifyAll(require('zlib'));
   var config = require('./config');
-  var dynamo = require('./lib/dynamo')(config);
+  // var dynamo = require('./lib/dynamo')(config);
   var twitter = require('./lib/twitter')(config, league.leagueName);
   var request = require('./lib/request');
   var _ = require('lodash');
@@ -29,7 +29,7 @@ module.exports = function(league, testObj) {
     });
   };
 
-  const getFromStore = function(db, allTime) {
+  const getFromStore = (db, allTime) => {
     let closeDB = false;
     if (!db) {
       db = require('./lib/db')();
@@ -46,7 +46,8 @@ module.exports = function(league, testObj) {
     return db.query(sql, [league.leagueName]).then((res) => {
       if (!res[0]) { return final(closeDB, db, null); }
 
-      const timeSinceLast = moment.duration(moment().diff(res[0].CreatedOn));
+      const createdOn = moment.unix(res[0].CreatedOn);
+      const timeSinceLast = moment.duration(moment().diff(createdOn));
       if (timeSinceLast.asMinutes() >= 20 && !allTime && !league.occasionalFetch) {
         console.log('Skipping because existing item is too old');
         return final(closeDB, db, null);
@@ -57,24 +58,24 @@ module.exports = function(league, testObj) {
     });
   };
 
-  var getFromDynamo = function(allTime) {
-    return dynamo.get({TableName: 'Leagues', Key: {League: league.leagueName}}).then(function(res) {
-      if (res.Item) {
-        var timeSinceLast = moment.duration(moment().diff(res.Item.CreatedOn));
-        if (timeSinceLast.asMinutes() >= 20 && !allTime && !league.occasionalFetch) {
-          console.log('Skipping because existing item is too old');
-          return Promise.resolve(null);
-        }
-        return zlib.gunzipAsync(res.Item.Scores).then(function(unzipped) {
-          var scores = JSON.parse(unzipped);
-          var oldObj = new league.Scores(scores);
-          return Promise.resolve(oldObj);
-        });
-      } else {
-        return Promise.resolve(null);
-      }
-    });
-  };
+  // var getFromDynamo = function(allTime) {
+  //   return dynamo.get({TableName: 'Leagues', Key: {League: league.leagueName}}).then(function(res) {
+  //     if (res.Item) {
+  //       var timeSinceLast = moment.duration(moment().diff(res.Item.CreatedOn));
+  //       if (timeSinceLast.asMinutes() >= 20 && !allTime && !league.occasionalFetch) {
+  //         console.log('Skipping because existing item is too old');
+  //         return Promise.resolve(null);
+  //       }
+  //       return zlib.gunzipAsync(res.Item.Scores).then(function(unzipped) {
+  //         var scores = JSON.parse(unzipped);
+  //         var oldObj = new league.Scores(scores);
+  //         return Promise.resolve(oldObj);
+  //       });
+  //     } else {
+  //       return Promise.resolve(null);
+  //     }
+  //   });
+  // };
 
   var compareAndTweet = function(oldObj, newObj) {
     var changes = newObj.getChanges(oldObj, league);
@@ -101,62 +102,87 @@ module.exports = function(league, testObj) {
     }
   };
 
-  var saveNewObj = function(newObj) {
+  const saveScores = (db, newObj) => {
     if (testObj && testObj.noSave) {
       return Promise.resolve();
     }
-    return zlib.gzipAsync(JSON.stringify(newObj)).then(function(zipped) {
-      return dynamo.put({
-        TableName: 'Leagues',
-        Item: {
-          League: league.leagueName,
-          Scores: zipped,
-          CreatedOn: (new Date()).toISOString()
-        }
-      });
-    }).then(function() {
+    let closeDB = false;
+    if (!db) {
+      db = require('./lib/db')();
+      closeDB = true;
+    }
+    const sql = `
+    insert into score_tweet.Leagues(League,CreatedOn,\`Data\`)
+    values (?,UNIX_TIMESTAMP(),?);`;
+    return db.query(sql, [
+      league.leagueName,
+      JSON.stringify(newObj)
+    ]).then(() => {
       console.log('New Item Saved');
-      return Promise.resolve();
+      return final(closeDB, db, null);
     });
   };
+
+  // var saveNewObj = function(newObj) {
+  //   if (testObj && testObj.noSave) {
+  //     return Promise.resolve();
+  //   }
+  //   return zlib.gzipAsync(JSON.stringify(newObj)).then(function(zipped) {
+  //     return dynamo.put({
+  //       TableName: 'Leagues',
+  //       Item: {
+  //         League: league.leagueName,
+  //         Scores: zipped,
+  //         CreatedOn: (new Date()).toISOString()
+  //       }
+  //     });
+  //   }).then(function() {
+  //     console.log('New Item Saved');
+  //     return Promise.resolve();
+  //   });
+  // };
 
   return {
     getFromStore,
     web: function(cb) {
       var nextObj = null;
-      fetchNextFromWeb().then(function(res) {
+      const db = require('./lib/db')();
+      fetchNextFromWeb().then((res) => {
         nextObj = res;
         if (!nextObj) {
           console.log('Bad data from ' + league.urls()[0]);
           return Promise.reject('Bad data from ' + league.urls()[0]);
         }
-        return getFromDynamo();
-      }).then(function(oldObj) {
+        return getFromStore(db);
+      }).then((oldObj) => {
         if (oldObj) {
           return compareAndTweet(oldObj, nextObj);
         } else {
           return Promise.resolve();
         }
-      }).then(function() {
-        return saveNewObj(nextObj);
-      }).then(function() {
+      }).then(() => {
+        return saveScores(db, nextObj);
+      }).then(() => {
+        return db.end();
+      }).then(() => {
         cb(null, 'done');
-      }).catch(function(err) {
+      }).catch((err) => {
         console.log(err);
         cb(err);
       });
     },
     getChanges: function(cb, allTime) {
       var nextObj = null;
-      fetchNextFromWeb().then(function(res) {
+      const db = require('./lib/db')();
+      fetchNextFromWeb().then((res) => {
         nextObj = res;
         console.log('New scores: ' + nextObj.getScores().length);
         if (!nextObj) {
           console.log('Bad data from ' + league.urls()[0]);
           return Promise.reject('Bad data from ' + league.urls()[0]);
         }
-        return getFromDynamo(allTime);
-      }).then(function(oldObj) {
+        return getFromStore(db, allTime);
+      }).then((oldObj) => {
         if (oldObj) {
           console.log('Old scores: ' + oldObj.getScores().length);
           var changes = nextObj.getChanges(oldObj, league);
@@ -169,11 +195,13 @@ module.exports = function(league, testObj) {
         } else {
           return Promise.resolve();
         }
-      }).then(function() {
-        return saveNewObj(nextObj);
-      }).then(function() {
+      }).then(() => {
+        return saveScores(db, nextObj);
+      }).then(() => {
+        return db.end();
+      }).then(() => {
         cb(null, 'done');
-      }).catch(function(err) {
+      }).catch((err) => {
         console.log(err);
         cb(err);
       });
