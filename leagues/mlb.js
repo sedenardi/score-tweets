@@ -1,6 +1,5 @@
 'use strict';
 
-var Promise = Promise || require('bluebird');
 var moment = require('moment');
 
 module.exports = {

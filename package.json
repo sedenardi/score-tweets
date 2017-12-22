@@ -1,16 +1,13 @@
 {
   "name": "score-tweet",
-  "version": "3.1.0",
+  "version": "4.0.0",
   "author": "Sanders DeNardi",
   "description": "Framework for sending out live score updates via Twitter.",
-  "main": "score-tweets.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/sedenardi/score-tweets"
   },
   "dependencies": {
-    "aws-sdk": "^2.3.2",
-    "bluebird": "^3.3.4",
     "lodash": "^4.8.2",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.11",
@@ -19,7 +16,7 @@
     "twitter": "^1.2.5"
   },
   "engines": {
-    "node": ">=0.10"
+    "node": ">=4.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.2",

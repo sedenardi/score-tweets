@@ -2,10 +2,7 @@
 
 module.exports = function(league, testObj) {
 
-  // var Promise = Promise || require('bluebird');
-  // var zlib = require('bluebird').promisifyAll(require('zlib'));
   var config = require('./config');
-  // var dynamo = require('./lib/dynamo')(config);
   var twitter = require('./lib/twitter')(config, league.leagueName);
   var request = require('./lib/request');
   var _ = require('lodash');
@@ -58,25 +55,6 @@ module.exports = function(league, testObj) {
     });
   };
 
-  // var getFromDynamo = function(allTime) {
-  //   return dynamo.get({TableName: 'Leagues', Key: {League: league.leagueName}}).then(function(res) {
-  //     if (res.Item) {
-  //       var timeSinceLast = moment.duration(moment().diff(res.Item.CreatedOn));
-  //       if (timeSinceLast.asMinutes() >= 20 && !allTime && !league.occasionalFetch) {
-  //         console.log('Skipping because existing item is too old');
-  //         return Promise.resolve(null);
-  //       }
-  //       return zlib.gunzipAsync(res.Item.Scores).then(function(unzipped) {
-  //         var scores = JSON.parse(unzipped);
-  //         var oldObj = new league.Scores(scores);
-  //         return Promise.resolve(oldObj);
-  //       });
-  //     } else {
-  //       return Promise.resolve(null);
-  //     }
-  //   });
-  // };
-
   var compareAndTweet = function(oldObj, newObj) {
     var changes = newObj.getChanges(oldObj, league);
     if (changes.length) {
@@ -122,25 +100,6 @@ module.exports = function(league, testObj) {
       return final(closeDB, db, null);
     });
   };
-
-  // var saveNewObj = function(newObj) {
-  //   if (testObj && testObj.noSave) {
-  //     return Promise.resolve();
-  //   }
-  //   return zlib.gzipAsync(JSON.stringify(newObj)).then(function(zipped) {
-  //     return dynamo.put({
-  //       TableName: 'Leagues',
-  //       Item: {
-  //         League: league.leagueName,
-  //         Scores: zipped,
-  //         CreatedOn: (new Date()).toISOString()
-  //       }
-  //     });
-  //   }).then(function() {
-  //     console.log('New Item Saved');
-  //     return Promise.resolve();
-  //   });
-  // };
 
   return {
     getFromStore,

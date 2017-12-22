@@ -1,7 +1,5 @@
 'use strict';
 
-var Promise = Promise || require('bluebird');
-
 module.exports = {
   leagueName: 'NHL',
   urls: function() {

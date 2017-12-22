@@ -1,6 +1,5 @@
 'use strict';
 
-var Promise = Promise || require('bluebird');
 var moment = require('moment');
 var _ = require('lodash');
 var request = require('../lib/request');

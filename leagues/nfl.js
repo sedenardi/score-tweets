@@ -1,7 +1,5 @@
 'use strict';
 
-const Promise = global.Promise || require('bluebird');
-
 module.exports = {
   leagueName: 'NFL',
   urls: function() {
