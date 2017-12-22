@@ -68,7 +68,7 @@ Instance.prototype.scoreChanged = function(prevInstance) {
       prevInstance.State === 'Scheduled' &&
       this.State === 'Scheduled' &&
       prevInstance.Time !== this.Time &&
-      this.Time.length
+      this.Time && this.Time.length
     )
   );
 };
