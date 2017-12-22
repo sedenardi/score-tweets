@@ -1,6 +1,6 @@
 'use strict';
 
-var Hole = function(hole) {
+const Hole = function(hole) {
   this.Hole = hole.Hole;
   this.Strokes = hole.Strokes;
   this.Par = hole.Par;
@@ -23,7 +23,7 @@ Hole.prototype.scoreChanged = function(otherHole) {
 };
 
 Hole.prototype.scoreType = function() {
-  var diff = this.Strokes - this.Par;
+  const diff = this.Strokes - this.Par;
   if (isNaN(diff)) {
     return null;
   }

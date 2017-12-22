@@ -1,8 +1,8 @@
 'use strict';
 
-var ordinal = require('../../lib/ordinal');
+const ordinal = require('../../lib/ordinal');
 
-var Instance = function(instance) {
+const Instance = function(instance) {
   this.State = instance.State;
   this.Inning = instance.Inning;
   this.TopInning = instance.TopInning;
@@ -11,7 +11,7 @@ var Instance = function(instance) {
 };
 
 Instance.parse = function(raw) {
-  var instObj = {
+  const instObj = {
     State: raw.status.status,
     HomeScore: 0,
     AwayScore: 0,
@@ -40,16 +40,16 @@ Instance.prototype.scoreChanged = function(prevInstance) {
 };
 
 Instance.prototype.inningString = function() {
-  var topOrBottom = this.TopInning ? 'Top' : 'Bottom';
+  const topOrBottom = this.TopInning ? 'Top' : 'Bottom';
   return topOrBottom + ' ' + ordinal(this.Inning) + ' inning.';
 };
 
 Instance.prototype.changeString = function(prevInstance, game) {
-  var str = '';
-  var scores = game.AwayTeam.Name + ' ' + this.AwayScore + ', ' +
+  let str = '';
+  const scores = game.AwayTeam.Name + ' ' + this.AwayScore + ', ' +
     game.HomeTeam.Name + ' ' + this.HomeScore + '. ';
 
-  var leadString = ' take the lead. ';
+  let leadString = ' take the lead. ';
   if (this.Inning > prevInstance.Inning) {
     leadString = ' lead. ';
   }

@@ -1,27 +1,27 @@
 'use strict';
 
-var runner = require('./runner');
-var PGA = require('./leagues/pga');
-var NHL = require('./leagues/nhl');
-var MLB = require('./leagues/mlb');
-var NFL = require('./leagues/nfl');
+const runner = require('./runner');
+const PGA = require('./leagues/pga');
+const NHL = require('./leagues/nhl');
+const MLB = require('./leagues/mlb');
+const NFL = require('./leagues/nfl');
 const api = require('./api');
 
 module.exports = {
   pga: function(event, context) {
-    var league = runner(PGA);
+    const league = runner(PGA);
     league.web(context.done);
   },
   nhl: function(event, context) {
-    var league = runner(NHL);
+    const league = runner(NHL);
     league.web(context.done);
   },
   mlb: function(event, context) {
-    var league = runner(MLB);
+    const league = runner(MLB);
     league.web(context.done);
   },
   nfl: function(event, context) {
-    var league = runner(NFL);
+    const league = runner(NFL);
     league.web(context.done);
   },
   getFinalScore: function(event, context) {

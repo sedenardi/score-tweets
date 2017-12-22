@@ -1,14 +1,14 @@
 'use strict';
 
-var Team = require('./Team');
-var Instance = require('./Instance');
-var _ = require('lodash');
+const Team = require('./Team');
+const Instance = require('./Instance');
+const _ = require('lodash');
 
-var Game = function(game) {
+const Game = function(game) {
   this.GameSymbol = game.GameSymbol;
   this.HomeTeam = new Team(game.HomeTeam);
   this.AwayTeam = new Team(game.AwayTeam);
-  this.Instances = _.map(game.Instances, function(i) { return new Instance(i); });
+  this.Instances = _.map(game.Instances, (i) => { return new Instance(i); });
 };
 
 Game.parse = function(raw) {
@@ -21,7 +21,7 @@ Game.parse = function(raw) {
 };
 
 Game.prototype.scoreChange = function(prevGame) {
-  var changed = this.Instances[0].scoreChanged(prevGame.Instances[0]);
+  const changed = this.Instances[0].scoreChanged(prevGame.Instances[0]);
   if (changed) {
     return new Game({
       GameSymbol: this.GameSymbol,

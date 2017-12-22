@@ -1,16 +1,16 @@
 'use strict';
 
-var Hole = require('./Hole');
-var _ = require('lodash');
-var ordinal = require('../../lib/ordinal');
+const Hole = require('./Hole');
+const _ = require('lodash');
+const ordinal = require('../../lib/ordinal');
 
-var Player = function(player) {
+const Player = function(player) {
   this.First = player.First;
   this.Last = player.Last;
   this.RoundTotal = player.RoundTotal;
   this.EventTotal = player.EventTotal;
   this.Position = player.Position;
-  this.Holes = _.map(player.Holes, function(h) { return new Hole(h); });
+  this.Holes = _.map(player.Holes, (h) => { return new Hole(h); });
 };
 
 Player.parse = function(raw) {
@@ -20,7 +20,7 @@ Player.parse = function(raw) {
     RoundTotal: raw.today,
     EventTotal: raw.total,
     Position: raw.current_position,
-    Holes: _.map(raw.holes, function(h) { return Hole.parse(h); })
+    Holes: _.map(raw.holes, (h) => { return Hole.parse(h); })
   });
 };
 
@@ -42,15 +42,15 @@ Player.prototype.getHole = function(hole) {
 };
 
 Player.prototype.getLatestHoleFinished = function() {
-  var finished = _.filter(this.Holes, function(h) { return h.isFinished(); });
+  const finished = _.filter(this.Holes, (h) => { return h.isFinished(); });
   return _.maxBy(finished, 'Hole');
 };
 
 Player.prototype.scoreChange = function(otherPlayer) {
-  var latestHole = this.getLatestHoleFinished();
+  const latestHole = this.getLatestHoleFinished();
   if (latestHole) {
-    var otherHole = otherPlayer.getHole(latestHole.Hole);
-    var changed = latestHole.scoreChanged(otherHole);
+    const otherHole = otherPlayer.getHole(latestHole.Hole);
+    const changed = latestHole.scoreChanged(otherHole);
     if (changed) {
       return new Player({
         First: this.First,
@@ -87,7 +87,7 @@ Player.prototype.changeString = function() {
   if (this.Holes.length !== 2) {
     return null;
   }
-  var score = this.Holes[1].scoreType();
+  const score = this.Holes[1].scoreType();
   if (!score) {
     return null;
   }
