@@ -146,7 +146,11 @@ module.exports = function(league, testObj) {
       }).catch((err) => {
         console.log(err);
         return db.end().then(() => {
-          cb(err);
+          if (err === 'No games, skipping') {
+            cb(null, err);
+          } else {
+            cb(err);
+          }
         });
       });
     },
