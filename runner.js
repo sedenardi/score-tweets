@@ -125,6 +125,9 @@ module.exports = function(league, testObj) {
           console.log('Bad data from ' + league.urls()[0]);
           return Promise.reject('Bad data from ' + league.urls()[0]);
         }
+        if (!nextObj.Games.lenght) {
+          return Promise.reject('No games, skipping');
+        }
         return getFromStore(db);
       }).then((oldObj) => {
         if (oldObj) {
@@ -142,7 +145,9 @@ module.exports = function(league, testObj) {
         cb(null, 'done');
       }).catch((err) => {
         console.log(err);
-        cb(err);
+        return db.end().then(() => {
+          cb(err);
+        });
       });
     },
     getChanges: function(cb, allTime) {
