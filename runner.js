@@ -125,7 +125,7 @@ module.exports = function(league, testObj) {
           console.log('Bad data from ' + league.urls()[0]);
           return Promise.reject('Bad data from ' + league.urls()[0]);
         }
-        if (!nextObj.Games.lenght) {
+        if (!nextObj.Games.length) {
           return Promise.reject('No games, skipping');
         }
         return getFromStore(db);
