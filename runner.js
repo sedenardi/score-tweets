@@ -84,6 +84,10 @@ module.exports = function(league, testObj) {
     if (testObj && testObj.noSave) {
       return Promise.resolve();
     }
+    if (!newObj.Games.length) {
+      console.log('No games, not saving');
+      return Promise.resolve();
+    }
     let closeDB = false;
     if (!db) {
       db = require('./lib/db')();
@@ -98,6 +102,15 @@ module.exports = function(league, testObj) {
     ]).then(() => {
       console.log('New Item Saved');
       return final(closeDB, db, null);
+    });
+  };
+
+  const cleanup = (db) => {
+    const threshold = moment().subtract(2, 'weeks').unix();
+    const sql = 'delete from score_tweet.Leagues where League = ? and CreatedOn < ?';
+    return db.query(sql, [league.leagueName, threshold]).then((res) => {
+      console.log(`${res.affectedRows} rows cleaned up.`);
+      return Promise.resolve();
     });
   };
 
@@ -121,6 +134,8 @@ module.exports = function(league, testObj) {
         }
       }).then(() => {
         return saveScores(db, nextObj);
+      }).then(() => {
+        return cleanup(db);
       }).then(() => {
         return db.end();
       }).then(() => {
