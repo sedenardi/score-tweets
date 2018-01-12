@@ -106,6 +106,8 @@ module.exports = function(league, testObj) {
   };
 
   const cleanup = (db) => {
+    if (moment().minute() !== 0) { return Promise.resolve(); }
+
     const threshold = moment().subtract(2, 'weeks').unix();
     const sql = 'delete from score_tweet.Leagues where League = ? and CreatedOn < ?';
     return db.query(sql, [league.leagueName, threshold]).then((res) => {
