@@ -2,6 +2,13 @@
 
 module.exports = function(league, testObj) {
 
+  const ENABLE_LOGGING = false;
+  const log = (msg) => {
+    if (ENABLE_LOGGING) {
+      console.log(msg);
+    }
+  };
+
   const config = require('./config');
   const twitter = require('./lib/twitter')(config, league.leagueName);
   const request = require('./lib/request');
@@ -9,6 +16,7 @@ module.exports = function(league, testObj) {
   const moment = require('moment');
 
   const fetchNextFromWeb = function() {
+    log('Fetching scores from league');
     return league.urls().then((urls) => {
       const requests = urls.map((url) => {
         return request.get(url);
@@ -35,11 +43,8 @@ module.exports = function(league, testObj) {
     const sql = `
     select * from score_tweet.Leagues t1
     where League = ?
-    and not exists (
-      select 1 from score_tweet.Leagues t2
-      where t2.League = t1.League
-      and t2.id > t1.id
-    );`;
+    order by id desc limit 1;`;
+    log('Fetching scores from database');
     return db.query(sql, [league.leagueName]).then((res) => {
       if (!res[0]) { return final(closeDB, db, null); }
 
