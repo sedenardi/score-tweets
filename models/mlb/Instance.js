@@ -55,7 +55,7 @@ Instance.prototype.changeString = function(prevInstance, game) {
   }
 
   if (this.State === 'In Progress' &&
-    this.Inning === 1 && this.TopInning === 1 &&
+    this.Inning === 1 && this.TopInning &&
     this.AwayScore === 0 && this.HomeScore === 0) {
     str = 'Start of game: ' + game.AwayTeam.Name + ' vs ' + game.HomeTeam.Name;
   } else if ((this.State === 'Game Over' || this.State === 'Final') &&
