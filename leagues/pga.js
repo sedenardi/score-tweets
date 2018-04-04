@@ -7,15 +7,19 @@ const request = require('../lib/request');
 module.exports = {
   leagueName: 'PGA',
   urls: function()  {
-    return request.get('http://www.pgatour.com/data/r/current/schedule.json').then((res) => {
+    return request.get('https://statdata.pgatour.com/r/current/schedule-v2.json').then((res) => {
       const schedule = JSON.parse(res);
-      const now = moment();
-      const tour = _.find(schedule.tours, {desc: 'PGA TOUR'});
+      const weekNumber = schedule.thisWeek.weekNumber;
+      const year = _.find(schedule.years, { year: moment().year().toString() });
+      if (!year) {
+        return Promise.resolve([]);
+      }
+      const tour = _.find(year.tours, {desc: 'PGA TOUR'});
       if (!tour) {
         return Promise.resolve([]);
       }
       const current = _.find(tour.trns, (t) => {
-        return  now > moment(t.date.start) && now < moment(t.date.end).add(1, 'd') &&
+        return  t.date.weekNumber === weekNumber &&
                 t.FedExCup === 'Yes' &&
                 t.primaryEvent === 'Y';
       });
