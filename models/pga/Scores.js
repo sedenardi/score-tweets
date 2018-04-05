@@ -72,11 +72,6 @@ Scores.prototype.getChanges = function(prev, league) {
 Scores.prototype.getPlayers = function(names) {
   const scores = _.chain(this.Players)
     .filter((p) => {
-      if (p.Last === 'Moore') {
-        console.log(p);
-        console.log(p.isFinished());
-        console.log(names);
-      }
       return p.isFinished() && _.some(names, (n) => { return p.nameEquals(n); });
     })
     .map((p) => {
