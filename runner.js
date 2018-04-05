@@ -89,7 +89,7 @@ module.exports = function(league, testObj) {
     if (testObj && testObj.noSave) {
       return Promise.resolve();
     }
-    if (!newObj.Games.length) {
+    if (!newObj.getScores().length) {
       console.log('No games, not saving');
       return Promise.resolve();
     }
@@ -132,7 +132,7 @@ module.exports = function(league, testObj) {
           console.log('Bad data from ' + league.urls()[0]);
           return Promise.reject('Bad data from ' + league.urls()[0]);
         }
-        if (!nextObj.Games.length) {
+        if (!nextObj.getScores().length) {
           return Promise.reject('No games, skipping');
         }
         return getFromStore(db);
