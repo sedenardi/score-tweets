@@ -10,7 +10,8 @@ module.exports = {
     return request.get('https://statdata.pgatour.com/r/current/schedule-v2.json').then((res) => {
       const schedule = JSON.parse(res);
       const weekNumber = schedule.thisWeek.weekNumber;
-      const year = _.find(schedule.years, { year: moment().year().toString() });
+      const yString = moment().year().toString();
+      const year = _.find(schedule.years, { year: yString });
       if (!year) {
         return Promise.resolve([]);
       }
@@ -26,7 +27,7 @@ module.exports = {
       if (!current) {
         return Promise.resolve([]);
       }
-      const url = `http://www.pgatour.com/data/r/${current.permNum}/leaderboard-v2.json`;
+      const url = `https://statdata.pgatour.com/r/${current.permNum}/${yString}/leaderboard-v2.json`;
       return Promise.resolve([url]);
     });
   },
