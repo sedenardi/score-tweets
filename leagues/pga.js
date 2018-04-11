@@ -9,7 +9,7 @@ module.exports = {
   urls: function()  {
     return request.get('https://statdata.pgatour.com/r/current/schedule-v2.json').then((res) => {
       const schedule = JSON.parse(res);
-      const weekNumber = schedule.thisWeek.weekNumber;
+      const weekNumber = moment().week().toString();
       const yString = moment().year().toString();
       const year = _.find(schedule.years, { year: yString });
       if (!year) {
@@ -20,7 +20,7 @@ module.exports = {
         return Promise.resolve([]);
       }
       const current = _.find(tour.trns, (t) => {
-        return  t.date.weekNumber === weekNumber &&
+        return  t.date.weekNumber === weekNumber.toString() &&
                 t.FedExCup === 'Yes' &&
                 t.primaryEvent === 'Y';
       });
